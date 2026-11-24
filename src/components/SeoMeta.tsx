@@ -16,6 +16,17 @@ export function getProductionBaseUrl(): string {
   if (envUrl && typeof envUrl === 'string' && envUrl.startsWith('http')) {
     return envUrl.replace(/\/+$/, '');
   }
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const origin = window.location.origin.replace(/\/+$/, '');
+    if (
+      origin.startsWith('http') &&
+      !origin.includes('localhost') &&
+      !origin.includes('127.0.0.1') &&
+      !origin.includes('ais-dev-')
+    ) {
+      return origin;
+    }
+  }
   return VERIFIED_PRODUCTION_DOMAIN;
 }
 
