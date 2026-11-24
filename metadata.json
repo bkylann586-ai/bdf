@@ -1,0 +1,6 @@
+{
+  "name": "PDFQuick",
+  "description": "Free, private online PDF tools. Merge, split, compress, convert images to PDF, and convert PDF to images directly in your browser without uploading files.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,177 @@
+import React, { useEffect } from 'react';
+import { ShieldCheck, BookOpen, Cpu, HelpCircle } from 'lucide-react';
+import { FinancialFormFillerTool } from '../components/tools/FinancialFormFillerTool';
+import { Breadcrumbs } from '../components/Breadcrumbs';
+import { AdPlaceholder } from '../components/AdPlaceholder';
+import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import { Link } from '../components/Link';
+import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
+import { useTranslation } from '../lib/i18n';
+
+const FORM_FILLER_FAQS: FaqSchemaItem[] = [
+  {
+    question: 'Are the 5 Financial Form Filler templates official bank or government forms?',
+    answer: 'No. Personal Financial Information, Income and Expense Statement, Monthly Budget, Business Financial Information, and Beneficiary Information are personal preparation helper worksheets only—never official forms issued by any bank, mortgage lender, or government agency.',
+  },
+  {
+    question: 'Do any numbers or personal details I enter leave my browser?',
+    answer: 'Never. Entered values remain strictly inside volatile React state in browser RAM, are never written to localStorage or remote databases, and clear immediately when you reset or close the tab.',
+  },
+  {
+    question: 'Which paper sizes and currency formats are supported?',
+    answer: 'You can export clean print-ready PDFs formatted for US Letter (8.5 x 11 inches) or international ISO A4 (210 x 297 mm), with USD totals automatically calculated across assets, liabilities, cash flow, budgets, and beneficiary splits.',
+  },
+  {
+    question: 'Can I preview and edit my filled worksheet before downloading the PDF?',
+    answer: 'Yes. You see live layout updates while typing, can generate a rendered pixel preview of every output PDF page inside the browser, keep editing any field, or print directly.',
+  },
+  {
+    question: 'Why are SSNs, card numbers, and bank passwords excluded?',
+    answer: 'PDFQuick follows strict financial data minimization: templates intentionally exclude SSNs, PINs, card numbers, and bank logins and actively warn if SSN or payment-card patterns are entered.',
+  },
+];
+
+export const FinancialFormFillerPage: React.FC = () => {
+  const { t } = useTranslation();
+  const baseUrl = getProductionBaseUrl();
+  const canonicalUrl = `${baseUrl}/banking/financial-pdf-form-filler`;
+
+  useEffect(() => {
+    return injectFaqSchema(FORM_FILLER_FAQS, {
+      toolId: 'financial-pdf-form-filler',
+      pageUrl: canonicalUrl,
+    });
+  }, [canonicalUrl]);
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Financial PDF Form Filler – PDFQuick',
+    url: canonicalUrl,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'All web browsers',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description:
+      'Create and fill 5 structured USD financial helper worksheets (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) locally in browser memory and export print-ready US Letter or A4 PDFs.',
+  };
+
+  return (
+    <div className="flex-1 bg-slate-50/60 pb-16">
+      <SeoMeta
+        title="Financial PDF Form Filler – US Letter & A4 USD Worksheets | PDFQuick"
+        description="Fill Personal Financial Information, Income & Expense Statement, Monthly Budget, Business Financial, and Beneficiary helper PDFs privately in your browser. Supports US Letter, A4, and USD calculations."
+        path="/banking/financial-pdf-form-filler"
+        schema={schema}
+      />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <Breadcrumbs
+          items={[
+            { label: 'Banking & Finance', href: '/banking-finance' },
+            { label: 'Financial PDF Form Filler' },
+          ]}
+        />
+
+        <div className="text-center py-6 sm:py-8 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200/70 rounded-md text-xs font-medium mb-3">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{t('header.privacyBadge')}</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            {t('banking.formFillerTitle')}
+          </h1>
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
+            Prepare print-ready US Letter or ISO A4 helper financial worksheets in USD directly inside your browser—with live summary math, visual PDF page preview, and zero server storage.
+          </p>
+        </div>
+
+        {/* Interactive Form Filler Tool Container */}
+        <div className="mb-12">
+          <FinancialFormFillerTool />
+        </div>
+
+        {/* How To Use */}
+        <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <BookOpen className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+              How to Prepare &amp; Export Financial Helper PDFs
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600 leading-relaxed">
+            <div>
+              <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold font-mono mb-3">
+                1
+              </span>
+              <h3 className="text-sm font-semibold text-slate-900 mb-1">Select Worksheet &amp; Paper Size</h3>
+              <p>Pick one of the 5 structured USD templates and select US Letter (8.5 × 11 in) or ISO A4 print framing.</p>
+            </div>
+            <div>
+              <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold font-mono mb-3">
+                2
+              </span>
+              <h3 className="text-sm font-semibold text-slate-900 mb-1">Fill &amp; Verify Computed Totals</h3>
+              <p>Enter dollar figures, dates, and text while viewing real-time USD net worth, cash flow, or allocation totals.</p>
+            </div>
+            <div>
+              <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold font-mono mb-3">
+                3
+              </span>
+              <h3 className="text-sm font-semibold text-slate-900 mb-1">Preview &amp; Export Clean PDF</h3>
+              <p>Generate and inspect the actual rendered PDF pages right in your browser, tweak any value, then download or print.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Ad Buffer (>= 40px vertical & horizontal clearance) */}
+        <div className="max-w-4xl mx-auto my-10 py-2 px-2 sm:px-10">
+          <AdPlaceholder />
+        </div>
+
+        {/* Technical Details */}
+        <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Cpu className="w-5 h-5 text-slate-700" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+              In-Browser PDF Synthesis &amp; Data Boundaries
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600 leading-relaxed">
+            <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-lg">
+              <h3 className="font-bold text-slate-900 mb-1">Native Vector PDF Typography (English &amp; Arabic)</h3>
+              <p>Pages are synthesized natively with pdf-lib and embedded Noto Sans + Noto Sans Arabic TTF fonts, supporting crisp RTL Arabic shaping, English text, and USD amounts across Mac, Windows, and mobile readers.</p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-lg">
+              <h3 className="font-bold text-slate-900 mb-1">Volatile Memory Guarantee</h3>
+              <p>Zero form inputs are persisted to localStorage, IndexedDB, cookies, or analytics logs. Resetting or closing the tab clears everything immediately.</p>
+            </div>
+          </div>
+          <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs font-semibold">
+            <Link to="/merge-pdf" className="text-blue-600 hover:underline">
+              Combine Worksheet with Bank Statements (Merge PDF) →
+            </Link>
+            <Link to="/banking/financial-document-privacy" className="text-blue-600 hover:underline">
+              Redact &amp; Scrub PDFs Before Sending →
+            </Link>
+          </div>
+        </section>
+
+        {/* FAQs */}
+        <section id="faqs" className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-4">
+            {FORM_FILLER_FAQS.map((faq, idx) => (
+              <div key={idx} className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">{faq.question}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};

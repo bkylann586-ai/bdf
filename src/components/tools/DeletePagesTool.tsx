@@ -1,0 +1,302 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { FileText, FileMinus, AlertCircle } from 'lucide-react';
+import { ProcessingFile, ProcessingResult } from '../../types';
+import { DropZone } from '../DropZone';
+import { ProcessingProgress } from '../ProcessingProgress';
+import { SuccessDownload } from '../SuccessDownload';
+import { deletePagesFromPdf } from '../../lib/deletePagesPdf';
+import { formatBytes, getPdfPageCount, parsePageRange } from '../../lib/pdfUtils';
+import { validateSelectedFiles } from '../../lib/fileValidation';
+import { createSamplePdf } from '../../lib/sampleFiles';
+import { useTranslation } from '../../lib/i18n';
+import { useGlobalDrop } from '../../lib/globalDrop';
+import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from '../../lib/analytics';
+
+export const DeletePagesTool: React.FC = () => {
+  const { t } = useTranslation();
+  const { registerDropHandler } = useGlobalDrop();
+  const [file, setFile] = useState<ProcessingFile | null>(null);
+  const [pageRange, setPageRange] = useState('1');
+  const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [result, setResult] = useState<ProcessingResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const statusRef = useRef(status);
+
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+
+  const handleFileSelected = async (files: File[]) => {
+    if (statusRef.current === 'processing' || statusRef.current === 'success') return;
+    if (files.length === 0) return;
+    setErrorMessage(null);
+
+    const validation = validateSelectedFiles(files, {
+      accept: 'application/pdf,.pdf',
+      multiple: false,
+    });
+
+    const errorParts: string[] = [];
+    if (validation.errorMessage) {
+      errorParts.push(validation.errorMessage);
+    }
+    if (validation.validFiles.length === 0) {
+      if (errorParts.length > 0) setErrorMessage(errorParts.join(' '));
+      return;
+    }
+
+    const selected = validation.validFiles[0];
+    const id = `${selected.name}-${Date.now()}`;
+
+    let pageCount = 1;
+    try {
+      pageCount = await getPdfPageCount(selected);
+    } catch (e: any) {
+      errorParts.push(`${e?.message || 'Failed to read PDF.'}`);
+      setErrorMessage(errorParts.join(' '));
+      return;
+    }
+
+    if (errorParts.length > 0) {
+      setErrorMessage(errorParts.join(' '));
+    }
+
+    setStatus('idle');
+    setResult(null);
+    setFile({
+      id,
+      file: selected,
+      name: selected.name,
+      size: selected.size,
+      type: selected.type,
+      pageCount,
+    });
+    setPageRange(pageCount > 1 ? String(pageCount) : '1');
+  };
+
+  useEffect(() => {
+    const canAcceptDrop = status === 'idle' || status === 'error';
+    return registerDropHandler(
+      (dropped) => {
+        handleFileSelected(dropped);
+      },
+      t('tool.deletePages.title'),
+      canAcceptDrop
+    );
+  }, [registerDropHandler, t, status]);
+
+  const handleLoadSample = async () => {
+    setErrorMessage(null);
+    trackSampleUse('delete-pdf-pages');
+    try {
+      const sample = await createSamplePdf('Quarterly Report Draft', 5);
+      await handleFileSelected([sample]);
+    } catch (err: any) {
+      setErrorMessage(`Could not create sample PDF: ${err.message}`);
+    }
+  };
+
+  // Live preview of how many pages will be removed / kept
+  let previewRemoveCount = 0;
+  let previewError = '';
+  if (file?.pageCount && pageRange.trim()) {
+    try {
+      const indices = parsePageRange(pageRange, file.pageCount);
+      previewRemoveCount = new Set(indices).size;
+      if (previewRemoveCount >= file.pageCount) {
+        previewError = 'At least 1 page must remain in the final PDF.';
+      }
+    } catch (err: any) {
+      previewError = err.message;
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!file) return;
+    setErrorMessage(null);
+    setStatus('processing');
+    setProgress({ current: 0, total: 3, message: t('progress.processing') });
+    trackToolStart('delete-pdf-pages');
+    const startTime = Date.now();
+
+    try {
+      const deleteRes = await deletePagesFromPdf(
+        file,
+        { pageRange },
+        (curr, tot, msg) => {
+          setProgress({ current: curr, total: tot, message: msg });
+        }
+      );
+      setResult(deleteRes);
+      setStatus('success');
+      trackToolSuccess('delete-pdf-pages', {
+        durationMs: Date.now() - startTime,
+        pageCount: deleteRes.pageCount,
+      });
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err.message || 'Failed to delete pages.');
+      trackToolError('delete-pdf-pages', err.name || 'DeletePagesError');
+    }
+  };
+
+  const handleReset = () => {
+    setStatus('idle');
+    setResult(null);
+    setFile(null);
+    setErrorMessage(null);
+  };
+
+  if (status === 'success' && result) {
+    return (
+      <SuccessDownload
+        result={result}
+        onReset={handleReset}
+        title={t('tool.deletePages.successTitle')}
+        relatedToolPath="/compress-pdf"
+        relatedToolName="Compress PDF"
+      />
+    );
+  }
+
+  if (status === 'processing') {
+    return (
+      <ProcessingProgress
+        current={progress.current}
+        total={progress.total}
+        message={progress.message}
+        operationTitle={t('tool.deletePages.title')}
+      />
+    );
+  }
+
+  const totalPages = file?.pageCount || 1;
+  const remainingCount = Math.max(0, totalPages - previewRemoveCount);
+
+  return (
+    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+      {!file ? (
+        <div className="space-y-3">
+          <DropZone
+            accept="application/pdf,.pdf"
+            multiple={false}
+            delegateValidation={true}
+            onFilesSelected={handleFileSelected}
+            onSampleRequested={handleLoadSample}
+            sampleLabel="Load a 5-page sample PDF to remove pages"
+            helperText="Select 1 PDF file (up to 250 MB) to strip blank, duplicate, or unwanted pages."
+          />
+          {errorMessage && (
+            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* File Overview */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
+                <p className="text-xs text-slate-500 font-mono tabular-nums">
+                  {formatBytes(file.size)} · {totalPages} {totalPages === 1 ? 'page' : 'pages'} total
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
+            >
+              Choose different file
+            </button>
+          </div>
+
+          {totalPages === 1 ? (
+            <div role="alert" className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+              This document only contains 1 page. At least 1 page must remain in a valid PDF, so no pages can be deleted.
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+              <div>
+                <label htmlFor="deleteRangeInput" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Pages or Ranges to Delete (1–{totalPages})
+                </label>
+                <input
+                  id="deleteRangeInput"
+                  type="text"
+                  value={pageRange}
+                  onChange={(e) => setPageRange(e.target.value)}
+                  className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                  placeholder="e.g. 1, 3-4"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
+                <span>Quick select:</span>
+                <button
+                  type="button"
+                  onClick={() => setPageRange('1')}
+                  className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                >
+                  Cover Page (1)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPageRange(String(totalPages))}
+                  className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                >
+                  Last Page ({totalPages})
+                </button>
+                {totalPages >= 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setPageRange(`2-${totalPages - 1}`)}
+                    className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                  >
+                    Middle Pages (2–{totalPages - 1})
+                  </button>
+                )}
+              </div>
+
+              {!previewError && previewRemoveCount > 0 && (
+                <p className="text-xs text-slate-700 font-medium">
+                  Preview: Removing <span className="font-mono font-bold text-red-600">{previewRemoveCount}</span> page(s) ·{' '}
+                  <span className="font-mono font-bold text-emerald-700">{remainingCount}</span> page(s) will be kept.
+                </p>
+              )}
+              {previewError && (
+                <p className="text-xs text-red-600">{previewError}</p>
+              )}
+            </div>
+          )}
+
+          {errorMessage && (
+            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end pt-2">
+            <button
+              type="button"
+              disabled={totalPages === 1}
+              onClick={handleDelete}
+              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed rounded-lg shadow-sm transition-colors whitespace-nowrap"
+            >
+              <FileMinus className="w-4 h-4" />
+              <span>{t('tool.deletePages.button')}</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
