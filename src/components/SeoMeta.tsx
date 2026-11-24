@@ -9,7 +9,7 @@ interface SeoMetaProps {
   noindex?: boolean;
 }
 
-export const VERIFIED_PRODUCTION_DOMAIN = 'https://ais-pre-2e4cswqli4ogjyk4wkg2qg-52008683268.europe-west2.run.app';
+export const VERIFIED_PRODUCTION_DOMAIN = 'https://bdf-mufv.vercel.app';
 
 export function getProductionBaseUrl(): string {
   const envUrl = (import.meta as any).env?.VITE_APP_URL || (import.meta as any).env?.APP_URL;
