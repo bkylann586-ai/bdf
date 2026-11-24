@@ -59,6 +59,15 @@ export interface ProcessingResult {
   message?: string;
 }
 
+export interface BatchProgressItem {
+  id: string;
+  name: string;
+  size?: number;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  progress?: number; // 0-100
+  detail?: string;
+}
+
 export type SplitMode = 'range' | 'all' | 'chunk';
 
 export interface SplitOptions {

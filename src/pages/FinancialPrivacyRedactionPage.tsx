@@ -3,7 +3,11 @@ import { ShieldCheck, BookOpen, Cpu, HelpCircle } from 'lucide-react';
 import { FinancialPrivacyRedactionTool } from '../components/tools/FinancialPrivacyRedactionTool';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 import { useTranslation } from '../lib/i18n';
@@ -45,14 +49,52 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
 
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'Financial Document Privacy & Redaction – PDFQuick',
-    url: canonicalUrl,
-    applicationCategory: 'SecurityApplication',
-    operatingSystem: 'All web browsers',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    description:
-      'True client-side PDF redaction and Metadata/XMP scrubbing. Visually preview pages, destructively remove sensitive areas without leaving selectable text underneath, and inspect Before vs After results.',
+    '@graph': [
+      {
+        '@type': 'WebApplication',
+        '@id': `${canonicalUrl}#webapp`,
+        name: 'Financial Document Privacy & Redaction – PDFQuick',
+        url: canonicalUrl,
+        applicationCategory: 'SecurityApplication',
+        operatingSystem: 'All web browsers',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        description:
+          'True client-side PDF redaction and Metadata/XMP scrubbing. Visually preview pages, destructively remove sensitive areas without leaving selectable text underneath, and inspect Before vs After results.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+          { name: 'Financial Document Privacy & Redaction', path: '/banking/financial-document-privacy' },
+        ],
+        baseUrl
+      ),
+      {
+        '@type': 'HowTo',
+        '@id': `${canonicalUrl}#howto`,
+        name: 'How True PDF Redaction & Metadata Scrubbing Work',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: 'Inspect & Mark Regions',
+            text: 'Review detected Info/XMP metadata, navigate pages, and drag rectangles over sensitive numbers or auto-locate text matches.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: 'Destructive Rebuild',
+            text: 'Marked pages are rendered, pixels under blackout boxes are permanently cleared, and a fresh PDF catalog without XMP/Info/Annots is rebuilt.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: 'Verify Before & After',
+            text: 'Inspect side-by-side Before/After previews and automated verification confirming zero extractable text remains on redacted pages.',
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -62,6 +104,7 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
         description="Permanently redact sensitive areas on bank statements and scrub Author, Title, Creator, Annotations, and XMP Metadata strictly in your browser—no black-box text tricks."
         path="/banking/financial-document-privacy"
         schema={schema}
+        faqs={PRIVACY_REDACTION_FAQS}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

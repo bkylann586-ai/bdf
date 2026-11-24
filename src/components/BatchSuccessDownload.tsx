@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import { ProcessingResult } from '../types';
 import { BatchItemOutcome, BatchPdfZipSummary } from '../lib/batchProcessing';
-import { downloadBlob, formatBytes } from '../lib/pdfUtils';
+import { downloadBlob, formatBytes } from '../lib/fileHelpers';
 import { Link } from './Link';
+import { PerformanceMonitor } from './PerformanceMonitor';
 
 interface BatchSuccessDownloadProps {
   title: string;
@@ -100,6 +101,14 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Client-Side Performance Summary */}
+      <PerformanceMonitor
+        variant="summary"
+        inputBytes={totalOrig > 0 ? totalOrig : items.reduce((s, it) => s + it.fileItem.size, 0)}
+        outputBytes={totalProc > 0 ? totalProc : zipSummary?.zipBlob.size}
+        className="mt-5"
+      />
 
       {/* Per-file results breakdown */}
       <div className="mt-5 divide-y divide-slate-200 border border-slate-200 rounded-lg overflow-hidden">

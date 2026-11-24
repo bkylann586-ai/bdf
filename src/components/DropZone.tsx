@@ -55,7 +55,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
     };
   }, []);
 
-  const processFiles = (incomingFiles: File[]) => {
+  const processFiles = async (incomingFiles: File[]) => {
     setErrorMessage(null);
     if (!incomingFiles || incomingFiles.length === 0) return;
 
@@ -64,7 +64,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
       return;
     }
 
-    const result = validateSelectedFiles(incomingFiles, {
+    const result = await validateSelectedFiles(incomingFiles, {
       accept,
       multiple,
       existingTotalBytes,

@@ -19,6 +19,7 @@ import {
   openUnencryptedPdfJsDocument,
   parsePageRange,
   readFileAsArrayBuffer,
+  releaseCanvasMemory,
   renderPdfPageToCanvas,
 } from './pdfUtils';
 
@@ -280,16 +281,29 @@ export async function runPdfOcr(
           const tesseractModule = await import('tesseract.js');
           throwIfAborted(signal);
 
-          const workerUrl =
-            typeof window !== 'undefined'
-              ? new URL('/tesseract/worker.min.js', window.location.origin).href
-              : undefined;
+          if (typeof window === 'undefined' || !window.location?.origin) {
+            throw new Error(
+              'Local browser OCR requires an active window origin to load self-hosted WebAssembly and traineddata assets.'
+            );
+          }
+
+          const baseOrigin = window.location.origin;
+          const workerPath = new URL('/tesseract/worker.min.js', baseOrigin).href;
+          const corePath = new URL('/tesseract', baseOrigin).href;
+          const langPath = new URL('/tesseract/tessdata', baseOrigin).href;
 
           worker = await tesseractModule.createWorker(
             options.language,
             tesseractModule.OEM.LSTM_ONLY,
             {
-              ...(workerUrl ? { workerPath: workerUrl, workerBlobURL: false } : {}),
+              workerPath,
+              workerBlobURL: false,
+              corePath,
+              langPath,
+              gzip: true,
+              errorHandler: (workerErr: any) => {
+                console.warn('Local OCR worker notice:', workerErr);
+              },
               logger: (m: any) => {
                 if (signal?.aborted) return;
                 if (m?.status === 'recognizing text' && typeof m.progress === 'number') {
@@ -308,7 +322,7 @@ export async function runPdfOcr(
                   onProgress?.(
                     Math.max(4, Math.round((activePageStatusIndex * 100 * 90) / totalProgressSteps)),
                     100,
-                    `Preparing "${options.language}" OCR dictionary (cached locally after first run)...`
+                    `Loading local "${options.language}" OCR dictionary (offline-capable after first load)...`
                   );
                 }
               },
@@ -344,8 +358,7 @@ export async function runPdfOcr(
           };
         } finally {
           // Immediately free raster buffer from device RAM
-          canvas.width = 0;
-          canvas.height = 0;
+          releaseCanvasMemory(canvas);
         }
       }
 

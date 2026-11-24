@@ -4,8 +4,14 @@ import { ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { PdfPreview } from '../PdfPreview';
 import { deletePagesFromPdf } from '../../lib/deletePagesPdf';
-import { formatBytes, getPdfPageCount, parsePageRange } from '../../lib/pdfUtils';
+import {
+  formatBytes,
+  getPdfPageCount,
+  parsePageRange,
+  togglePageInRangeString,
+} from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
@@ -17,6 +23,7 @@ export const DeletePagesTool: React.FC = () => {
   const { registerDropHandler } = useGlobalDrop();
   const [file, setFile] = useState<ProcessingFile | null>(null);
   const [pageRange, setPageRange] = useState('1');
+  const [previewViewTab, setPreviewViewTab] = useState<'all' | 'kept'>('all');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -32,7 +39,7 @@ export const DeletePagesTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });
@@ -100,10 +107,12 @@ export const DeletePagesTool: React.FC = () => {
   // Live preview of how many pages will be removed / kept
   let previewRemoveCount = 0;
   let previewError = '';
+  let markedDeletePages: number[] = [];
   if (file?.pageCount && pageRange.trim()) {
     try {
       const indices = parsePageRange(pageRange, file.pageCount);
-      previewRemoveCount = new Set(indices).size;
+      markedDeletePages = indices.map((idx) => idx + 1);
+      previewRemoveCount = markedDeletePages.length;
       if (previewRemoveCount >= file.pageCount) {
         previewError = 'At least 1 page must remain in the final PDF.';
       }
@@ -152,6 +161,7 @@ export const DeletePagesTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={file?.file}
         onReset={handleReset}
         title={t('tool.deletePages.successTitle')}
         relatedToolPath="/compress-pdf"
@@ -172,6 +182,10 @@ export const DeletePagesTool: React.FC = () => {
   }
 
   const totalPages = file?.pageCount || 1;
+  const markedDeleteSet = new Set(markedDeletePages);
+  const keptPages = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+    (p) => !markedDeleteSet.has(p)
+  );
   const remainingCount = Math.max(0, totalPages - previewRemoveCount);
 
   return (
@@ -276,6 +290,67 @@ export const DeletePagesTool: React.FC = () => {
               )}
             </div>
           )}
+
+          {/* Interactive Page Preview (Before & Resulting Pages Preview) */}
+          <PdfPreview
+            file={file.file}
+            title="Select & Preview Pages"
+            subtitle={
+              totalPages > 1
+                ? 'Click any page to mark/unmark for deletion before saving'
+                : '1 page total'
+            }
+            pageOrder={
+              previewViewTab === 'kept' && keptPages.length > 0 ? keptPages : undefined
+            }
+            markedPageNumbers={previewViewTab === 'all' ? markedDeletePages : []}
+            markVariant="delete"
+            markBadgeText="Delete"
+            unmarkedBadgeText={previewViewTab === 'all' ? 'Keep' : undefined}
+            onPageClick={
+              previewViewTab === 'all' && totalPages > 1
+                ? (pageNum) =>
+                    setPageRange((prev) =>
+                      togglePageInRangeString(prev, pageNum, totalPages, {
+                        minRemaining: 1,
+                      })
+                    )
+                : undefined
+            }
+            headerActions={
+              totalPages > 1 ? (
+                <div
+                  role="group"
+                  aria-label="Deletion preview filter"
+                  className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setPreviewViewTab('all')}
+                    className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                      previewViewTab === 'all'
+                        ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Before ({totalPages})
+                  </button>
+                  <button
+                    type="button"
+                    disabled={keptPages.length === 0}
+                    onClick={() => setPreviewViewTab('kept')}
+                    className={`px-2 py-1 rounded transition-colors whitespace-nowrap disabled:opacity-40 cursor-pointer ${
+                      previewViewTab === 'kept'
+                        ? 'bg-white text-emerald-700 shadow-xs font-semibold'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    After ({keptPages.length})
+                  </button>
+                </div>
+              ) : undefined
+            }
+          />
 
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">

@@ -1,15 +1,42 @@
 import React from 'react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { SeoMeta } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 
 export const TermsPage: React.FC = () => {
+  const baseUrl = getProductionBaseUrl();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/terms#webpage`,
+        name: 'Terms of Use – Legal Agreement | PDFQuick',
+        url: `${baseUrl}/terms`,
+        description:
+          'Terms of Use and service agreement for PDFQuick online PDF utilities. Plain terms governing usage of our client-side software tools.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Terms of Use', path: '/terms' },
+        ],
+        baseUrl
+      ),
+    ],
+  };
+
   return (
     <div className="flex-1 bg-white pb-16">
       <SeoMeta
         title="Terms of Use – Legal Agreement | PDFQuick"
         description="Terms of Use and service agreement for PDFQuick online PDF utilities. Plain terms governing usage of our client-side software tools."
         path="/terms"
+        schema={schema}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

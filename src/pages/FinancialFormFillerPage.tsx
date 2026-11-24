@@ -3,7 +3,11 @@ import { ShieldCheck, BookOpen, Cpu, HelpCircle } from 'lucide-react';
 import { FinancialFormFillerTool } from '../components/tools/FinancialFormFillerTool';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 import { useTranslation } from '../lib/i18n';
@@ -45,14 +49,52 @@ export const FinancialFormFillerPage: React.FC = () => {
 
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'Financial PDF Form Filler – PDFQuick',
-    url: canonicalUrl,
-    applicationCategory: 'FinanceApplication',
-    operatingSystem: 'All web browsers',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    description:
-      'Create and fill 5 structured USD financial helper worksheets (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) locally in browser memory and export print-ready US Letter or A4 PDFs.',
+    '@graph': [
+      {
+        '@type': 'WebApplication',
+        '@id': `${canonicalUrl}#webapp`,
+        name: 'Financial PDF Form Filler – PDFQuick',
+        url: canonicalUrl,
+        applicationCategory: 'FinanceApplication',
+        operatingSystem: 'All web browsers',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        description:
+          'Create and fill 5 structured USD financial helper worksheets (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) locally in browser memory and export print-ready US Letter or A4 PDFs.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+          { name: 'Financial PDF Form Filler', path: '/banking/financial-pdf-form-filler' },
+        ],
+        baseUrl
+      ),
+      {
+        '@type': 'HowTo',
+        '@id': `${canonicalUrl}#howto`,
+        name: 'How to Prepare & Export Financial Helper PDFs',
+        step: [
+          {
+            '@type': 'HowToStep',
+            position: 1,
+            name: 'Select Worksheet & Paper Size',
+            text: 'Pick one of the 5 structured USD templates and select US Letter (8.5 × 11 in) or ISO A4 print framing.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 2,
+            name: 'Fill & Verify Computed Totals',
+            text: 'Enter dollar figures, dates, and text while viewing real-time USD net worth, cash flow, or allocation totals.',
+          },
+          {
+            '@type': 'HowToStep',
+            position: 3,
+            name: 'Preview & Export Clean PDF',
+            text: 'Generate and inspect the actual rendered PDF pages right in your browser, tweak any value, then download or print.',
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -62,6 +104,7 @@ export const FinancialFormFillerPage: React.FC = () => {
         description="Fill Personal Financial Information, Income & Expense Statement, Monthly Budget, Business Financial, and Beneficiary helper PDFs privately in your browser. Supports US Letter, A4, and USD calculations."
         path="/banking/financial-pdf-form-filler"
         schema={schema}
+        faqs={FORM_FILLER_FAQS}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

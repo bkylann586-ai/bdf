@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Download, CheckCircle2, RotateCcw, FileText, ArrowRight, Info } from 'lucide-react';
 import { ProcessingResult } from '../types';
-import { formatBytes, downloadBlob } from '../lib/pdfUtils';
+import { formatBytes, downloadBlob } from '../lib/fileHelpers';
 import { Link } from './Link';
 import { useTranslation } from '../lib/i18n';
+import { PerformanceMonitor } from './PerformanceMonitor';
+
+const LazyPdfPreview = lazy(() =>
+  import('./PdfPreview').then((m) => ({ default: m.PdfPreview }))
+);
 
 interface SuccessDownloadProps {
   result: ProcessingResult;
@@ -11,6 +16,8 @@ interface SuccessDownloadProps {
   title?: string;
   relatedToolPath?: string;
   relatedToolName?: string;
+  originalFile?: File | Blob | null;
+  previewDefaultOpen?: boolean;
 }
 
 export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
@@ -19,6 +26,8 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
   title,
   relatedToolPath,
   relatedToolName,
+  originalFile,
+  previewDefaultOpen = true,
 }) => {
   const { t } = useTranslation();
 
@@ -42,7 +51,11 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
     ? Math.round(((result.fileSize - result.originalSize!) / result.originalSize!) * 100)
     : 0;
 
-  const isZip = result.downloadName.endsWith('.zip');
+  const isZip = result.downloadName.toLowerCase().endsWith('.zip');
+  const isPdfResult =
+    !isZip &&
+    (result.downloadName.toLowerCase().endsWith('.pdf') ||
+      result.blob.type === 'application/pdf');
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
@@ -139,6 +152,14 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
           )}
         </div>
 
+        {/* Client-Side Performance Summary */}
+        <PerformanceMonitor
+          variant="summary"
+          inputBytes={result.originalSize}
+          outputBytes={result.fileSize}
+          className="mb-6"
+        />
+
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
           <button
@@ -173,6 +194,29 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
           </div>
         )}
       </div>
+
+      {isPdfResult && (
+        <div className="max-w-3xl mx-auto mt-6">
+          <Suspense
+            fallback={
+              <div className="border border-slate-200 rounded-xl p-6 text-center text-xs text-slate-500 bg-slate-50">
+                Loading PDF preview...
+              </div>
+            }
+          >
+            <LazyPdfPreview
+              file={result.blob}
+              compareFile={originalFile ?? undefined}
+              title="Processed PDF Preview"
+              beforeLabel="Original (Before)"
+              afterLabel="Result (After)"
+              defaultViewMode="single"
+              collapsible={true}
+              defaultOpen={previewDefaultOpen}
+            />
+          </Suspense>
+        </div>
+      )}
     </div>
   );
 };

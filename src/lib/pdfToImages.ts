@@ -1,10 +1,12 @@
 import JSZip from 'jszip';
 import { ProcessingFile, PdfToImagesOptions } from '../types';
 import {
-  readFileAsArrayBuffer,
-  parsePageRange,
-  renderPdfPageToCanvas,
+  CanvasScaleClampInfo,
   openUnencryptedPdfJsDocument,
+  parsePageRange,
+  readFileAsArrayBuffer,
+  releaseCanvasMemory,
+  renderPdfPageToCanvas,
 } from './pdfUtils';
 
 export interface RenderedPageImage {
@@ -22,6 +24,7 @@ export interface PdfToImagesResult {
   zipFilename: string;
   totalRendered: number;
   format: 'png' | 'jpeg';
+  warnings?: string[];
 }
 
 export interface PdfToImagesProgressCallback {
@@ -29,7 +32,7 @@ export interface PdfToImagesProgressCallback {
 }
 
 /**
- * Render PDF pages into PNG or JPEG images with ZIP archive generation
+ * Render PDF pages into PNG or JPEG images with ZIP archive generation and canvas memory protection
  */
 export async function convertPdfToImages(
   fileItem: ProcessingFile,
@@ -61,6 +64,7 @@ export async function convertPdfToImages(
     const quality = isPng ? undefined : Math.min(1.0, Math.max(0.6, options.quality || 0.9));
 
     const renderedImages: RenderedPageImage[] = [];
+    const clampedPages: CanvasScaleClampInfo[] = [];
     const zip = new JSZip();
     const folder = zip.folder(`${baseName}_images`) || zip;
 
@@ -78,7 +82,12 @@ export async function convertPdfToImages(
         );
       }
 
-      const canvas = await renderPdfPageToCanvas(pdfJsDoc, pageNumber, options.scale);
+      const canvas = await renderPdfPageToCanvas(pdfJsDoc, pageNumber, options.scale, {
+        allowScaleClamp: true,
+        onScaleClamped: (info) => {
+          clampedPages.push(info);
+        },
+      });
       let width = 0;
       let height = 0;
       let blob: Blob;
@@ -97,8 +106,7 @@ export async function convertPdfToImages(
           );
         });
       } finally {
-        canvas.width = 0;
-        canvas.height = 0;
+        releaseCanvasMemory(canvas);
       }
 
       const padNumber = String(pageNumber).padStart(String(totalPages).length, '0');
@@ -126,12 +134,25 @@ export async function convertPdfToImages(
       compressionOptions: { level: 5 },
     });
 
+    const warnings: string[] = [];
+    if (clampedPages.length > 0) {
+      const pageList = clampedPages
+        .map((c) => `Page ${c.pageNumber} (${c.appliedScale.toFixed(2)}× -> ${c.appliedWidth}×${c.appliedHeight}px)`)
+        .slice(0, 4)
+        .join(', ');
+      const extraCount = clampedPages.length > 4 ? ` (+${clampedPages.length - 4} more)` : '';
+      warnings.push(
+        `Browser canvas memory protection clamped ${clampedPages.length} high-resolution page(s) below your requested ${options.scale}× scale to avoid memory exhaustion: ${pageList}${extraCount}.`
+      );
+    }
+
     return {
       images: renderedImages,
       zipBlob,
       zipFilename: `${baseName}-images.zip`,
       totalRendered: renderedImages.length,
       format: isPng ? 'png' : 'jpeg',
+      ...(warnings.length > 0 ? { warnings } : {}),
     };
   } finally {
     await cleanup();

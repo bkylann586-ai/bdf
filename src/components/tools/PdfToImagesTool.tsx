@@ -11,10 +11,16 @@ import {
   ChevronUp,
   RotateCcw,
 } from 'lucide-react';
-import { ProcessingFile, ImageFormatOption, PdfToImagesOptions } from '../../types';
+import {
+  BatchProgressItem,
+  ProcessingFile,
+  ImageFormatOption,
+  PdfToImagesOptions,
+} from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { BatchFileQueue } from '../BatchFileQueue';
+import { PerformanceMonitor } from '../PerformanceMonitor';
 import { convertPdfToImages, RenderedPageImage, PdfToImagesResult } from '../../lib/pdfToImages';
 import { formatBytes, downloadBlob } from '../../lib/pdfUtils';
 import { createSamplePdf } from '../../lib/sampleFiles';
@@ -24,8 +30,10 @@ import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from
 import {
   BatchImagesZipSummary,
   BatchItemOutcome,
+  createBatchProgressItems,
   packageBatchImagesToZip,
   runSequentialBatch,
+  updateBatchProgressItems,
   validateAndInspectPdfQueue,
 } from '../../lib/batchProcessing';
 
@@ -40,6 +48,8 @@ export const PdfToImagesTool: React.FC = () => {
 
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<PdfToImagesResult | null>(null);
   const [batchItems, setBatchItems] = useState<BatchItemOutcome<PdfToImagesResult>[] | null>(null);
   const [batchZip, setBatchZip] = useState<BatchImagesZipSummary | null>(null);
@@ -142,6 +152,8 @@ export const PdfToImagesTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
+    setBatchProgressItems(createBatchProgressItems(files));
+    setCurrentFileIndex(1);
     setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('pdf-to-images');
     const startTime = Date.now();
@@ -164,6 +176,12 @@ export const PdfToImagesTool: React.FC = () => {
           onProgress: (curr, tot, msg) => {
             setProgress({ current: curr, total: tot, message: msg });
           },
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
+          },
           signal: controller.signal,
         }
       );
@@ -184,24 +202,30 @@ export const PdfToImagesTool: React.FC = () => {
         return;
       }
 
-      revokeAllPreviewUrls();
-      const nextPreviewUrls: Record<string, string> = {};
       let totalRendered = 0;
-
       for (const item of summary.items) {
         if (item.status === 'success' && item.result) {
           totalRendered += item.result.totalRendered;
-          for (const img of item.result.images) {
-            const objectUrl = URL.createObjectURL(img.blob);
-            createdUrlsRef.current.add(objectUrl);
-            nextPreviewUrls[`${item.fileItem.id}:${img.pageNumber}`] = objectUrl;
-          }
         }
       }
 
-      setPreviewUrls(nextPreviewUrls);
+      const registerPreviewUrls = () => {
+        revokeAllPreviewUrls();
+        const nextUrls: Record<string, string> = {};
+        for (const item of summary.items) {
+          if (item.status === 'success' && item.result) {
+            for (const img of item.result.images) {
+              const objectUrl = URL.createObjectURL(img.blob);
+              createdUrlsRef.current.add(objectUrl);
+              nextUrls[`${item.fileItem.id}:${img.pageNumber}`] = objectUrl;
+            }
+          }
+        }
+        setPreviewUrls(nextUrls);
+      };
 
       if (files.length === 1 && summary.items[0]?.status === 'success' && summary.items[0].result) {
+        registerPreviewUrls();
         setResult(summary.items[0].result);
         setBatchItems(null);
         setBatchZip(null);
@@ -213,6 +237,7 @@ export const PdfToImagesTool: React.FC = () => {
           message: 'Packaging all rendered images into organized ZIP folders...',
         });
         const zipSummary = await packageBatchImagesToZip(summary.items, 'pdf-to-images-batch.zip');
+        registerPreviewUrls();
         const firstSuccess = summary.items.find((item) => item.status === 'success');
         setExpandedFileIds(firstSuccess ? { [firstSuccess.fileItem.id]: true } : {});
         setResult(null);
@@ -267,6 +292,10 @@ export const PdfToImagesTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.pdfToImages.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={files.length}
+        itemLabel="PDF"
         onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
@@ -306,6 +335,24 @@ export const PdfToImagesTool: React.FC = () => {
             </button>
           </div>
         </div>
+
+        <PerformanceMonitor
+          variant="summary"
+          inputBytes={files[0].size}
+          outputBytes={result.zipBlob.size}
+          className="mt-5"
+        />
+
+        {result.warnings && result.warnings.length > 0 && (
+          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              {result.warnings.map((w, i) => (
+                <p key={i}>{w}</p>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Rendered Images Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -397,6 +444,28 @@ export const PdfToImagesTool: React.FC = () => {
             </button>
           </div>
         </div>
+
+        <PerformanceMonitor
+          variant="summary"
+          inputBytes={files.reduce((sum, item) => sum + item.size, 0)}
+          outputBytes={batchZip.zipBlob.size}
+          className="mt-5"
+        />
+
+        {batchItems.some((it) => it.result?.warnings && it.result.warnings.length > 0) && (
+          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              {batchItems.flatMap((it) =>
+                (it.result?.warnings || []).map((w, i) => (
+                  <p key={`${it.fileItem.id}-warn-${i}`}>
+                    <strong>{it.fileItem.name}:</strong> {w}
+                  </p>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-5 space-y-3">
           {batchItems.map((item) => {

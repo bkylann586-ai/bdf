@@ -20,6 +20,7 @@ import {
 } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
+import { PerformanceMonitor } from '../PerformanceMonitor';
 import { OCR_LANGUAGE_OPTIONS, runPdfOcr } from '../../lib/ocrPdf';
 import { downloadBlob, formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
@@ -71,7 +72,7 @@ export const OcrPdfTool: React.FC = () => {
     if (files.length === 0) return;
 
     setErrorMessage(null);
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });
@@ -337,6 +338,13 @@ export const OcrPdfTool: React.FC = () => {
           </div>
         </div>
 
+        <PerformanceMonitor
+          variant="summary"
+          durationMs={result.durationMs}
+          inputBytes={file?.size}
+          outputBytes={result.searchablePdfBlob.size}
+        />
+
         {/* Quantitative Breakdown */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
@@ -579,7 +587,7 @@ export const OcrPdfTool: React.FC = () => {
           <div className="flex items-start gap-2.5 p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed">
             <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <p>
-              OCR runs 100% locally in a WebAssembly worker inside your browser. On first run for a new language, Tesseract downloads that language&apos;s compact dictionary once and caches it locally in IndexedDB—your PDF pages and recognized text are never uploaded.
+              OCR runs 100% locally in a WebAssembly worker inside your browser. On first run for a new language, Tesseract loads that language&apos;s compact dictionary locally from this site once and caches it in IndexedDB for offline reuse—your PDF pages and recognized text are never uploaded.
             </p>
           </div>
 

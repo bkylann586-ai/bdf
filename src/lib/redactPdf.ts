@@ -2,13 +2,14 @@ import { PDFDocument, PDFName, PDFDict } from 'pdf-lib';
 import { ProcessingFile } from '../types';
 import {
   ENCRYPTED_PDF_ERROR_MESSAGE,
+  MAX_CANVAS_PIXELS,
   isEncryptedPdfError,
   loadUnencryptedPdf,
   openUnencryptedPdfJsDocument,
   readFileAsArrayBuffer,
+  releaseCanvasMemory,
   renderPdfPageToCanvas,
 } from './pdfUtils';
-import { pdfjsLib } from './pdfWorker';
 
 export interface RedactionRect {
   id: string;
@@ -86,7 +87,6 @@ export interface ApplyPrivacyRedactionOptions {
   customRasterizer?: CustomPageRasterizer;
 }
 
-const MAX_CANVAS_PIXELS = 14_000_000; // ~14 MP cap to prevent mobile/desktop browser OOM
 
 function clampNormalizedRect(rect: RedactionRect): RedactionRect | null {
   const x1 = Math.max(0, Math.min(1, rect.x));
@@ -257,6 +257,7 @@ export async function findTextMatchesOnPage(
     const textContent = await page.getTextContent();
     const matches: RedactionRect[] = [];
 
+    const { pdfjsLib } = await import('./pdfWorker');
     for (let idx = 0; idx < (textContent?.items || []).length; idx++) {
       const item: any = textContent.items[idx];
       if (!item || typeof item.str !== 'string') continue;
@@ -354,8 +355,7 @@ async function defaultBrowserRasterizePage(
       format: 'jpeg',
     };
   } finally {
-    canvas.width = 0;
-    canvas.height = 0;
+    releaseCanvasMemory(canvas);
   }
 }
 

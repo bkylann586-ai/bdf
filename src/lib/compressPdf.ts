@@ -1,10 +1,12 @@
 import { PDFDocument } from 'pdf-lib';
 import { ProcessingFile, ProcessingResult, CompressOptions } from '../types';
 import {
-  readFileAsArrayBuffer,
-  renderPdfPageToCanvas,
+  CanvasScaleClampInfo,
   loadUnencryptedPdf,
   openUnencryptedPdfJsDocument,
+  readFileAsArrayBuffer,
+  releaseCanvasMemory,
+  renderPdfPageToCanvas,
 } from './pdfUtils';
 
 export interface CompressProgressCallback {
@@ -75,6 +77,7 @@ export async function compressPdfFile(
 
   const newDoc = await PDFDocument.create();
   newDoc.setProducer('PDFQuick');
+  const clampedPages: CanvasScaleClampInfo[] = [];
 
   try {
     for (let i = 1; i <= numPages; i++) {
@@ -82,14 +85,21 @@ export async function compressPdfFile(
         onProgress(i, numPages, `Optimizing page ${i} of ${numPages}...`);
       }
 
-      const canvas = await renderPdfPageToCanvas(pdfJsDoc, i, scale);
+      let appliedScale = scale;
+      const canvas = await renderPdfPageToCanvas(pdfJsDoc, i, scale, {
+        allowScaleClamp: true,
+        onScaleClamped: (info) => {
+          appliedScale = info.appliedScale;
+          clampedPages.push(info);
+        },
+      });
       let imageBlob: Blob;
       let widthPt: number;
       let heightPt: number;
 
       try {
-        widthPt = canvas.width / scale;
-        heightPt = canvas.height / scale;
+        widthPt = canvas.width / appliedScale;
+        heightPt = canvas.height / appliedScale;
 
         // Convert canvas to optimized JPEG blob via canvas toBlob directly (no network fetch)
         imageBlob = await new Promise<Blob>((resolve, reject) => {
@@ -100,8 +110,7 @@ export async function compressPdfFile(
           );
         });
       } finally {
-        canvas.width = 0;
-        canvas.height = 0;
+        releaseCanvasMemory(canvas);
       }
 
       const imageBytes = await imageBlob.arrayBuffer();
@@ -134,6 +143,13 @@ export async function compressPdfFile(
   } else {
     const increasePercent = Math.round(((blob.size - originalSize) / originalSize) * 100);
     message = `No compression achieved: Output is ${increasePercent}% larger than original (Original: ${(originalSize / 1024).toFixed(1)} KB → Output: ${(blob.size / 1024).toFixed(1)} KB). This document consists of vector graphics or text that takes more bytes when rasterized than in raw format. We recommend keeping your original file.`;
+  }
+
+  if (clampedPages.length > 0) {
+    const pageList = clampedPages.map((p) => p.pageNumber).slice(0, 5).join(', ');
+    const more = clampedPages.length > 5 ? ` (+${clampedPages.length - 5} more)` : '';
+    const minApplied = Math.min(...clampedPages.map((p) => p.appliedScale)).toFixed(2);
+    message += ` Memory protection notice: High-resolution page(s) (${pageList}${more}) exceeded the safe browser canvas limit and were rendered at controlled scale (${minApplied}× instead of ${scale}×) while preserving physical page size.`;
   }
 
   const baseName = fileItem.name.replace(/\.[^/.]+$/, '');

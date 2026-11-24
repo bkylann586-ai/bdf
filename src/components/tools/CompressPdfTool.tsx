@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Minimize2, AlertCircle, Info } from 'lucide-react';
-import { ProcessingFile, ProcessingResult, CompressLevel } from '../../types';
+import { BatchProgressItem, ProcessingFile, ProcessingResult, CompressLevel } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
@@ -14,8 +14,10 @@ import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from
 import {
   BatchItemOutcome,
   BatchPdfZipSummary,
+  createBatchProgressItems,
   packageBatchPdfsToZip,
   runSequentialBatch,
+  updateBatchProgressItems,
   validateAndInspectPdfQueue,
 } from '../../lib/batchProcessing';
 
@@ -26,6 +28,8 @@ export const CompressPdfTool: React.FC = () => {
   const [level, setLevel] = useState<CompressLevel>('recommended');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
   const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
@@ -106,6 +110,8 @@ export const CompressPdfTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
+    setBatchProgressItems(createBatchProgressItems(files));
+    setCurrentFileIndex(1);
     setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('compress-pdf');
     const startTime = Date.now();
@@ -119,6 +125,12 @@ export const CompressPdfTool: React.FC = () => {
         {
           onProgress: (curr, tot, msg) => {
             setProgress({ current: curr, total: tot, message: msg });
+          },
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
           },
           signal: controller.signal,
         }
@@ -191,6 +203,7 @@ export const CompressPdfTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={files[0]?.file}
         onReset={handleReset}
         title={isSmaller ? t('tool.compress.successTitle') : t('tool.compress.reportTitle')}
         relatedToolPath="/split-pdf"
@@ -220,6 +233,10 @@ export const CompressPdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.compress.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={files.length}
+        itemLabel="PDF"
         onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );

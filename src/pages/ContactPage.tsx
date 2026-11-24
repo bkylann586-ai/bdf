@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { MessageSquare, CheckCircle2, Info, Bug, Copy, Clock } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { SeoMeta } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 
 export const ContactPage: React.FC = () => {
   const [reportData, setReportData] = useState({
@@ -31,12 +35,35 @@ export const ContactPage: React.FC = () => {
     }
   };
 
+  const baseUrl = getProductionBaseUrl();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        '@id': `${baseUrl}/contact#webpage`,
+        name: 'Contact & Support Information | PDFQuick',
+        url: `${baseUrl}/contact`,
+        description:
+          'Support guidance, technical bug reporting instructions, and operator contact status for PDFQuick client-side PDF utilities.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Contact & Support', path: '/contact' },
+        ],
+        baseUrl
+      ),
+    ],
+  };
+
   return (
     <div className="flex-1 bg-white pb-16">
       <SeoMeta
         title="Contact & Support Information | PDFQuick"
         description="Support guidance, technical bug reporting instructions, and operator contact status for PDFQuick client-side PDF utilities."
         path="/contact"
+        schema={schema}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

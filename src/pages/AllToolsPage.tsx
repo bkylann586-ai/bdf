@@ -26,7 +26,11 @@ import { BANKING_SERVICES, searchBankingServices } from '../lib/bankingCatalog';
 import { BankingServiceMeta, ToolCategory, ToolMeta } from '../types';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { useTranslation } from '../lib/i18n';
 
@@ -136,12 +140,35 @@ export const AllToolsPage: React.FC = () => {
     );
   };
 
+  const baseUrl = getProductionBaseUrl();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${baseUrl}/tools#webpage`,
+        name: 'All 13 PDF Tools – Merge, Compress, OCR, Unlock & Edit PDFs Free | PDFQuick',
+        url: `${baseUrl}/tools`,
+        description:
+          'Explore all 13 free in-browser PDF tools: Merge, Split, Compress, OCR PDF, Edit PDF Metadata, Unlock PDF, Rotate, Delete Pages, Reorder, Images to PDF, PDF to Images, Page Numbers, and Watermark PDF.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'All Tools', path: '/tools' },
+        ],
+        baseUrl
+      ),
+    ],
+  };
+
   return (
     <div className="flex-1 bg-slate-50/60 pb-16">
       <SeoMeta
         title="All 13 PDF Tools – Merge, Compress, OCR, Unlock & Edit PDFs Free | PDFQuick"
         description="Explore all 13 free in-browser PDF tools: Merge, Split, Compress, OCR PDF, Edit PDF Metadata, Unlock PDF, Rotate, Delete Pages, Reorder, Images to PDF, PDF to Images, Page Numbers, and Watermark PDF."
         path="/tools"
+        schema={schema}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

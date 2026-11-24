@@ -1,16 +1,43 @@
 import React from 'react';
 import { ShieldCheck, Lock, AlertTriangle, EyeOff, HardDrive } from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { SeoMeta } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 
 export const PrivacyPage: React.FC = () => {
+  const baseUrl = getProductionBaseUrl();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/privacy#webpage`,
+        name: 'Privacy Policy – Client-Side Data Protection | PDFQuick',
+        url: `${baseUrl}/privacy`,
+        description:
+          'Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our zero-upload commitment.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Privacy Policy', path: '/privacy' },
+        ],
+        baseUrl
+      ),
+    ],
+  };
+
   return (
     <div className="flex-1 bg-white pb-16">
       <SeoMeta
         title="Privacy Policy – Client-Side Data Protection | PDFQuick"
         description="Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our zero-upload commitment."
         path="/privacy"
+        schema={schema}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

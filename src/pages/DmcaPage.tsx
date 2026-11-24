@@ -1,15 +1,42 @@
 import React from 'react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { SeoMeta } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 
 export const DmcaPage: React.FC = () => {
+  const baseUrl = getProductionBaseUrl();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/dmca#webpage`,
+        name: 'Copyright & DMCA Policy – Intellectual Property | PDFQuick',
+        url: `${baseUrl}/dmca`,
+        description:
+          'Copyright and intellectual property information for PDFQuick. Learn about our client-side processing model and how to submit intellectual property notices.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Copyright & DMCA Policy', path: '/dmca' },
+        ],
+        baseUrl
+      ),
+    ],
+  };
+
   return (
     <div className="flex-1 bg-white pb-16">
       <SeoMeta
         title="Copyright & DMCA Policy – Intellectual Property | PDFQuick"
         description="Copyright and intellectual property information for PDFQuick. Learn about our client-side processing model and how to submit intellectual property notices."
         path="/dmca"
+        schema={schema}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

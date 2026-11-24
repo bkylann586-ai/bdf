@@ -4,8 +4,14 @@ import { ProcessingFile, ProcessingResult, SplitMode } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { PdfPreview } from '../PdfPreview';
 import { splitPdfFile } from '../../lib/splitPdf';
-import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
+import {
+  formatBytes,
+  getPdfPageCount,
+  parsePageRange,
+  togglePageInRangeString,
+} from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
@@ -33,7 +39,7 @@ export const SplitPdfTool: React.FC = () => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
     if (files.length === 0) return;
     setErrorMessage(null);
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });
@@ -149,6 +155,7 @@ export const SplitPdfTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={file?.file}
         onReset={handleReset}
         title={t('tool.split.successTitle')}
         relatedToolPath="/merge-pdf"
@@ -349,6 +356,36 @@ export const SplitPdfTool: React.FC = () => {
               </div>
             )}
           </div>
+
+          <PdfPreview
+            file={file.file}
+            title="Inspect PDF Pages"
+            subtitle={
+              mode === 'range'
+                ? 'Click pages to include/exclude them in your extract range'
+                : `${file.pageCount} page(s) in ${file.name}`
+            }
+            markedPageNumbers={(() => {
+              if (mode !== 'range' || !pageRange.trim() || !file.pageCount) return [];
+              try {
+                return parsePageRange(pageRange, file.pageCount).map((i) => i + 1);
+              } catch {
+                return [];
+              }
+            })()}
+            markVariant="select"
+            markBadgeText="Extract"
+            onPageClick={
+              mode === 'range' && file.pageCount
+                ? (pageNum) =>
+                    setPageRange((prev) =>
+                      togglePageInRangeString(prev, pageNum, file.pageCount || 1)
+                    )
+                : undefined
+            }
+            collapsible={true}
+            defaultOpen={false}
+          />
 
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">

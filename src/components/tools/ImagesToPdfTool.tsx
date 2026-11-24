@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image as ImageIcon, ArrowLeft, ArrowRight, Trash2, Plus, AlertCircle } from 'lucide-react';
 import {
+  BatchProgressItem,
   ProcessingFile,
   ProcessingResult,
   PageSizeOption,
@@ -12,6 +13,10 @@ import { InlineDropTarget } from '../InlineDropTarget';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { convertImagesToPdf } from '../../lib/imagesToPdf';
+import {
+  createBatchProgressItems,
+  updateBatchProgressItems,
+} from '../../lib/batchProcessing';
 import { formatBytes } from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSampleImage } from '../../lib/sampleFiles';
@@ -30,11 +35,14 @@ export const ImagesToPdfTool: React.FC = () => {
 
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const imagesRef = useRef<ProcessingFile[]>([]);
   const createdUrlsRef = useRef<Set<string>>(new Set());
   const statusRef = useRef(status);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     imagesRef.current = images;
@@ -58,11 +66,11 @@ export const ImagesToPdfTool: React.FC = () => {
     };
   }, []);
 
-  const handleFilesSelected = (newFiles: File[]) => {
+  const handleFilesSelected = async (newFiles: File[]) => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
     setErrorMessage(null);
     const currentTotalBytes = imagesRef.current.reduce((acc, img) => acc + img.size, 0);
-    const validation = validateSelectedFiles(newFiles, {
+    const validation = await validateSelectedFiles(newFiles, {
       accept: 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp',
       multiple: true,
       existingTotalBytes: currentTotalBytes,
@@ -116,7 +124,7 @@ export const ImagesToPdfTool: React.FC = () => {
     try {
       const sample1 = await createSampleImage('Architecture Diagram', 800, 600, 'image/jpeg');
       const sample2 = await createSampleImage('Mobile UI Screenshot', 600, 800, 'image/png');
-      handleFilesSelected([sample1, sample2]);
+      await handleFilesSelected([sample1, sample2]);
     } catch (err: any) {
       setErrorMessage(`Failed to create sample images: ${err.message}`);
     }
@@ -154,6 +162,10 @@ export const ImagesToPdfTool: React.FC = () => {
     setErrorMessage(null);
   };
 
+  const handleCancelBatch = () => {
+    abortControllerRef.current?.abort();
+  };
+
   const handleConvert = async () => {
     if (images.length === 0) {
       setErrorMessage('Please add at least 1 image.');
@@ -162,9 +174,17 @@ export const ImagesToPdfTool: React.FC = () => {
 
     setErrorMessage(null);
     setStatus('processing');
-    setProgress({ current: 0, total: images.length, message: t('progress.processing') });
+    setBatchProgressItems(createBatchProgressItems(images));
+    setCurrentFileIndex(1);
+    setProgress({
+      current: 0,
+      total: images.length * 100 + 20,
+      message: t('progress.processing'),
+    });
     trackToolStart('images-to-pdf');
     const startTime = Date.now();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       const convertRes = await convertImagesToPdf(
@@ -177,8 +197,18 @@ export const ImagesToPdfTool: React.FC = () => {
         outputName,
         (curr, tot, msg) => {
           setProgress({ current: curr, total: tot, message: msg });
+        },
+        {
+          signal: controller.signal,
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
+          },
         }
       );
+      abortControllerRef.current = null;
       setResult(convertRes);
       setStatus('success');
       trackToolSuccess('images-to-pdf', {
@@ -186,6 +216,13 @@ export const ImagesToPdfTool: React.FC = () => {
         pageCount: images.length,
       });
     } catch (err: any) {
+      abortControllerRef.current = null;
+      if (err?.name === 'AbortError') {
+        setStatus('idle');
+        setBatchProgressItems([]);
+        setErrorMessage('Image batch conversion was cancelled. Your queued images remain ready.');
+        return;
+      }
       setStatus('error');
       setErrorMessage(err.message || 'Failed to convert images to PDF.');
       trackToolError('images-to-pdf', err.name || 'ConvertError');
@@ -193,7 +230,10 @@ export const ImagesToPdfTool: React.FC = () => {
   };
 
   const handleReset = () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     clearAll();
+    setBatchProgressItems([]);
     setStatus('idle');
     setResult(null);
   };
@@ -217,6 +257,11 @@ export const ImagesToPdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.imagesToPdf.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={images.length}
+        itemLabel="Image"
+        onCancel={images.length > 1 ? handleCancelBatch : undefined}
       />
     );
   }

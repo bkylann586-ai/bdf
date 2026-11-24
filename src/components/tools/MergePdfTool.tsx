@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown, Trash2, Plus, FileText, AlertCircle } from 'lucide-react';
-import { ProcessingFile, ProcessingResult } from '../../types';
+import { BatchProgressItem, ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
 import { InlineDropTarget } from '../InlineDropTarget';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { mergePdfFiles } from '../../lib/mergePdf';
+import {
+  createBatchProgressItems,
+  updateBatchProgressItems,
+} from '../../lib/batchProcessing';
 import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
@@ -20,10 +24,13 @@ export const MergePdfTool: React.FC = () => {
   const [outputName, setOutputName] = useState('pdfquick-merged.pdf');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const filesRef = useRef<ProcessingFile[]>([]);
   const statusRef = useRef(status);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     filesRef.current = files;
@@ -37,7 +44,7 @@ export const MergePdfTool: React.FC = () => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
     setErrorMessage(null);
     const currentTotalBytes = filesRef.current.reduce((acc, f) => acc + f.size, 0);
-    const validation = validateSelectedFiles(newFiles, {
+    const validation = await validateSelectedFiles(newFiles, {
       accept: 'application/pdf,.pdf',
       multiple: true,
       existingTotalBytes: currentTotalBytes,
@@ -129,6 +136,10 @@ export const MergePdfTool: React.FC = () => {
     setErrorMessage(null);
   };
 
+  const handleCancelMerge = () => {
+    abortControllerRef.current?.abort();
+  };
+
   const handleMerge = async () => {
     if (files.length < 2) {
       setErrorMessage(t('tool.merge.minWarning'));
@@ -137,14 +148,36 @@ export const MergePdfTool: React.FC = () => {
 
     setErrorMessage(null);
     setStatus('processing');
-    setProgress({ current: 0, total: files.length, message: t('progress.processing') });
+    setBatchProgressItems(createBatchProgressItems(files));
+    setCurrentFileIndex(1);
+    setProgress({
+      current: 0,
+      total: files.length * 100 + 20,
+      message: t('progress.processing'),
+    });
     trackToolStart('merge-pdf');
     const startTime = Date.now();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
-      const mergeRes = await mergePdfFiles(files, outputName, (curr, tot, msg) => {
-        setProgress({ current: curr, total: tot, message: msg });
-      });
+      const mergeRes = await mergePdfFiles(
+        files,
+        outputName,
+        (curr, tot, msg) => {
+          setProgress({ current: curr, total: tot, message: msg });
+        },
+        {
+          signal: controller.signal,
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
+          },
+        }
+      );
+      abortControllerRef.current = null;
       setResult(mergeRes);
       setStatus('success');
       trackToolSuccess('merge-pdf', {
@@ -152,6 +185,13 @@ export const MergePdfTool: React.FC = () => {
         pageCount: mergeRes.pageCount,
       });
     } catch (err: any) {
+      abortControllerRef.current = null;
+      if (err?.name === 'AbortError') {
+        setStatus('idle');
+        setBatchProgressItems([]);
+        setErrorMessage('Merge batch was cancelled. Your queued PDFs remain ready.');
+        return;
+      }
       setStatus('error');
       setErrorMessage(err.message || 'Failed to merge documents.');
       trackToolError('merge-pdf', err.name || 'MergeError');
@@ -159,8 +199,11 @@ export const MergePdfTool: React.FC = () => {
   };
 
   const handleReset = () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setStatus('idle');
     setResult(null);
+    setBatchProgressItems([]);
     setFiles([]);
     setErrorMessage(null);
   };
@@ -184,6 +227,11 @@ export const MergePdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.merge.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={files.length}
+        itemLabel="PDF"
+        onCancel={handleCancelMerge}
       />
     );
   }

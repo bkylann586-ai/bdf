@@ -57,7 +57,7 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: baseUrl,
+          item: `${baseUrl}/`,
         },
         {
           '@type': 'ListItem',
@@ -103,6 +103,7 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
         description={tool.metaDescription}
         path={`/${tool.id}`}
         schema={schema}
+        faqs={faqs}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

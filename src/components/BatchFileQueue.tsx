@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { FileText, Plus, Trash2 } from 'lucide-react';
 import { ProcessingFile } from '../types';
-import { formatBytes } from '../lib/pdfUtils';
+import { formatBytes } from '../lib/fileHelpers';
 import { InlineDropTarget } from './InlineDropTarget';
 
 interface BatchFileQueueProps {

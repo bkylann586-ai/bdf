@@ -77,7 +77,7 @@ export const EditPdfMetadataTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });
@@ -217,6 +217,7 @@ export const EditPdfMetadataTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={file?.file}
         onReset={handleReset}
         title={t('tool.editMetadata.successTitle')}
         relatedToolPath="/watermark-pdf"

@@ -19,6 +19,7 @@ import {
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
+import { PerformanceMonitor } from '../PerformanceMonitor';
 import { ProcessingFile } from '../../types';
 import {
   PdfPrivacyInspection,
@@ -36,6 +37,7 @@ import {
   readFileAsArrayBuffer,
   renderPdfPageToCanvas,
 } from '../../lib/pdfUtils';
+import { validateSelectedFiles } from '../../lib/fileValidation';
 import { trackSampleUse, trackToolError, trackToolStart, trackToolSuccess } from '../../lib/analytics';
 import { useTranslation } from '../../lib/i18n';
 import { useGlobalDrop } from '../../lib/globalDrop';
@@ -81,6 +83,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const beforeCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const afterCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isLoadingFileRef = useRef(false);
 
   const cleanupCanvases = () => {
     [editorCanvasRef.current, beforeCanvasRef.current, afterCanvasRef.current].forEach((c) => {
@@ -244,13 +247,37 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
     }
   };
 
+  const handleFilesSelected = async (incomingFiles: File[]) => {
+    if (isLoadingFileRef.current || inspecting || isProcessing || result) return;
+    if (!incomingFiles || incomingFiles.length === 0) return;
+
+    isLoadingFileRef.current = true;
+    setErrorMsg(null);
+    try {
+      const validation = await validateSelectedFiles(incomingFiles, {
+        accept: 'application/pdf,.pdf',
+        multiple: false,
+      });
+
+      if (validation.errorMessage) {
+        setErrorMsg(validation.errorMessage);
+      }
+
+      if (validation.validFiles.length === 0) {
+        return;
+      }
+
+      await loadPdfFile(validation.validFiles[0]);
+    } finally {
+      isLoadingFileRef.current = false;
+    }
+  };
+
   useEffect(() => {
     const canAcceptDrop = !inspecting && !isProcessing && !result;
     return registerDropHandler(
       (dropped) => {
-        if (dropped[0]) {
-          loadPdfFile(dropped[0]);
-        }
+        void handleFilesSelected(dropped);
       },
       t('banking.privacyTitle'),
       canAcceptDrop
@@ -418,6 +445,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
         current={progress.current}
         total={progress.total}
         message={progress.message}
+        operationTitle={t('banking.privacyTitle')}
       />
     );
   }
@@ -549,6 +577,13 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
               </button>
             </div>
           </div>
+
+          <PerformanceMonitor
+            variant="summary"
+            inputBytes={result.originalSize}
+            outputBytes={result.fileSize}
+            className="mt-4"
+          />
         </div>
 
         {/* Before vs After Visual & Text Layer Comparison */}
@@ -653,15 +688,14 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
             accept="application/pdf,.pdf"
             multiple={false}
             disabled={inspecting}
+            delegateValidation={true}
             helperText={
               inspecting
                 ? 'Inspecting PDF structure, metadata, and page streams in browser memory...'
                 : t('dropzone.helperSingle')
             }
             onFilesSelected={(files) => {
-              if (files[0]) {
-                loadPdfFile(files[0]);
-              }
+              void handleFilesSelected(files);
             }}
             onSampleRequested={handleLoadSampleStatement}
             sampleLabel="Try with a sample statement PDF (safe fake data + test metadata)"

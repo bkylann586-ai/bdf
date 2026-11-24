@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RotateCw, AlertCircle, Layers } from 'lucide-react';
-import { ProcessingFile, ProcessingResult, RotateAngle } from '../../types';
+import { BatchProgressItem, ProcessingFile, ProcessingResult, RotateAngle } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { BatchFileQueue } from '../BatchFileQueue';
 import { BatchSuccessDownload } from '../BatchSuccessDownload';
+import { PdfPreview } from '../PdfPreview';
 import { rotatePdfFile } from '../../lib/rotatePdf';
+import { parsePageRange, togglePageInRangeString } from '../../lib/pdfUtils';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
 import { useGlobalDrop } from '../../lib/globalDrop';
@@ -14,8 +16,10 @@ import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from
 import {
   BatchItemOutcome,
   BatchPdfZipSummary,
+  createBatchProgressItems,
   packageBatchPdfsToZip,
   runSequentialBatch,
+  updateBatchProgressItems,
   validateAndInspectPdfQueue,
 } from '../../lib/batchProcessing';
 
@@ -28,9 +32,13 @@ export const RotatePdfTool: React.FC = () => {
   const [pageRange, setPageRange] = useState('1');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
   const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
+  const [previewRotated, setPreviewRotated] = useState(true);
+  const [previewFileIdx, setPreviewFileIdx] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const statusRef = useRef(status);
@@ -113,6 +121,8 @@ export const RotatePdfTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
+    setBatchProgressItems(createBatchProgressItems(files));
+    setCurrentFileIndex(1);
     setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('rotate-pdf');
     const startTime = Date.now();
@@ -127,6 +137,12 @@ export const RotatePdfTool: React.FC = () => {
         {
           onProgress: (curr, tot, msg) => {
             setProgress({ current: curr, total: tot, message: msg });
+          },
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
           },
           signal: controller.signal,
         }
@@ -198,6 +214,7 @@ export const RotatePdfTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={files[0]?.file}
         onReset={handleReset}
         title={t('tool.rotate.successTitle')}
         relatedToolPath="/reorder-pdf-pages"
@@ -226,10 +243,31 @@ export const RotatePdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.rotate.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={files.length}
+        itemLabel="PDF"
         onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
   }
+
+  const safePreviewFileIdx = files.length > 0 ? Math.min(previewFileIdx, files.length - 1) : 0;
+  const previewTargetFile = files[safePreviewFileIdx];
+  const previewMaxPages = previewTargetFile?.pageCount ?? 1;
+  let targetedPreviewPages: number[] = [];
+  if (previewTargetFile) {
+    if (pageSelection === 'all') {
+      targetedPreviewPages = Array.from({ length: previewMaxPages }, (_, i) => i + 1);
+    } else if (pageRange.trim()) {
+      try {
+        targetedPreviewPages = parsePageRange(pageRange, previewMaxPages).map((i) => i + 1);
+      } catch {
+        targetedPreviewPages = [];
+      }
+    }
+  }
+  const targetedPreviewSet = new Set(targetedPreviewPages);
 
   const angleOptions: { value: RotateAngle; label: string; desc: string }[] = [
     { value: 90, label: '90° Clockwise (Right)', desc: 'Fixes scans turned sideways to the left' },
@@ -330,7 +368,7 @@ export const RotatePdfTool: React.FC = () => {
               <div>
                 <label htmlFor="rotatePageRange" className="block text-xs font-medium text-slate-700 mb-1">
                   {files.length === 1
-                    ? `Enter pages to rotate (1–${files[0].pageCount ?? 1})`
+                    ? `Enter pages to rotate (1–${files[0].pageCount ?? 1}) or click pages below`
                     : 'Enter pages to rotate in each PDF (e.g. 1, 3-4)'}
                 </label>
                 <input
@@ -344,6 +382,78 @@ export const RotatePdfTool: React.FC = () => {
               </div>
             )}
           </div>
+
+          {previewTargetFile && (
+            <PdfPreview
+              file={previewTargetFile.file}
+              title="Orientation Preview"
+              subtitle={
+                previewRotated
+                  ? `Previewing +${angle}° clockwise rotation on ${targetedPreviewPages.length} of ${previewMaxPages} page(s)`
+                  : `Original orientation (${previewTargetFile.name})`
+              }
+              markedPageNumbers={pageSelection === 'range' ? targetedPreviewPages : []}
+              markVariant="select"
+              markBadgeText={previewRotated ? `+${angle}°` : 'Target'}
+              getPageExtraRotation={(pageNum) =>
+                previewRotated && targetedPreviewSet.has(pageNum) ? angle : 0
+              }
+              onPageClick={
+                pageSelection === 'range'
+                  ? (pageNum) =>
+                      setPageRange((prev) =>
+                        togglePageInRangeString(prev, pageNum, previewMaxPages)
+                      )
+                  : undefined
+              }
+              headerActions={
+                <div className="flex flex-wrap items-center gap-2">
+                  {files.length > 1 && (
+                    <select
+                      aria-label="Select queued PDF to preview"
+                      value={safePreviewFileIdx}
+                      onChange={(e) => setPreviewFileIdx(Number(e.target.value))}
+                      className="text-[11px] px-2 py-1 bg-white border border-slate-300 rounded-md max-w-[160px] truncate"
+                    >
+                      {files.map((item, idx) => (
+                        <option key={item.id} value={idx}>
+                          {idx + 1}. {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <div
+                    role="group"
+                    aria-label="Rotation preview state"
+                    className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setPreviewRotated(false)}
+                      className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                        !previewRotated
+                          ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Before (0°)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewRotated(true)}
+                      className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                        previewRotated
+                          ? 'bg-white text-blue-700 shadow-xs font-semibold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      After (+{angle}°)
+                    </button>
+                  </div>
+                </div>
+              }
+            />
+          )}
 
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">

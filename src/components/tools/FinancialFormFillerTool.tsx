@@ -34,6 +34,8 @@ import { FinancialTemplateId, ProcessingResult } from '../../types';
 import { downloadBlob, formatBytes, openUnencryptedPdfJsDocument, renderPdfPageToCanvas } from '../../lib/pdfUtils';
 import { trackToolError, trackToolStart, trackToolSuccess } from '../../lib/analytics';
 import { useTranslation } from '../../lib/i18n';
+import { usePerformanceMonitor } from '../../lib/performanceMonitor';
+import { PerformanceMonitor } from '../PerformanceMonitor';
 
 const SAMPLE_VALUES: Record<FinancialTemplateId, Record<string, string>> = {
   'personal-financial-information': {
@@ -98,6 +100,7 @@ const SAMPLE_VALUES: Record<FinancialTemplateId, Record<string, string>> = {
 
 export const FinancialFormFillerTool: React.FC = () => {
   const { t, language } = useTranslation();
+  const { startRun, finishRun } = usePerformanceMonitor();
 
   const initialTemplateId = useMemo<FinancialTemplateId>(() => {
     if (typeof window !== 'undefined') {
@@ -239,6 +242,7 @@ export const FinancialFormFillerTool: React.FC = () => {
 
     const startedAt = Date.now();
     trackToolStart('financial-pdf-form-filler');
+    startRun({ operationName: t('banking.formFillerTitle') });
     setIsGenerating(true);
 
     try {
@@ -250,6 +254,7 @@ export const FinancialFormFillerTool: React.FC = () => {
         includeBlankOptionalFields,
         customNotes,
       });
+      finishRun({ outputBytes: result.fileSize });
       setPreviewPage(1);
       setGeneratedResult(result);
       trackToolSuccess('financial-pdf-form-filler', {
@@ -257,6 +262,7 @@ export const FinancialFormFillerTool: React.FC = () => {
         pageCount: result.pageCount,
       });
     } catch (err: any) {
+      finishRun();
       const msg = err?.message || 'Failed to generate helper PDF worksheet.';
       setErrorMsg(msg);
       trackToolError('financial-pdf-form-filler', err?.name || 'FormPdfError');
@@ -687,6 +693,8 @@ export const FinancialFormFillerTool: React.FC = () => {
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Keep Editing Fields</span>
                 </button>
+
+                <PerformanceMonitor variant="summary" outputBytes={generatedResult.fileSize} />
               </div>
             )}
           </div>

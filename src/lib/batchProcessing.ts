@@ -1,8 +1,37 @@
 import JSZip from 'jszip';
-import { ProcessingFile, ProcessingResult } from '../types';
+import { BatchProgressItem, ProcessingFile, ProcessingResult } from '../types';
 import { validateSelectedFiles } from './fileValidation';
 import { getPdfPageCount } from './pdfUtils';
 import type { PdfToImagesResult } from './pdfToImages';
+
+export function createBatchProgressItems(files: ProcessingFile[]): BatchProgressItem[] {
+  return files.map((fileItem) => ({
+    id: fileItem.id,
+    name: fileItem.name,
+    size: fileItem.size,
+    status: 'pending',
+    progress: 0,
+  }));
+}
+
+export function updateBatchProgressItems(
+  prev: BatchProgressItem[],
+  index: number,
+  status: 'processing' | 'completed' | 'error',
+  itemPercent?: number,
+  detail?: string
+): BatchProgressItem[] {
+  return prev.map((item, idx) =>
+    idx === index
+      ? {
+          ...item,
+          status,
+          progress: itemPercent ?? (status === 'completed' ? 100 : item.progress),
+          detail: detail ?? item.detail,
+        }
+      : item
+  );
+}
 
 export interface BatchItemOutcome<T> {
   fileItem: ProcessingFile;
@@ -42,7 +71,7 @@ export async function validateAndInspectPdfQueue(
   existingFiles: ProcessingFile[]
 ): Promise<{ validItems: ProcessingFile[]; errorMessage: string | null }> {
   const existingTotalBytes = existingFiles.reduce((sum, item) => sum + item.size, 0);
-  const validation = validateSelectedFiles(incomingFiles, {
+  const validation = await validateSelectedFiles(incomingFiles, {
     accept: 'application/pdf,.pdf',
     multiple: true,
     existingTotalBytes,
@@ -119,6 +148,12 @@ export async function runSequentialBatch<T>(
   ) => Promise<T>,
   options: {
     onProgress?: (current: number, total: number, message: string) => void;
+    onItemStatus?: (
+      index: number,
+      status: 'processing' | 'completed' | 'error',
+      itemPercent?: number,
+      detail?: string
+    ) => void;
     signal?: AbortSignal;
   } = {}
 ): Promise<BatchRunSummary<T>> {
@@ -140,6 +175,7 @@ export async function runSequentialBatch<T>(
     const baseOffset = i * stepsPerFile;
     const prefix = totalFiles > 1 ? `File ${i + 1} of ${totalFiles} (${fileItem.name}): ` : '';
 
+    options.onItemStatus?.(i, 'processing', 5, 'Starting...');
     options.onProgress?.(
       baseOffset + 1,
       totalSteps,
@@ -150,13 +186,16 @@ export async function runSequentialBatch<T>(
       const result = await processItem(fileItem, (curr, tot, msg) => {
         const safeTotal = tot > 0 ? tot : 1;
         const fraction = Math.min(1, Math.max(0, curr / safeTotal));
+        const itemPct = Math.max(5, Math.min(99, Math.round(fraction * 100)));
         const normalizedStep = Math.min(
           totalSteps,
           baseOffset + Math.max(1, Math.round(fraction * stepsPerFile))
         );
+        options.onItemStatus?.(i, 'processing', itemPct, msg);
         options.onProgress?.(normalizedStep, totalSteps, `${prefix}${msg}`);
       });
 
+      options.onItemStatus?.(i, 'completed', 100, 'Completed');
       items.push({ fileItem, status: 'success', result });
       successCount++;
     } catch (err: any) {
@@ -164,10 +203,12 @@ export async function runSequentialBatch<T>(
         cancelled = true;
         break;
       }
+      const errMsg = err?.message || 'Processing failed for this file.';
+      options.onItemStatus?.(i, 'error', 100, errMsg);
       items.push({
         fileItem,
         status: 'error',
-        error: err?.message || 'Processing failed for this file.',
+        error: errMsg,
       });
       errorCount++;
     }

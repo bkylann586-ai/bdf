@@ -4,7 +4,11 @@ import { US_BANK_GUIDES } from '../lib/bankingCatalog';
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 
 const US_BANKS_INDEX_FAQS: FaqSchemaItem[] = [
@@ -38,13 +42,27 @@ export const UsBanksIndexPage: React.FC = () => {
     });
   }, []);
 
+  const baseUrl = getProductionBaseUrl();
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: 'US Bank Statement PDF Guides – PDFQuick',
-    url: `${getProductionBaseUrl()}/banking/us-banks`,
-    description:
-      'Independent workflows for merging, splitting, rotating, and compressing PDF statements downloaded from major US banks privately in your browser.',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${baseUrl}/banking/us-banks#webpage`,
+        name: 'US Bank Statement PDF Guides – PDFQuick',
+        url: `${baseUrl}/banking/us-banks`,
+        description:
+          'Independent workflows for merging, splitting, rotating, and compressing PDF statements downloaded from major US banks privately in your browser.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+          { name: 'US Bank Statement Guides', path: '/banking/us-banks' },
+        ],
+        baseUrl
+      ),
+    ],
   };
 
   return (
@@ -54,6 +72,7 @@ export const UsBanksIndexPage: React.FC = () => {
         description="Independent privacy-first guides for organizing PDF statements downloaded from Chase, Bank of America, Wells Fargo, Citi, and U.S. Bank locally in your browser."
         path="/banking/us-banks"
         schema={schema}
+        faqs={US_BANKS_INDEX_FAQS}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

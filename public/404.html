@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Page Not Found (404) | PDFQuick</title>
+    <meta
+      name="description"
+      content="The requested page could not be found on PDFQuick. Explore our 13 free in-browser PDF tools or Banking &amp; Finance workflows."
+    />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -21,42 +26,125 @@
       .card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 14px;
         padding: 32px;
-        max-width: 480px;
+        max-width: 560px;
         width: 100%;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
-      h1 { font-size: 24px; font-weight: 800; margin: 0 0 12px; color: #0f172a; }
-      p { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 24px; }
+      .code {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #2563eb;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        padding: 3px 10px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0 0 10px;
+        color: #0f172a;
+      }
+      p {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.6;
+        margin: 0 0 22px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
       .btn {
         display: inline-block;
         background: #2563eb;
         color: #ffffff;
         text-decoration: none;
-        padding: 10px 20px;
+        padding: 10px 18px;
         border-radius: 8px;
         font-weight: 600;
         font-size: 14px;
       }
-      .links { margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9; text-align: left; }
-      .links a { display: block; font-size: 13px; color: #2563eb; text-decoration: none; padding: 4px 0; }
+      .btn-secondary {
+        display: inline-block;
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .links {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+        text-align: left;
+      }
+      .links-title {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 8px;
+      }
+      .links a {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #2563eb;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        text-decoration: none;
+        padding: 7px 10px;
+      }
+      .links a:hover {
+        border-color: #93c5fd;
+        background: #eff6ff;
+      }
     </style>
   </head>
   <body>
-    <div class="card">
-      <h1>Page Not Found (404)</h1>
-      <p>The page you requested could not be found. You can return to PDFQuick home or select one of our free tools below.</p>
-      <a href="/" class="btn">Return to Homepage</a>
-      <div class="links">
-        <strong style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Available Tools</strong>
-        <a href="/merge-pdf">Merge PDF</a>
-        <a href="/split-pdf">Split PDF</a>
-        <a href="/compress-pdf">Compress PDF</a>
-        <a href="/images-to-pdf">Images to PDF</a>
-        <a href="/pdf-to-images">PDF to Images</a>
+    <main class="card">
+      <span class="code">HTTP 404</span>
+      <h1>Page Not Found</h1>
+      <p>
+        The page you requested does not exist or may have moved. Return to PDFQuick home or choose one of our free, browser-based PDF tools below.
+      </p>
+      <div class="actions">
+        <a href="/" class="btn">Return to Homepage</a>
+        <a href="/tools" class="btn-secondary">Browse All 13 Tools</a>
       </div>
-    </div>
+      <nav class="links" aria-label="Popular PDF Tools">
+        <span class="links-title">Popular PDFQuick Utilities</span>
+        <div class="grid">
+          <a href="/merge-pdf">Merge PDF</a>
+          <a href="/split-pdf">Split PDF</a>
+          <a href="/compress-pdf">Compress PDF</a>
+          <a href="/images-to-pdf">Images to PDF</a>
+          <a href="/pdf-to-images">PDF to Images</a>
+          <a href="/ocr-pdf">OCR PDF</a>
+          <a href="/unlock-pdf">Unlock PDF</a>
+          <a href="/edit-pdf-metadata">Edit PDF Metadata</a>
+          <a href="/banking-finance">Banking &amp; Finance</a>
+        </div>
+      </nav>
+    </main>
   </body>
 </html>

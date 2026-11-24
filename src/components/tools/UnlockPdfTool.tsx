@@ -73,7 +73,7 @@ export const UnlockPdfTool: React.FC = () => {
 
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });

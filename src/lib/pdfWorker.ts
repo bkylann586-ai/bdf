@@ -1,4 +1,5 @@
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import * as pdfjsLib from 'pdfjs-dist';
+import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 if (typeof (Promise as any).try !== 'function') {
   (Promise as any).try = function (fn: (...args: any[]) => any, ...args: any[]) {
@@ -6,15 +7,8 @@ if (typeof (Promise as any).try !== 'function') {
   };
 }
 
-if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-      'pdfjs-dist/legacy/build/pdf.worker.mjs',
-      import.meta.url
-    ).toString();
-  } catch (e) {
-    console.warn('Worker configuration notice:', e);
-  }
+if (typeof window !== 'undefined' && pdfjsLib?.GlobalWorkerOptions) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 }
 
 export { pdfjsLib };

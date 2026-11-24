@@ -4,7 +4,11 @@ import { US_BANK_GUIDES, getUsBankGuideBySlug } from '../lib/bankingCatalog';
 import { injectFaqSchema } from '../lib/faqSchema';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { UsBankSlug } from '../types';
 
@@ -24,12 +28,27 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
 
   const otherBanks = US_BANK_GUIDES.filter((b) => b.slug !== guide.slug);
 
+  const baseUrl = getProductionBaseUrl();
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: guide.metaTitle,
-    url: `${getProductionBaseUrl()}${guide.path}`,
-    description: guide.metaDescription,
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}${guide.path}#webpage`,
+        name: guide.metaTitle,
+        url: `${baseUrl}${guide.path}`,
+        description: guide.metaDescription,
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+          { name: 'US Banks', path: '/banking/us-banks' },
+          { name: guide.bankName, path: guide.path },
+        ],
+        baseUrl
+      ),
+    ],
   };
 
   return (
@@ -39,6 +58,7 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
         description={guide.metaDescription}
         path={guide.path}
         schema={schema}
+        faqs={guide.faqs}
       />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

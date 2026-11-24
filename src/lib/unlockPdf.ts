@@ -1,6 +1,6 @@
 import { createQpdf, QpdfError, type Qpdf } from '@mssio/qpdf-wasm';
 import { ProcessingFile, ProcessingResult, UnlockPdfInspection } from '../types';
-import { formatBytes } from './pdfUtils';
+import { formatBytes } from './fileHelpers';
 
 let qpdfPromise: Promise<Qpdf> | null = null;
 

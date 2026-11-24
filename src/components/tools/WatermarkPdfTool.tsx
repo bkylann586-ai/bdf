@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stamp, AlertCircle, Layers } from 'lucide-react';
 import {
+  BatchProgressItem,
   ProcessingFile,
   ProcessingResult,
   WatermarkColor,
@@ -11,6 +12,7 @@ import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { BatchFileQueue } from '../BatchFileQueue';
 import { BatchSuccessDownload } from '../BatchSuccessDownload';
+import { PdfPreview } from '../PdfPreview';
 import { addWatermarkToPdf } from '../../lib/watermarkPdf';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
@@ -19,8 +21,10 @@ import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from
 import {
   BatchItemOutcome,
   BatchPdfZipSummary,
+  createBatchProgressItems,
   packageBatchPdfsToZip,
   runSequentialBatch,
+  updateBatchProgressItems,
   validateAndInspectPdfQueue,
 } from '../../lib/batchProcessing';
 
@@ -37,6 +41,8 @@ export const WatermarkPdfTool: React.FC = () => {
   const [pageRange, setPageRange] = useState('1');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
+  const [batchProgressItems, setBatchProgressItems] = useState<BatchProgressItem[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(1);
   const [result, setResult] = useState<ProcessingResult | null>(null);
   const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
   const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
@@ -122,6 +128,8 @@ export const WatermarkPdfTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
+    setBatchProgressItems(createBatchProgressItems(files));
+    setCurrentFileIndex(1);
     setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('watermark-pdf');
     const startTime = Date.now();
@@ -148,6 +156,12 @@ export const WatermarkPdfTool: React.FC = () => {
         {
           onProgress: (curr, tot, msg) => {
             setProgress({ current: curr, total: tot, message: msg });
+          },
+          onItemStatus: (index, itemStatus, itemPercent, detail) => {
+            setCurrentFileIndex(index + 1);
+            setBatchProgressItems((prev) =>
+              updateBatchProgressItems(prev, index, itemStatus, itemPercent, detail)
+            );
           },
           signal: controller.signal,
         }
@@ -219,6 +233,7 @@ export const WatermarkPdfTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={files[0]?.file}
         onReset={handleReset}
         title={t('tool.watermark.successTitle')}
         relatedToolPath="/compress-pdf"
@@ -247,6 +262,10 @@ export const WatermarkPdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.watermark.title')}
+        batchItems={batchProgressItems}
+        currentFileIndex={currentFileIndex}
+        totalFiles={files.length}
+        itemLabel="PDF"
         onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
@@ -440,6 +459,16 @@ export const WatermarkPdfTool: React.FC = () => {
               </div>
             )}
           </div>
+
+          {files[0] && (
+            <PdfPreview
+              file={files[0].file}
+              title="Inspect PDF Pages"
+              subtitle={`Previewing ${files[0].name} (${files[0].pageCount ?? 1} page(s))`}
+              collapsible={true}
+              defaultOpen={false}
+            />
+          )}
 
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">

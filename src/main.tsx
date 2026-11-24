@@ -1,6 +1,7 @@
-import {createRoot} from 'react-dom/client';
-import {registerSW} from 'virtual:pwa-register';
-import App from './App.tsx';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
+import App, { preloadRouteComponent } from './App.tsx';
+import { getCurrentPath } from './lib/router';
 import './index.css';
 
 const updateSW = registerSW({
@@ -28,4 +29,20 @@ if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById('root')!).render(<App />);
+async function mountApp() {
+  const rootEl = document.getElementById('root');
+  if (!rootEl) return;
+
+  const ssrRoute = rootEl.getAttribute('data-ssr-route');
+  const currentPath = getCurrentPath();
+
+  if (ssrRoute && ssrRoute === currentPath && rootEl.firstElementChild !== null) {
+    await preloadRouteComponent(currentPath);
+    hydrateRoot(rootEl, <App />);
+  } else {
+    rootEl.innerHTML = '';
+    createRoot(rootEl).render(<App />);
+  }
+}
+
+void mountApp();

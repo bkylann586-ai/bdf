@@ -4,7 +4,11 @@ import { FINANCIAL_TEMPLATES, HELPER_TEMPLATE_DISCLAIMER } from '../lib/financia
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { FinancialTemplateId } from '../types';
 
@@ -44,13 +48,27 @@ export const FinancialTemplatesPage: React.FC = () => {
   const activeTemplate =
     FINANCIAL_TEMPLATES.find((t) => t.id === selectedId) || FINANCIAL_TEMPLATES[0];
 
+  const baseUrl = getProductionBaseUrl();
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: 'Fillable Financial Form Templates Structure – PDFQuick',
-    url: `${getProductionBaseUrl()}/banking/financial-templates`,
-    description:
-      'Structured schemas for Personal Financial Information, Income & Expense Statement, Monthly Budget, Business Financial Information, and Beneficiary Information helper worksheets.',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/banking/financial-templates#webpage`,
+        name: 'Fillable Financial Form Templates Structure – PDFQuick',
+        url: `${baseUrl}/banking/financial-templates`,
+        description:
+          'Structured schemas for Personal Financial Information, Income & Expense Statement, Monthly Budget, Business Financial Information, and Beneficiary Information helper worksheets.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+          { name: 'Financial Helper Templates', path: '/banking/financial-templates' },
+        ],
+        baseUrl
+      ),
+    ],
   };
 
   return (
@@ -60,6 +78,7 @@ export const FinancialTemplatesPage: React.FC = () => {
         description="Explore the 5 structured financial helper schemas (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) powered by our offline US Letter & A4 PDF Form Filler."
         path="/banking/financial-templates"
         schema={schema}
+        faqs={FINANCIAL_TEMPLATES_FAQS}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">

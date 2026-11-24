@@ -1,7 +1,16 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Custom event name for History API state pushes
 const NAVIGATE_EVENT = 'pdfquick:navigate';
+
+const SsrPathContext = createContext<string | null>(null);
+
+export const SsrRouterProvider: React.FC<{ path: string; children: React.ReactNode }> = ({
+  path,
+  children,
+}) => {
+  return React.createElement(SsrPathContext.Provider, { value: normalizePath(path) }, children);
+};
 
 export function normalizePath(path: string): string {
   if (!path) return '/';
@@ -42,7 +51,8 @@ export function navigate(to: string): void {
  * React hook to observe the current route path and trigger re-renders on route changes
  */
 export function usePathname(): string {
-  const [pathname, setPathname] = useState<string>(() => getCurrentPath());
+  const ssrPath = useContext(SsrPathContext);
+  const [pathname, setPathname] = useState<string>(() => ssrPath ?? getCurrentPath());
 
   useEffect(() => {
     const handlePopState = () => {

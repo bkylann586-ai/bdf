@@ -31,7 +31,11 @@ import {
 import { searchTools } from '../lib/toolsCatalog';
 import { US_BANK_GUIDES, searchBankingServices } from '../lib/bankingCatalog';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildOrganizationSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { useTranslation } from '../lib/i18n';
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
@@ -116,20 +120,30 @@ export const HomePage: React.FC = () => {
   const visibleTools = searchTools(searchQuery);
   const matchedBankingServices = searchQuery.trim().length > 0 ? searchBankingServices(searchQuery) : [];
 
+  const baseUrl = getProductionBaseUrl();
+  const homeUrl = `${baseUrl}/`;
+
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'PDFQuick',
-    url: getProductionBaseUrl(),
-    description:
-      'Free, private online PDF tools for US, UK, and international users. Merge, split, compress, OCR scanned PDFs, edit PDF metadata, rotate, delete pages, reorder, number pages, watermark, and convert PDF documents locally in your browser.',
-    applicationCategory: 'UtilityApplication',
-    operatingSystem: 'All web browsers',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
+    '@graph': [
+      buildOrganizationSchema(baseUrl),
+      {
+        '@type': 'WebApplication',
+        '@id': `${homeUrl}#webapp`,
+        name: 'PDFQuick',
+        url: homeUrl,
+        publisher: { '@id': `${baseUrl}/#organization` },
+        description:
+          'Free, private online PDF tools for US, UK, and international users. Merge, split, compress, OCR scanned PDFs, edit PDF metadata, rotate, delete pages, reorder, number pages, watermark, and convert PDF documents locally in your browser.',
+        applicationCategory: 'UtilityApplication',
+        operatingSystem: 'All web browsers',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+      },
+    ],
   };
 
   return (
@@ -139,6 +153,7 @@ export const HomePage: React.FC = () => {
         description="Free in-browser PDF tools with zero server uploads: Merge PDF, Split PDF, Compress PDF, OCR PDF to searchable text, Edit PDF Metadata, Unlock PDF, JPG to PDF, Rotate, Watermark, and Number Pages."
         path="/"
         schema={schema}
+        faqs={HOME_FAQS}
       />
 
       {/* Hero Section */}

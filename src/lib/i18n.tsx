@@ -88,6 +88,29 @@ export const translations = {
     'progress.local': 'Local processing',
     'progress.memoryNote': 'Processed strictly in device RAM',
     'progress.elapsed': 'Elapsed',
+    'progress.batchTitle': 'Batch processing {count} items...',
+    'progress.fileOf': 'File {current} of {total}',
+    'progress.completedSummary': '{done} of {total} completed',
+    'progress.cancel': 'Cancel Batch',
+
+    // Client-Side Performance Monitor
+    'perf.title': 'Client-Side Performance',
+    'perf.liveExecution': 'Live browser telemetry',
+    'perf.localExecution': '100% In-Browser execution',
+    'perf.elapsedTime': 'Elapsed Time',
+    'perf.timeTaken': 'Time Taken',
+    'perf.liveHeap': 'JS Heap Memory',
+    'perf.peakMemory': 'Peak JS Heap',
+    'perf.heapDelta': 'Delta',
+    'perf.currentHeap': 'Current',
+    'perf.jsHeapLabel': 'Chromium JS Heap',
+    'perf.browserManaged': 'Browser-managed RAM',
+    'perf.heapUnavailable': 'JS heap API unavailable in this browser',
+    'perf.heapQuota': 'Heap Utilization',
+    'perf.bufferFootprint': 'Data Footprint',
+    'perf.inputSize': 'Input',
+    'perf.zeroUpload': 'Zero server upload',
+    'perf.clientRamOnly': 'Volatile browser memory',
 
     // Tools Names & Actions
     'tool.merge.title': 'Merge PDF',
@@ -252,6 +275,28 @@ export const translations = {
     'progress.local': 'Procesamiento local',
     'progress.memoryNote': 'Procesado estrictamente en la memoria RAM de tu dispositivo',
     'progress.elapsed': 'Transcurrido',
+    'progress.batchTitle': 'Procesando lote de {count} elementos...',
+    'progress.fileOf': 'Archivo {current} de {total}',
+    'progress.completedSummary': '{done} de {total} completados',
+    'progress.cancel': 'Cancelar lote',
+
+    'perf.title': 'Rendimiento en el navegador',
+    'perf.liveExecution': 'Telemetría local en vivo',
+    'perf.localExecution': 'Ejecución 100% en navegador',
+    'perf.elapsedTime': 'Tiempo transcurrido',
+    'perf.timeTaken': 'Tiempo total',
+    'perf.liveHeap': 'Memoria Heap JS',
+    'perf.peakMemory': 'Pico de memoria Heap',
+    'perf.heapDelta': 'Variación',
+    'perf.currentHeap': 'Actual',
+    'perf.jsHeapLabel': 'Heap JS de Chromium',
+    'perf.browserManaged': 'RAM gestionada por navegador',
+    'perf.heapUnavailable': 'API Heap JS no disponible en este navegador',
+    'perf.heapQuota': 'Uso del Heap JS',
+    'perf.bufferFootprint': 'Huella de datos',
+    'perf.inputSize': 'Entrada',
+    'perf.zeroUpload': 'Sin subidas al servidor',
+    'perf.clientRamOnly': 'Memoria volátil del navegador',
 
     'tool.merge.title': 'Unir PDF',
     'tool.merge.tagline': 'Combina múltiples archivos PDF en un solo documento organizado de forma rápida y privada.',
@@ -413,6 +458,28 @@ export const translations = {
     'progress.local': 'Traitement local',
     'progress.memoryNote': 'Traité strictement dans la RAM de votre appareil',
     'progress.elapsed': 'Écoulé',
+    'progress.batchTitle': 'Traitement par lot de {count} éléments...',
+    'progress.fileOf': 'Fichier {current} sur {total}',
+    'progress.completedSummary': '{done} sur {total} terminés',
+    'progress.cancel': 'Annuler le lot',
+
+    'perf.title': 'Performances côté client',
+    'perf.liveExecution': 'Télémétrie locale en direct',
+    'perf.localExecution': 'Exécution 100% locale',
+    'perf.elapsedTime': 'Temps écoulé',
+    'perf.timeTaken': 'Durée totale',
+    'perf.liveHeap': 'Mémoire Heap JS',
+    'perf.peakMemory': 'Pic de mémoire Heap',
+    'perf.heapDelta': 'Variation',
+    'perf.currentHeap': 'Actuelle',
+    'perf.jsHeapLabel': 'Heap JS Chromium',
+    'perf.browserManaged': 'RAM gérée par le navigateur',
+    'perf.heapUnavailable': 'API Heap JS indisponible dans ce navigateur',
+    'perf.heapQuota': 'Utilisation du Heap',
+    'perf.bufferFootprint': 'Empreinte des données',
+    'perf.inputSize': 'Entrée',
+    'perf.zeroUpload': 'Aucun envoi serveur',
+    'perf.clientRamOnly': 'Mémoire volatile du navigateur',
 
     'tool.merge.title': 'Fusionner PDF',
     'tool.merge.tagline': 'Combinez plusieurs fichiers PDF en un seul document propre, rapidement et en toute confidentialité.',
@@ -574,6 +641,28 @@ export const translations = {
     'progress.local': 'معالجة محلية',
     'progress.memoryNote': 'تتم المعالجة بالكامل في ذاكرة جهازك العشوائية (RAM)',
     'progress.elapsed': 'الوقت المنقضي',
+    'progress.batchTitle': 'جارٍ معالجة دفعة من {count} ملفات...',
+    'progress.fileOf': 'ملف {current} من {total}',
+    'progress.completedSummary': 'اكتمل {done} من {total}',
+    'progress.cancel': 'إلغاء الدفعة',
+
+    'perf.title': 'أداء المعالجة داخل المتصفح',
+    'perf.liveExecution': 'قياس فوري على جهازك',
+    'perf.localExecution': 'تنفيذ محلي 100% في المتصفح',
+    'perf.elapsedTime': 'الوقت المنقضي',
+    'perf.timeTaken': 'الوقت المستغرق',
+    'perf.liveHeap': 'ذاكرة المتصفح (JS Heap)',
+    'perf.peakMemory': 'ذروة استخدام الذاكرة',
+    'perf.heapDelta': 'التغيّر',
+    'perf.currentHeap': 'الحالية',
+    'perf.jsHeapLabel': 'ذاكرة JS Heap',
+    'perf.browserManaged': 'ذاكرة مُدارة من المتصفح',
+    'perf.heapUnavailable': 'واجهة قياس Heap غير متاحة في هذا المتصفح',
+    'perf.heapQuota': 'نسبة استهلاك الذاكرة',
+    'perf.bufferFootprint': 'حجم البيانات المعالجة',
+    'perf.inputSize': 'الإدخال',
+    'perf.zeroUpload': 'دون أي رفع للخوادم',
+    'perf.clientRamOnly': 'ذاكرة متصفح مؤقتة',
 
     'tool.merge.title': 'دمج ملفات PDF',
     'tool.merge.tagline': 'اجمع عدة ملفات PDF في مستند واحد منظم بسرعة وخصوصية تامة.',
@@ -690,6 +779,10 @@ const LanguageContext = createContext<LanguageContextType>({
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<SupportedLanguage>(() => {
     if (typeof window === 'undefined') return 'en';
+    const rootEl = typeof document !== 'undefined' ? document.getElementById('root') : null;
+    if (rootEl && rootEl.hasAttribute('data-ssr-route')) {
+      return 'en';
+    }
     try {
       const saved = localStorage.getItem('pdfquick_lang') as SupportedLanguage;
       if (saved && (saved === 'en' || saved === 'es' || saved === 'fr' || saved === 'ar')) {
@@ -704,6 +797,31 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
     return 'en';
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem('pdfquick_lang') as SupportedLanguage;
+      if (saved && (saved === 'en' || saved === 'es' || saved === 'fr' || saved === 'ar')) {
+        if (saved !== language) setLanguageState(saved);
+        return;
+      }
+      const navLang = navigator.language?.toLowerCase() || '';
+      const detected: SupportedLanguage = navLang.startsWith('es')
+        ? 'es'
+        : navLang.startsWith('fr')
+          ? 'fr'
+          : navLang.startsWith('ar')
+            ? 'ar'
+            : 'en';
+      if (detected !== language) {
+        setLanguageState(detected);
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentOption = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
   const dir = currentOption.dir || 'ltr';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText,
-  ArrowUp,
-  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   RotateCcw,
   ArrowUpDown,
   Trash2,
@@ -12,6 +12,7 @@ import { ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { PdfPreview } from '../PdfPreview';
 import { reorderPdfPages } from '../../lib/reorderPagesPdf';
 import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
@@ -25,6 +26,7 @@ export const ReorderPagesTool: React.FC = () => {
   const { registerDropHandler } = useGlobalDrop();
   const [file, setFile] = useState<ProcessingFile | null>(null);
   const [pageOrder, setPageOrder] = useState<number[]>([]);
+  const [previewTab, setPreviewTab] = useState<'new' | 'original'>('new');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
   const [result, setResult] = useState<ProcessingResult | null>(null);
@@ -40,7 +42,7 @@ export const ReorderPagesTool: React.FC = () => {
     if (files.length === 0) return;
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
+    const validation = await validateSelectedFiles(files, {
       accept: 'application/pdf,.pdf',
       multiple: false,
     });
@@ -172,6 +174,7 @@ export const ReorderPagesTool: React.FC = () => {
     return (
       <SuccessDownload
         result={result}
+        originalFile={file?.file}
         onReset={handleReset}
         title={t('tool.reorderPages.successTitle')}
         relatedToolPath="/add-page-numbers"
@@ -236,15 +239,15 @@ export const ReorderPagesTool: React.FC = () => {
           </div>
 
           {/* Bulk Order Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-slate-600">
-              Use the Up and Down buttons to reorder pages cleanly before saving.
+              Arrange pages visually using the controls below each thumbnail, or switch between New Order and Original.
             </p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleReverseOrder}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-blue-600" />
                 <span>Reverse Order</span>
@@ -252,7 +255,7 @@ export const ReorderPagesTool: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResetOrder}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -260,59 +263,88 @@ export const ReorderPagesTool: React.FC = () => {
             </div>
           </div>
 
-          {/* Page Sequence List */}
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-            {pageOrder.map((origPage, idx) => (
+          {/* Visual Reorder & Before/After Sequence Preview */}
+          <PdfPreview
+            file={file.file}
+            title="Visual Page Sequence"
+            subtitle={
+              previewTab === 'new'
+                ? `Output order: ${pageOrder.length} of ${file.pageCount} page(s)`
+                : `Original order: ${file.pageCount} page(s)`
+            }
+            pageOrder={previewTab === 'new' ? pageOrder : undefined}
+            getPageLabel={(origPage) => `Orig p.${origPage}`}
+            headerActions={
               <div
-                key={`${origPage}-${idx}`}
-                className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg"
+                role="group"
+                aria-label="Page sequence preview"
+                className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-md bg-blue-100 text-blue-700 font-mono text-xs font-bold flex items-center justify-center">
-                    #{idx + 1}
-                  </span>
-                  <div>
-                    <p className="text-xs sm:text-sm font-semibold text-slate-900">
-                      Original Page {origPage}
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      Output position {idx + 1} of {pageOrder.length}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    disabled={idx === 0}
-                    onClick={() => movePage(idx, -1)}
-                    aria-label={`Move original page ${origPage} up`}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded disabled:opacity-30 disabled:pointer-events-none"
-                  >
-                    <ArrowUp className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={idx === pageOrder.length - 1}
-                    onClick={() => movePage(idx, 1)}
-                    aria-label={`Move original page ${origPage} down`}
-                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-white rounded disabled:opacity-30 disabled:pointer-events-none"
-                  >
-                    <ArrowDown className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={pageOrder.length <= 1}
-                    onClick={() => handleRemovePage(idx)}
-                    aria-label={`Remove original page ${origPage} from sequence`}
-                    className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white rounded disabled:opacity-30 disabled:pointer-events-none ml-1"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewTab('new')}
+                  className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                    previewTab === 'new'
+                      ? 'bg-white text-blue-700 shadow-xs font-semibold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  New Order ({pageOrder.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewTab('original')}
+                  className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                    previewTab === 'original'
+                      ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Before ({file.pageCount})
+                </button>
               </div>
-            ))}
-          </div>
+            }
+            renderPageActions={
+              previewTab === 'new'
+                ? (origPage, seqIdx, totalInSeq) => (
+                    <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-100">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={seqIdx === 0}
+                          onClick={() => movePage(seqIdx, -1)}
+                          aria-label={`Move original page ${origPage} earlier`}
+                          title="Move earlier"
+                          className="p-1 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                        >
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={seqIdx === totalInSeq - 1}
+                          onClick={() => movePage(seqIdx, 1)}
+                          aria-label={`Move original page ${origPage} later`}
+                          title="Move later"
+                          className="p-1 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                        >
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={totalInSeq <= 1}
+                        onClick={() => handleRemovePage(seqIdx)}
+                        aria-label={`Remove original page ${origPage} from sequence`}
+                        title="Remove page"
+                        className="p-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )
+                : undefined
+            }
+          />
 
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">

@@ -27,7 +27,11 @@ import {
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { AdPlaceholder } from '../components/AdPlaceholder';
-import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
+import {
+  SeoMeta,
+  buildBreadcrumbSchema,
+  getProductionBaseUrl,
+} from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { useTranslation } from '../lib/i18n';
 
@@ -84,13 +88,26 @@ export const BankingFinanceHubPage: React.FC = () => {
     setOpCount(0);
   };
 
+  const baseUrl = getProductionBaseUrl();
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: 'Banking & Finance PDF Tools – PDFQuick',
-    url: `${getProductionBaseUrl()}/banking-finance`,
-    description:
-      'US-first and global Banking & Finance PDF toolkit: prepare Chase, Bank of America, Wells Fargo, Citi, and U.S. Bank PDF statements locally in your browser.',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': `${baseUrl}/banking-finance#webpage`,
+        name: 'Banking & Finance PDF Tools – PDFQuick',
+        url: `${baseUrl}/banking-finance`,
+        description:
+          'US-first and global Banking & Finance PDF toolkit: prepare Chase, Bank of America, Wells Fargo, Citi, and U.S. Bank PDF statements locally in your browser.',
+      },
+      buildBreadcrumbSchema(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Banking & Finance', path: '/banking-finance' },
+        ],
+        baseUrl
+      ),
+    ],
   };
 
   return (
@@ -100,6 +117,7 @@ export const BankingFinanceHubPage: React.FC = () => {
         description="Combine, split, compress, rotate, number, and watermark bank statements and financial PDFs locally in your browser. Zero uploads, zero bank logins."
         path="/banking-finance"
         schema={schema}
+        faqs={BANKING_HUB_FAQS}
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
