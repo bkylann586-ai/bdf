@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -180,6 +181,7 @@ export default function App() {
       <GlobalDropProvider>
         <ErrorBoundary>
           <AppContent />
+          <SpeedInsights />
         </ErrorBoundary>
       </GlobalDropProvider>
     </LanguageProvider>
