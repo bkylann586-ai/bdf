@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { UploadCloud, FileText, Sparkles } from 'lucide-react';
-import { useTranslation } from './i18n';
+import { UploadCloud } from 'lucide-react';
+import { extractNativeFiles, hasNativeFilesInDragEvent } from './dragDropUtils';
 
 type FileDropHandler = (files: File[]) => void;
 
@@ -16,13 +16,20 @@ const GlobalDropContext = createContext<GlobalDropContextType>({
 
 export const useGlobalDrop = () => useContext(GlobalDropContext);
 
+function isTargetInsideLocalDropZone(target: EventTarget | null): boolean {
+  if (!target || typeof (target as HTMLElement).closest !== 'function') {
+    return false;
+  }
+  return Boolean((target as HTMLElement).closest('[data-dropzone="true"]'));
+}
+
 export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isOverLocalZone, setIsOverLocalZone] = useState(false);
   const [activeToolName, setActiveToolName] = useState<string>('PDFQuick');
   const handlerRef = useRef<FileDropHandler | null>(null);
   const enabledRef = useRef<boolean>(false);
   const dragCounterRef = useRef(0);
-  const { t } = useTranslation();
 
   const registerDropHandler = (
     handler: FileDropHandler,
@@ -35,6 +42,7 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!enabled) {
       dragCounterRef.current = 0;
       setIsDragging(false);
+      setIsOverLocalZone(false);
     }
 
     return () => {
@@ -43,6 +51,7 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         enabledRef.current = false;
         dragCounterRef.current = 0;
         setIsDragging(false);
+        setIsOverLocalZone(false);
       }
     };
   };
@@ -53,14 +62,15 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const resetDragState = () => {
       dragCounterRef.current = 0;
       setIsDragging(false);
+      setIsOverLocalZone(false);
     };
 
     const handleDragEnter = (e: DragEvent) => {
-      // Only react to file drags from the OS when an active tool accepts drops
-      if (!canAcceptDrop() || !e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+      if (!canAcceptDrop() || !hasNativeFilesInDragEvent(e.dataTransfer)) return;
 
       e.preventDefault();
       dragCounterRef.current += 1;
+      setIsOverLocalZone(isTargetInsideLocalDropZone(e.target));
       if (dragCounterRef.current === 1) {
         setIsDragging(true);
       }
@@ -75,16 +85,21 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
       if (dragCounterRef.current === 0) {
         setIsDragging(false);
+        setIsOverLocalZone(false);
       }
     };
 
     const handleDragOver = (e: DragEvent) => {
-      if (!canAcceptDrop() || !e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+      if (!canAcceptDrop() || !hasNativeFilesInDragEvent(e.dataTransfer)) return;
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'copy';
+      if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'copy';
+      }
+      const insideLocal = isTargetInsideLocalDropZone(e.target);
+      setIsOverLocalZone((prev) => (prev === insideLocal ? prev : insideLocal));
     };
 
-    // Capture phase always resets overlay even when DropZone stops propagation
+    // Capture phase always resets overlay even when a local DropZone stops propagation
     const handleDropCapture = () => {
       resetDragState();
     };
@@ -95,11 +110,9 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       if (!canAcceptDrop()) return;
 
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const files = Array.from(e.dataTransfer.files);
-        if (handlerRef.current) {
-          handlerRef.current(files);
-        }
+      const files = extractNativeFiles(e.dataTransfer);
+      if (files.length > 0 && handlerRef.current) {
+        handlerRef.current(files);
       }
     };
 
@@ -120,38 +133,36 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
   }, []);
 
+  const showWindowOverlay = isDragging && !isOverLocalZone;
+
   return (
     <GlobalDropContext.Provider value={{ registerDropHandler, isDragging }}>
       {children}
 
-      {/* Global Visual Drop Target Highlight Overlay */}
-      {isDragging && (
+      {/* Global Visual Drop Target Highlight Overlay (steps aside when hovering local DropZone) */}
+      {showWindowOverlay && (
         <div
-          className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-blue-900/40 backdrop-blur-sm transition-all duration-200 animate-in fade-in"
+          className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-slate-900/35 backdrop-blur-xs transition-opacity duration-150"
           aria-hidden="true"
         >
-          <div className="relative mx-4 max-w-xl w-full p-8 sm:p-12 bg-white/95 rounded-2xl border-4 border-dashed border-blue-500 shadow-2xl text-center transform scale-100 transition-transform">
-            {/* Ambient Pulse Ring */}
-            <div className="absolute inset-0 rounded-2xl bg-blue-500/10 animate-pulse pointer-events-none" />
-
+          <div className="relative mx-4 max-w-xl w-full p-8 sm:p-12 bg-white/95 rounded-2xl border-2 border-dashed border-blue-600 shadow-2xl text-center">
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-20 h-20 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg mb-5 animate-bounce">
-                <UploadCloud className="w-10 h-10" />
+              <div className="w-16 h-16 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md mb-5">
+                <UploadCloud className="w-8 h-8" />
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-                Drop your files anywhere!
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                Drop your files anywhere
               </h2>
 
               <p className="text-sm sm:text-base text-slate-600 max-w-md mx-auto mb-4">
-                Release anywhere in your browser window to immediately load files into{' '}
+                Release anywhere in the browser window to load files into{' '}
                 <strong className="text-blue-600 font-semibold">{activeToolName}</strong>.
               </p>
 
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-200">
-                <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                <span>100% Client-Side In-Browser Memory Processing</span>
-              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                100% Client-Side Processing <span aria-hidden="true">·</span> Zero Server Uploads
+              </p>
             </div>
           </div>
         </div>
@@ -159,3 +170,4 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     </GlobalDropContext.Provider>
   );
 };
+

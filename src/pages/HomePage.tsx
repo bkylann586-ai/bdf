@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layers,
   Scissors,
@@ -11,6 +11,8 @@ import {
   Hash,
   Stamp,
   ScanText,
+  FilePenLine,
+  Unlock,
   ShieldCheck,
   Zap,
   Lock,
@@ -24,6 +26,7 @@ import {
   FileSpreadsheet,
   Clock,
   CheckCircle2,
+  HelpCircle,
 } from 'lucide-react';
 import { searchTools } from '../lib/toolsCatalog';
 import { US_BANK_GUIDES, searchBankingServices } from '../lib/bankingCatalog';
@@ -31,10 +34,51 @@ import { AdPlaceholder } from '../components/AdPlaceholder';
 import { SeoMeta, getProductionBaseUrl } from '../components/SeoMeta';
 import { Link } from '../components/Link';
 import { useTranslation } from '../lib/i18n';
+import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
+
+const HOME_FAQS: FaqSchemaItem[] = [
+  {
+    question: 'Are my PDFs and bank statements uploaded to PDFQuick servers?',
+    answer:
+      'No. All PDFQuick tools run 100% locally inside your web browser using JavaScript, pdf-lib, PDF.js, and HTML5 Canvas. Your documents, financial statements, and images never leave your device or get transmitted to remote servers.',
+  },
+  {
+    question: 'Are all 13 PDFQuick tools free to use without registration?',
+    answer:
+      'Yes. All 13 core PDF utilities and Banking & Finance tools are free to use with no account registration, no email sign-up, and no forced PDFQuick watermarks added to your downloaded files.',
+  },
+  {
+    question: 'Which PDF operations can I perform with PDFQuick?',
+    answer:
+      'You can merge PDFs, split page ranges, compress PDF size, convert JPG/PNG/WebP images to PDF, export PDF pages to PNG or JPEG images, rotate pages, delete or reorder pages, add page numbers, apply text watermarks, run in-browser OCR to build searchable PDFs, edit PDF metadata, and unlock password-protected PDFs.',
+  },
+  {
+    question: 'Can I edit PDF metadata or run OCR on scanned PDFs offline?',
+    answer:
+      'Yes. Once loaded, PDFQuick supports Progressive Web App (PWA) offline caching so core tools work without an active internet connection. Edit PDF Metadata runs purely locally, and OCR PDF uses a lazy-loaded Tesseract.js WebAssembly worker with language dictionaries cached locally in your browser.',
+  },
+  {
+    question: 'Does PDFQuick support US Letter, ISO A4, and Arabic or multilingual documents?',
+    answer:
+      'Yes. PDFQuick supports US Letter, Legal, and ISO A4 paper sizes, offers an interface in English, Spanish, French, and Arabic, and embeds Noto Sans and Noto Sans Arabic fonts for accurate bilingual and right-to-left PDF text output.',
+  },
+  {
+    question: 'What are the file size limits and can PDFQuick process encrypted PDFs?',
+    answer:
+      'To protect browser tab memory, PDFQuick enforces a 250 MB safety limit per file and per multi-file queue. For password-protected or encrypted PDFs, use our Unlock PDF tool locally with your valid password before running other PDFQuick operations.',
+  },
+];
 
 export const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    return injectFaqSchema(HOME_FAQS, {
+      toolId: 'home',
+      pageUrl: getProductionBaseUrl(),
+    });
+  }, []);
 
   const getToolIcon = (name: string) => {
     switch (name) {
@@ -60,6 +104,10 @@ export const HomePage: React.FC = () => {
         return <Stamp className="w-5 h-5" />;
       case 'ScanText':
         return <ScanText className="w-5 h-5" />;
+      case 'FilePenLine':
+        return <FilePenLine className="w-5 h-5" />;
+      case 'Unlock':
+        return <Unlock className="w-5 h-5" />;
       default:
         return <Layers className="w-5 h-5" />;
     }
@@ -74,7 +122,7 @@ export const HomePage: React.FC = () => {
     name: 'PDFQuick',
     url: getProductionBaseUrl(),
     description:
-      'Free, private online PDF tools for US, UK, and international users. Merge, split, rotate, delete pages, reorder, add page numbers, watermark, compress, and convert PDF documents locally in your browser.',
+      'Free, private online PDF tools for US, UK, and international users. Merge, split, compress, OCR scanned PDFs, edit PDF metadata, rotate, delete pages, reorder, number pages, watermark, and convert PDF documents locally in your browser.',
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'All web browsers',
     offers: {
@@ -87,8 +135,8 @@ export const HomePage: React.FC = () => {
   return (
     <div className="flex-1 bg-white">
       <SeoMeta
-        title="PDFQuick – 10 Free, Private Online PDF Tools"
-        description="Private in-browser PDF utilities. Merge, split, rotate, delete pages, reorder, number pages, watermark, compress, and convert images to PDF without server document uploads."
+        title="PDFQuick – 13 Free, Private Online PDF Tools (Merge, Compress, OCR & Unlock)"
+        description="Free in-browser PDF tools with zero server uploads: Merge PDF, Split PDF, Compress PDF, OCR PDF to searchable text, Edit PDF Metadata, Unlock PDF, JPG to PDF, Rotate, Watermark, and Number Pages."
         path="/"
         schema={schema}
       />
@@ -106,7 +154,7 @@ export const HomePage: React.FC = () => {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
-            Merge files, rotate scans, delete or reorder pages, add page numbers, apply confidential watermarks, optimize sizes, and convert images directly inside your browser. Zero server uploads.
+            Merge files, compress PDFs, run OCR on scans, edit PDF metadata, rotate or reorder pages, add page numbers, apply watermarks, and convert images directly inside your browser. Zero server uploads.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -114,7 +162,7 @@ export const HomePage: React.FC = () => {
               to="/tools"
               className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
             >
-              <span>Explore All 10 Tools</span>
+              <span>Explore All 13 Tools</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -454,9 +502,38 @@ export const HomePage: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span><strong>Encrypted files:</strong> Encrypted or password-locked PDFs must be unlocked prior to processing.</span>
+              <span><strong>Encrypted files:</strong> Password-locked PDFs can be decrypted locally in your browser using <Link to="/unlock-pdf" className="text-blue-600 hover:underline font-medium">Unlock PDF</Link> with your valid password before processing.</span>
             </li>
           </ul>
+        </div>
+      </section>
+
+      {/* Landing Page Frequently Asked Questions (Synced with JSON-LD FAQPage Schema) */}
+      <section id="faqs" className="pb-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-5 h-5 text-blue-600 shrink-0" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {HOME_FAQS.map((faq, idx) => (
+              <div
+                key={faq.question}
+                id={`home-faq-${idx + 1}`}
+                className="pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+              >
+                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">
+                  {faq.question}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

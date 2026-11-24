@@ -36,6 +36,8 @@ export const translations = {
     'nav.pageNumbers': 'Page Numbers',
     'nav.watermark': 'Watermark PDF',
     'nav.ocrPdf': 'OCR PDF',
+    'nav.editMetadata': 'Edit Metadata',
+    'nav.unlockPdf': 'Unlock PDF',
     'nav.about': 'About PDFQuick',
     'nav.privacy': 'Privacy & Local Processing',
     'nav.exploreTools': 'Explore All Tools',
@@ -146,6 +148,14 @@ export const translations = {
     'tool.ocrPdf.button': 'Recognize Text & Build Searchable PDF',
     'tool.ocrPdf.successTitle': 'Text recognition complete!',
 
+    'tool.editMetadata.title': 'Edit PDF Metadata',
+    'tool.editMetadata.button': 'Save PDF Metadata',
+    'tool.editMetadata.successTitle': 'PDF metadata updated!',
+
+    'tool.unlockPdf.title': 'Unlock PDF',
+    'tool.unlockPdf.button': 'Unlock PDF Now',
+    'tool.unlockPdf.successTitle': 'PDF unlocked successfully!',
+
     // Success Screen
     'success.ready': 'Your document is ready!',
     'success.downloadPdf': 'Download PDF File',
@@ -193,6 +203,8 @@ export const translations = {
     'nav.pageNumbers': 'Numerar páginas',
     'nav.watermark': 'Marca de agua',
     'nav.ocrPdf': 'OCR PDF',
+    'nav.editMetadata': 'Editar metadatos',
+    'nav.unlockPdf': 'Desbloquear PDF',
     'nav.about': 'Acerca de PDFQuick',
     'nav.privacy': 'Privacidad y Procesamiento Local',
     'nav.exploreTools': 'Explorar todas las herramientas',
@@ -299,6 +311,14 @@ export const translations = {
     'tool.ocrPdf.button': 'Reconocer texto y crear PDF buscable',
     'tool.ocrPdf.successTitle': '¡Reconocimiento de texto completado!',
 
+    'tool.editMetadata.title': 'Editar metadatos PDF',
+    'tool.editMetadata.button': 'Guardar metadatos PDF',
+    'tool.editMetadata.successTitle': '¡Metadatos del PDF actualizados!',
+
+    'tool.unlockPdf.title': 'Desbloquear PDF',
+    'tool.unlockPdf.button': 'Desbloquear PDF ahora',
+    'tool.unlockPdf.successTitle': '¡PDF desbloqueado con éxito!',
+
     'success.ready': '¡Tu documento está listo!',
     'success.downloadPdf': 'Descargar archivo PDF',
     'success.downloadZip': 'Descargar archivo ZIP',
@@ -344,6 +364,8 @@ export const translations = {
     'nav.pageNumbers': 'Numéroter les pages',
     'nav.watermark': 'Filigrane PDF',
     'nav.ocrPdf': 'OCR PDF',
+    'nav.editMetadata': 'Métadonnées PDF',
+    'nav.unlockPdf': 'Déverrouiller PDF',
     'nav.about': 'À propos de PDFQuick',
     'nav.privacy': 'Confidentialité et Traitement Local',
     'nav.exploreTools': 'Découvrir tous les outils',
@@ -450,6 +472,14 @@ export const translations = {
     'tool.ocrPdf.button': 'Extraire le texte et créer un PDF indexable',
     'tool.ocrPdf.successTitle': 'Reconnaissance de texte terminée !',
 
+    'tool.editMetadata.title': 'Modifier les métadonnées PDF',
+    'tool.editMetadata.button': 'Enregistrer les métadonnées PDF',
+    'tool.editMetadata.successTitle': 'Métadonnées PDF mises à jour !',
+
+    'tool.unlockPdf.title': 'Déverrouiller PDF',
+    'tool.unlockPdf.button': 'Déverrouiller le PDF',
+    'tool.unlockPdf.successTitle': 'PDF déverrouillé avec succès !',
+
     'success.ready': 'Votre document est prêt !',
     'success.downloadPdf': 'Télécharger le fichier PDF',
     'success.downloadZip': 'Télécharger l’archive ZIP',
@@ -495,6 +525,8 @@ export const translations = {
     'nav.pageNumbers': 'ترقيم الصفحات',
     'nav.watermark': 'علامة مائية',
     'nav.ocrPdf': 'استخراج النص (OCR)',
+    'nav.editMetadata': 'تعديل البيانات الوصفية',
+    'nav.unlockPdf': 'فتح قفل PDF',
     'nav.about': 'عن PDFQuick',
     'nav.privacy': 'الخصوصية والمعالجة المحلية',
     'nav.exploreTools': 'استكشاف جميع الأدوات',
@@ -600,6 +632,14 @@ export const translations = {
     'tool.ocrPdf.title': 'استخراج النص من PDF (OCR)',
     'tool.ocrPdf.button': 'التعرف على النص وإنشاء PDF قابل للبحث',
     'tool.ocrPdf.successTitle': 'تم التعرف على النص بنجاح!',
+
+    'tool.editMetadata.title': 'تعديل البيانات الوصفية لـ PDF',
+    'tool.editMetadata.button': 'حفظ البيانات الوصفية',
+    'tool.editMetadata.successTitle': 'تم تحديث البيانات الوصفية لـ PDF بنجاح!',
+
+    'tool.unlockPdf.title': 'فتح قفل PDF',
+    'tool.unlockPdf.button': 'إزالة كلمة مرور PDF الآن',
+    'tool.unlockPdf.successTitle': 'تم فك تشفير PDF بنجاح!',
 
     'success.ready': 'مستندك جاهز للتحميل!',
     'success.downloadPdf': 'تحميل ملف PDF',

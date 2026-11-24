@@ -54,6 +54,8 @@ export interface ProcessingProgressProps {
   message: string;
   operationTitle?: string;
   stageName?: string;
+  onCancel?: () => void;
+  cancelLabel?: string;
 }
 
 /**
@@ -65,6 +67,8 @@ export const ProcessingProgress: React.FC<ProcessingProgressProps> = ({
   message,
   operationTitle,
   stageName,
+  onCancel,
+  cancelLabel = 'Cancel Batch',
 }) => {
   const { t } = useTranslation();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -136,6 +140,16 @@ export const ProcessingProgress: React.FC<ProcessingProgressProps> = ({
             <span>{elapsedSeconds.toFixed(1)}s</span>
           </div>
         </div>
+
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="mt-4 px-4 py-1.5 text-xs font-medium text-slate-700 hover:text-red-700 bg-white hover:bg-red-50 border border-slate-300 hover:border-red-200 rounded-md transition-colors"
+          >
+            {cancelLabel}
+          </button>
+        )}
 
         {/* Privacy verification badge */}
         <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-md text-[11px] text-slate-600 font-medium">

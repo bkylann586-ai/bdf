@@ -38,6 +38,7 @@ import {
 } from '../../lib/pdfUtils';
 import { trackSampleUse, trackToolError, trackToolStart, trackToolSuccess } from '../../lib/analytics';
 import { useTranslation } from '../../lib/i18n';
+import { useGlobalDrop } from '../../lib/globalDrop';
 
 interface DragDraft {
   startX: number;
@@ -48,6 +49,7 @@ interface DragDraft {
 
 export const FinancialPrivacyRedactionTool: React.FC = () => {
   const { t } = useTranslation();
+  const { registerDropHandler } = useGlobalDrop();
 
   const [fileItem, setFileItem] = useState<ProcessingFile | null>(null);
   const [inspection, setInspection] = useState<PdfPrivacyInspection | null>(null);
@@ -241,6 +243,19 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
       setInspecting(false);
     }
   };
+
+  useEffect(() => {
+    const canAcceptDrop = !inspecting && !isProcessing && !result;
+    return registerDropHandler(
+      (dropped) => {
+        if (dropped[0]) {
+          loadPdfFile(dropped[0]);
+        }
+      },
+      t('banking.privacyTitle'),
+      canAcceptDrop
+    );
+  }, [registerDropHandler, t, inspecting, isProcessing, result]);
 
   const handleLoadSampleStatement = async () => {
     trackSampleUse('financial-document-privacy');
@@ -635,7 +650,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
       {!fileItem || !inspection ? (
         <div className="space-y-4">
           <DropZone
-            accept=".pdf"
+            accept="application/pdf,.pdf"
             multiple={false}
             disabled={inspecting}
             helperText={

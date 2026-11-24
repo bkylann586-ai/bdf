@@ -53,6 +53,12 @@ const WatermarkPdfPage = lazy(() =>
 const OcrPdfPage = lazy(() =>
   import('./pages/OcrPdfPage').then((m) => ({ default: m.OcrPdfPage }))
 );
+const EditPdfMetadataPage = lazy(() =>
+  import('./pages/EditPdfMetadataPage').then((m) => ({ default: m.EditPdfMetadataPage }))
+);
+const UnlockPdfPage = lazy(() =>
+  import('./pages/UnlockPdfPage').then((m) => ({ default: m.UnlockPdfPage }))
+);
 const BankingFinanceHubPage = lazy(() =>
   import('./pages/BankingFinanceHubPage').then((m) => ({ default: m.BankingFinanceHubPage }))
 );
@@ -123,6 +129,10 @@ function AppContent() {
         return <WatermarkPdfPage />;
       case '/ocr-pdf':
         return <OcrPdfPage />;
+      case '/edit-pdf-metadata':
+        return <EditPdfMetadataPage />;
+      case '/unlock-pdf':
+        return <UnlockPdfPage />;
       case '/banking-finance':
         return <BankingFinanceHubPage />;
       case '/banking/us-banks':

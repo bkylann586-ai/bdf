@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Stamp, AlertCircle, Layers } from 'lucide-react';
+import { Stamp, AlertCircle, Layers } from 'lucide-react';
 import {
   ProcessingFile,
   ProcessingResult,
@@ -9,18 +9,25 @@ import {
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { BatchFileQueue } from '../BatchFileQueue';
+import { BatchSuccessDownload } from '../BatchSuccessDownload';
 import { addWatermarkToPdf } from '../../lib/watermarkPdf';
-import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
-import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
 import { useGlobalDrop } from '../../lib/globalDrop';
 import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from '../../lib/analytics';
+import {
+  BatchItemOutcome,
+  BatchPdfZipSummary,
+  packageBatchPdfsToZip,
+  runSequentialBatch,
+  validateAndInspectPdfQueue,
+} from '../../lib/batchProcessing';
 
 export const WatermarkPdfTool: React.FC = () => {
   const { t } = useTranslation();
   const { registerDropHandler } = useGlobalDrop();
-  const [file, setFile] = useState<ProcessingFile | null>(null);
+  const [files, setFiles] = useState<ProcessingFile[]>([]);
   const [text, setText] = useState('CONFIDENTIAL');
   const [position, setPosition] = useState<WatermarkPosition>('diagonal');
   const [color, setColor] = useState<WatermarkColor>('slate');
@@ -31,114 +38,166 @@ export const WatermarkPdfTool: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
   const [result, setResult] = useState<ProcessingResult | null>(null);
+  const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
+  const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const statusRef = useRef(status);
+  const filesRef = useRef(files);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     statusRef.current = status;
   }, [status]);
 
-  const handleFileSelected = async (files: File[]) => {
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  const handleFilesSelected = async (incomingFiles: File[]) => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
-    if (files.length === 0) return;
+    if (incomingFiles.length === 0) return;
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
-      accept: 'application/pdf,.pdf',
-      multiple: false,
-    });
+    const { validItems, errorMessage: validationError } = await validateAndInspectPdfQueue(
+      incomingFiles,
+      filesRef.current
+    );
 
-    const errorParts: string[] = [];
-    if (validation.errorMessage) {
-      errorParts.push(validation.errorMessage);
+    if (validationError) {
+      setErrorMessage(validationError);
     }
-    if (validation.validFiles.length === 0) {
-      if (errorParts.length > 0) setErrorMessage(errorParts.join(' '));
-      return;
-    }
+    if (validItems.length === 0) return;
 
-    const selected = validation.validFiles[0];
-    const id = `${selected.name}-${Date.now()}`;
-
-    let pageCount = 1;
-    try {
-      pageCount = await getPdfPageCount(selected);
-    } catch (e: any) {
-      errorParts.push(`${e?.message || 'Failed to read PDF.'}`);
-      setErrorMessage(errorParts.join(' '));
-      return;
-    }
-
-    if (errorParts.length > 0) {
-      setErrorMessage(errorParts.join(' '));
-    }
-
+    const wasEmpty = filesRef.current.length === 0;
     setStatus('idle');
     setResult(null);
-    setFile({
-      id,
-      file: selected,
-      name: selected.name,
-      size: selected.size,
-      type: selected.type,
-      pageCount,
-    });
-    setPageRange(pageCount > 1 ? `1-${pageCount}` : '1');
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles((prev) => [...prev, ...validItems]);
+
+    if (wasEmpty) {
+      const firstCount = validItems[0].pageCount ?? 1;
+      setPageRange(firstCount > 1 ? `1-${firstCount}` : '1');
+    }
   };
 
   useEffect(() => {
     const canAcceptDrop = status === 'idle' || status === 'error';
     return registerDropHandler(
       (dropped) => {
-        handleFileSelected(dropped);
+        handleFilesSelected(dropped);
       },
       t('tool.watermark.title'),
       canAcceptDrop
     );
   }, [registerDropHandler, t, status]);
 
+  const handleRemoveFile = (id: string) => {
+    setFiles((prev) => prev.filter((item) => item.id !== id));
+    setErrorMessage(null);
+  };
+
   const handleLoadSample = async () => {
     setErrorMessage(null);
     trackSampleUse('watermark-pdf');
     try {
-      const sample = await createSamplePdf('Client Proposal Contract', 4);
-      await handleFileSelected([sample]);
+      const [sample1, sample2] = await Promise.all([
+        createSamplePdf('Client Proposal Contract', 3),
+        createSamplePdf('Vendor Nondisclosure Agreement', 2),
+      ]);
+      filesRef.current = [];
+      setFiles([]);
+      await handleFilesSelected([sample1, sample2]);
     } catch (err: any) {
-      setErrorMessage(`Could not create sample PDF: ${err.message}`);
+      setErrorMessage(`Could not create sample PDFs: ${err.message}`);
     }
   };
 
+  const handleCancelBatch = () => {
+    abortControllerRef.current?.abort();
+  };
+
   const handleApplyWatermark = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
-    setProgress({ current: 0, total: 3, message: t('progress.processing') });
+    setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('watermark-pdf');
     const startTime = Date.now();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
-      const res = await addWatermarkToPdf(
-        file,
+      const summary = await runSequentialBatch(
+        files,
+        (fileItem, onItemProgress) =>
+          addWatermarkToPdf(
+            fileItem,
+            {
+              text,
+              opacity,
+              fontSize,
+              position,
+              color,
+              pageSelection,
+              pageRange,
+            },
+            onItemProgress
+          ),
         {
-          text,
-          opacity,
-          fontSize,
-          position,
-          color,
-          pageSelection,
-          pageRange,
-        },
-        (curr, tot, msg) => {
-          setProgress({ current: curr, total: tot, message: msg });
+          onProgress: (curr, tot, msg) => {
+            setProgress({ current: curr, total: tot, message: msg });
+          },
+          signal: controller.signal,
         }
       );
-      setResult(res);
-      setStatus('success');
+
+      abortControllerRef.current = null;
+
+      if (summary.cancelled) {
+        setStatus('idle');
+        setErrorMessage('Batch processing was cancelled. Your queued files remain ready.');
+        return;
+      }
+
+      if (summary.successCount === 0) {
+        const firstError = summary.items.find((item) => item.error)?.error;
+        setStatus('error');
+        setErrorMessage(firstError || 'Failed to watermark selected PDFs.');
+        trackToolError('watermark-pdf', 'BatchWatermarkFailed');
+        return;
+      }
+
+      const totalPages = summary.items.reduce(
+        (sum, item) => sum + (item.result?.pageCount ?? item.fileItem.pageCount ?? 0),
+        0
+      );
+
+      if (files.length === 1 && summary.items[0]?.status === 'success' && summary.items[0].result) {
+        setResult(summary.items[0].result);
+        setBatchItems(null);
+        setBatchZip(null);
+        setStatus('success');
+      } else {
+        setProgress({
+          current: files.length * 100,
+          total: files.length * 100,
+          message: 'Packaging watermarked PDFs into ZIP archive...',
+        });
+        const zipSummary = await packageBatchPdfsToZip(summary.items, 'watermarked-pdfs-batch.zip');
+        setResult(null);
+        setBatchItems(summary.items);
+        setBatchZip(zipSummary);
+        setStatus('success');
+      }
+
       trackToolSuccess('watermark-pdf', {
         durationMs: Date.now() - startTime,
-        pageCount: res.pageCount,
+        pageCount: totalPages,
       });
     } catch (err: any) {
+      abortControllerRef.current = null;
       setStatus('error');
       setErrorMessage(err.message || 'Failed to watermark PDF.');
       trackToolError('watermark-pdf', err.name || 'WatermarkError');
@@ -146,9 +205,13 @@ export const WatermarkPdfTool: React.FC = () => {
   };
 
   const handleReset = () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setStatus('idle');
     setResult(null);
-    setFile(null);
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles([]);
     setErrorMessage(null);
   };
 
@@ -164,6 +227,19 @@ export const WatermarkPdfTool: React.FC = () => {
     );
   }
 
+  if (status === 'success' && batchItems) {
+    return (
+      <BatchSuccessDownload
+        title="Batch Watermarking Complete"
+        items={batchItems}
+        zipSummary={batchZip}
+        onReset={handleReset}
+        relatedToolPath="/compress-pdf"
+        relatedToolName="Compress PDF"
+      />
+    );
+  }
+
   if (status === 'processing') {
     return (
       <ProcessingProgress
@@ -171,6 +247,7 @@ export const WatermarkPdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.watermark.title')}
+        onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
   }
@@ -179,16 +256,16 @@ export const WatermarkPdfTool: React.FC = () => {
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-      {!file ? (
+      {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
             accept="application/pdf,.pdf"
-            multiple={false}
+            multiple={true}
             delegateValidation={true}
-            onFilesSelected={handleFileSelected}
+            onFilesSelected={handleFilesSelected}
             onSampleRequested={handleLoadSample}
-            sampleLabel="Load a 4-page sample PDF to stamp"
-            helperText="Select 1 PDF file (up to 250 MB) to add custom diagonal, centered, or tiled text stamps."
+            sampleLabel="Load 2 sample PDFs to stamp"
+            helperText="Select 1 or more PDF files (up to 250 MB total) to add custom diagonal, centered, or tiled text stamps."
           />
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
@@ -199,27 +276,12 @@ export const WatermarkPdfTool: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* File Overview */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
-                  {formatBytes(file.size)} · {file.pageCount} {file.pageCount === 1 ? 'page' : 'pages'} total
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
-            >
-              Choose different file
-            </button>
-          </div>
+          <BatchFileQueue
+            files={files}
+            onAddFiles={handleFilesSelected}
+            onRemoveFile={handleRemoveFile}
+            onClearAll={handleReset}
+          />
 
           {/* Watermark Text + Quick Presets */}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2.5">
@@ -302,7 +364,7 @@ export const WatermarkPdfTool: React.FC = () => {
                 max={0.65}
                 step={0.05}
                 value={opacity}
-                onChange={(e) => setOpacity( parseFloat(e.target.value) )}
+                onChange={(e) => setOpacity(parseFloat(e.target.value))}
                 className="w-full accent-blue-600"
               />
             </div>
@@ -341,7 +403,11 @@ export const WatermarkPdfTool: React.FC = () => {
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>All {file.pageCount} Pages</span>
+                <span>
+                  {files.length === 1
+                    ? `All ${files[0].pageCount ?? 1} Pages`
+                    : 'All Pages in Each PDF'}
+                </span>
               </button>
               <button
                 type="button"
@@ -359,7 +425,9 @@ export const WatermarkPdfTool: React.FC = () => {
             {pageSelection === 'range' && (
               <div>
                 <label htmlFor="watermarkPageRange" className="block text-xs font-medium text-slate-700 mb-1">
-                  Enter pages to stamp (1–{file.pageCount})
+                  {files.length === 1
+                    ? `Enter pages to stamp (1–${files[0].pageCount ?? 1})`
+                    : 'Enter pages to stamp in each PDF (e.g. 1-3)'}
                 </label>
                 <input
                   id="watermarkPageRange"
@@ -387,7 +455,11 @@ export const WatermarkPdfTool: React.FC = () => {
               className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
             >
               <Stamp className="w-4 h-4" />
-              <span>{t('tool.watermark.button')}</span>
+              <span>
+                {files.length > 1
+                  ? `Watermark ${files.length} PDFs Sequentially`
+                  : t('tool.watermark.button')}
+              </span>
             </button>
           </div>
         </div>
@@ -395,3 +467,4 @@ export const WatermarkPdfTool: React.FC = () => {
     </div>
   );
 };
+

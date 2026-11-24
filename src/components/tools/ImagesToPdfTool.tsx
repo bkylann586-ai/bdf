@@ -8,6 +8,7 @@ import {
   MarginOption,
 } from '../../types';
 import { DropZone } from '../DropZone';
+import { InlineDropTarget } from '../InlineDropTarget';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { convertImagesToPdf } from '../../lib/imagesToPdf';
@@ -339,6 +340,14 @@ export const ImagesToPdfTool: React.FC = () => {
               </div>
             ))}
           </div>
+
+          <InlineDropTarget
+            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+            multiple={true}
+            label="Drag and drop more JPG, PNG, or WebP images here or click to add"
+            dragActiveLabel="Release to add images to conversion grid"
+            onFilesSelected={handleFilesSelected}
+          />
 
           {/* Options Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">

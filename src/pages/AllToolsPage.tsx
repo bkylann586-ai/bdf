@@ -11,6 +11,8 @@ import {
   Hash,
   Stamp,
   ScanText,
+  FilePenLine,
+  Unlock,
   ArrowRight,
   ShieldCheck,
   Search,
@@ -57,6 +59,10 @@ export const AllToolsPage: React.FC = () => {
         return <Stamp className="w-5 h-5" />;
       case 'ScanText':
         return <ScanText className="w-5 h-5" />;
+      case 'FilePenLine':
+        return <FilePenLine className="w-5 h-5" />;
+      case 'Unlock':
+        return <Unlock className="w-5 h-5" />;
       default:
         return <Layers className="w-5 h-5" />;
     }
@@ -133,8 +139,8 @@ export const AllToolsPage: React.FC = () => {
   return (
     <div className="flex-1 bg-slate-50/60 pb-16">
       <SeoMeta
-        title="All 10 PDF Tools – Free & Private Online Utilities | PDFQuick"
-        description="Explore all 10 free in-browser PDF utilities: Merge, Split, Rotate, Delete Pages, Reorder, Compress, Images to PDF, PDF to Images, Add Page Numbers, and Watermark PDF."
+        title="All 13 PDF Tools – Merge, Compress, OCR, Unlock & Edit PDFs Free | PDFQuick"
+        description="Explore all 13 free in-browser PDF tools: Merge, Split, Compress, OCR PDF, Edit PDF Metadata, Unlock PDF, Rotate, Delete Pages, Reorder, Images to PDF, PDF to Images, Page Numbers, and Watermark PDF."
         path="/tools"
       />
 
@@ -144,7 +150,7 @@ export const AllToolsPage: React.FC = () => {
         <div className="text-center py-6 sm:py-10 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200/60 rounded-md text-xs font-medium mb-3">
             <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            <span>Complete Suite of 10 Client-Side Tools</span>
+            <span>Complete Suite of 13 Client-Side Tools</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
@@ -318,20 +324,20 @@ export const AllToolsPage: React.FC = () => {
             )}
 
             {renderCategorySection('Organize & Structure', organizeTools)}
-            {renderCategorySection('Edit, Number & Stamp', editTools)}
+            {renderCategorySection('Edit, Unlock, Number & Stamp', editTools)}
             {renderCategorySection('Optimize & Compress', optimizeTools)}
             {renderCategorySection('Convert & Export', convertTools)}
           </>
         )}
 
-        {/* Feature Comparison & Decision Matrix (All 10 Tools) */}
+        {/* Feature Comparison & Decision Matrix (All 13 Tools) */}
         <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-10 shadow-sm">
           <div className="mb-6">
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">
               PDFQuick Tool Comparison & Technical Capabilities
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Compare all 10 client-side engines, supported US/UK paper geometries, and browser execution modes to choose the right utility:
+              Compare all 13 client-side engines, supported US/UK paper geometries, and browser execution modes to choose the right utility:
             </p>
           </div>
 
@@ -375,8 +381,8 @@ export const AllToolsPage: React.FC = () => {
                     <Link to="/rotate-pdf" className="text-blue-600 hover:underline">Rotate PDF</Link>
                   </td>
                   <td className="py-3.5 px-3">Permanently fixing sideways landscape scans or upside-down signed pages.</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">Rotated .pdf</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single / Batch)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Rotated .pdf / .zip</td>
                   <td className="py-3.5 px-3">Updates /Rotate catalog flag by 90°, 180°, or 270° losslessly.</td>
                   <td className="py-3.5 px-3">Angle steps in 90° increments; unlocked files only.</td>
                 </tr>
@@ -408,8 +414,8 @@ export const AllToolsPage: React.FC = () => {
                     <Link to="/add-page-numbers" className="text-blue-600 hover:underline">Add Page Numbers</Link>
                   </td>
                   <td className="py-3.5 px-3">Paginating US Letter/UK A4 legal briefs, theses, and exhibit packets.</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">Numbered .pdf</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single / Batch)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Numbered .pdf / .zip</td>
                   <td className="py-3.5 px-3">CropBox-aware positioning embedding Standard Helvetica fonts.</td>
                   <td className="py-3.5 px-3">Optional cover-page skip & custom start integer.</td>
                 </tr>
@@ -419,8 +425,8 @@ export const AllToolsPage: React.FC = () => {
                     <Link to="/watermark-pdf" className="text-blue-600 hover:underline">Watermark PDF</Link>
                   </td>
                   <td className="py-3.5 px-3">Stamping CONFIDENTIAL, DRAFT, or COPY notices across contracts and proofs.</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">Stamped .pdf</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single / Batch)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Stamped .pdf / .zip</td>
                   <td className="py-3.5 px-3">Vector HelveticaBold alpha compositing with auto-fit width scaling.</td>
                   <td className="py-3.5 px-3">Supports up to 80 characters; diagonal, center, or tiled.</td>
                 </tr>
@@ -430,8 +436,8 @@ export const AllToolsPage: React.FC = () => {
                     <Link to="/compress-pdf" className="text-blue-600 hover:underline">Compress PDF</Link>
                   </td>
                   <td className="py-3.5 px-3">Shrinking scanner files for email limits and US/UK e-filing portals.</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">Optimized .pdf</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single / Batch)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Optimized .pdf / .zip</td>
                   <td className="py-3.5 px-3">Lossless stream deduplication or 140/100 DPI canvas raster downsampling.</td>
                   <td className="py-3.5 px-3">Pure vector text PDFs see smaller gains than raw scans.</td>
                 </tr>
@@ -452,7 +458,7 @@ export const AllToolsPage: React.FC = () => {
                     <Link to="/pdf-to-images" className="text-blue-600 hover:underline">PDF to Images</Link>
                   </td>
                   <td className="py-3.5 px-3">Rendering PDF pages or slides as high-DPI PNG or JPEG pictures.</td>
-                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single / Batch)</td>
                   <td className="py-3.5 px-3 font-mono text-[11px]">.png / .jpg / .zip</td>
                   <td className="py-3.5 px-3">PDF.js Web Worker rasterization onto HTML5 Canvas (1.5x–3.0x).</td>
                   <td className="py-3.5 px-3">High-DPI rendering buffers are released immediately per page.</td>
@@ -467,6 +473,28 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3 font-mono text-[11px]">Searchable .pdf / .txt</td>
                   <td className="py-3.5 px-3">Lazy single-worker Tesseract.js LSTM WASM + hybrid text-layer check.</td>
                   <td className="py-3.5 px-3">Language traineddata cached locally in IndexedDB on first run.</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-3.5 px-3 font-medium text-slate-900">
+                    <Link to="/edit-pdf-metadata" className="text-blue-600 hover:underline">Edit PDF Metadata</Link>
+                  </td>
+                  <td className="py-3.5 px-3">Updating or clearing Title, Author, Creation Date, and document properties.</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Updated .pdf</td>
+                  <td className="py-3.5 px-3">pdf-lib Info dictionary rewriting + optional XMP catalog removal.</td>
+                  <td className="py-3.5 px-3">Preserves vector pages &amp; layout losslessly; rejects encrypted PDFs.</td>
+                </tr>
+
+                <tr className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-3.5 px-3 font-medium text-slate-900">
+                    <Link to="/unlock-pdf" className="text-blue-600 hover:underline">Unlock PDF</Link>
+                  </td>
+                  <td className="py-3.5 px-3">Removing open passwords and owner printing/copying restrictions locally.</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">.pdf (Single)</td>
+                  <td className="py-3.5 px-3 font-mono text-[11px]">Unlocked .pdf</td>
+                  <td className="py-3.5 px-3">WebAssembly qpdf decryption inside isolated browser Web Worker.</td>
+                  <td className="py-3.5 px-3">Requires valid user/owner password if open-locked; supports AES-256/128 &amp; RC4.</td>
                 </tr>
               </tbody>
             </table>

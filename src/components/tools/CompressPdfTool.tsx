@@ -1,76 +1,68 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Minimize2, AlertCircle, Info } from 'lucide-react';
+import { Minimize2, AlertCircle, Info } from 'lucide-react';
 import { ProcessingFile, ProcessingResult, CompressLevel } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { BatchFileQueue } from '../BatchFileQueue';
+import { BatchSuccessDownload } from '../BatchSuccessDownload';
 import { compressPdfFile } from '../../lib/compressPdf';
-import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
-import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
 import { useGlobalDrop } from '../../lib/globalDrop';
 import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from '../../lib/analytics';
+import {
+  BatchItemOutcome,
+  BatchPdfZipSummary,
+  packageBatchPdfsToZip,
+  runSequentialBatch,
+  validateAndInspectPdfQueue,
+} from '../../lib/batchProcessing';
 
 export const CompressPdfTool: React.FC = () => {
   const { t } = useTranslation();
   const { registerDropHandler } = useGlobalDrop();
-  const [file, setFile] = useState<ProcessingFile | null>(null);
+  const [files, setFiles] = useState<ProcessingFile[]>([]);
   const [level, setLevel] = useState<CompressLevel>('recommended');
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
   const [result, setResult] = useState<ProcessingResult | null>(null);
+  const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
+  const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const statusRef = useRef(status);
+  const filesRef = useRef(files);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     statusRef.current = status;
   }, [status]);
 
-  const handleFileSelected = async (files: File[]) => {
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  const handleFilesSelected = async (incomingFiles: File[]) => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
-    if (files.length === 0) return;
+    if (incomingFiles.length === 0) return;
     setErrorMessage(null);
-    const validation = validateSelectedFiles(files, {
-      accept: 'application/pdf,.pdf',
-      multiple: false,
-    });
 
-    const errorParts: string[] = [];
-    if (validation.errorMessage) {
-      errorParts.push(validation.errorMessage);
-    }
-    if (validation.validFiles.length === 0) {
-      if (errorParts.length > 0) setErrorMessage(errorParts.join(' '));
-      return;
+    const { validItems, errorMessage: validationError } = await validateAndInspectPdfQueue(
+      incomingFiles,
+      filesRef.current
+    );
+
+    if (validationError) {
+      setErrorMessage(validationError);
     }
 
-    const selected = validation.validFiles[0];
-    const id = `${selected.name}-${Date.now()}`;
-
-    let pageCount = 1;
-    try {
-      pageCount = await getPdfPageCount(selected);
-    } catch (e: any) {
-      errorParts.push(`${e?.message || 'Failed to read PDF.'}`);
-      setErrorMessage(errorParts.join(' '));
-      return;
-    }
-
-    if (errorParts.length > 0) {
-      setErrorMessage(errorParts.join(' '));
-    }
+    if (validItems.length === 0) return;
 
     setStatus('idle');
     setResult(null);
-    setFile({
-      id,
-      file: selected,
-      name: selected.name,
-      size: selected.size,
-      type: selected.type,
-      pageCount,
-    });
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles((prev) => [...prev, ...validItems]);
   };
 
   // Register with window-wide drag & drop system (disabled during processing/success)
@@ -78,47 +70,105 @@ export const CompressPdfTool: React.FC = () => {
     const canAcceptDrop = status === 'idle' || status === 'error';
     return registerDropHandler(
       (dropped) => {
-        handleFileSelected(dropped);
+        handleFilesSelected(dropped);
       },
       t('tool.compress.title'),
       canAcceptDrop
     );
   }, [registerDropHandler, t, status]);
 
+  const handleRemoveFile = (id: string) => {
+    setFiles((prev) => prev.filter((item) => item.id !== id));
+    setErrorMessage(null);
+  };
+
   const handleLoadSample = async () => {
     setErrorMessage(null);
     trackSampleUse('compress-pdf');
     try {
-      const sample = await createSamplePdf('Scanned Receipt & Report', 3);
-      await handleFileSelected([sample]);
+      const [sample1, sample2] = await Promise.all([
+        createSamplePdf('Scanned Receipt Packet', 3),
+        createSamplePdf('Quarterly Field Report', 2),
+      ]);
+      filesRef.current = [];
+      setFiles([]);
+      await handleFilesSelected([sample1, sample2]);
     } catch (err: any) {
-      setErrorMessage(`Could not create sample PDF: ${err.message}`);
+      setErrorMessage(`Could not create sample PDFs: ${err.message}`);
     }
   };
 
+  const handleCancelBatch = () => {
+    abortControllerRef.current?.abort();
+  };
+
   const handleCompress = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
-    setProgress({ current: 0, total: 10, message: t('progress.processing') });
+    setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('compress-pdf');
     const startTime = Date.now();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
-      const compressRes = await compressPdfFile(
-        file,
-        { level },
-        (curr, tot, msg) => {
-          setProgress({ current: curr, total: tot, message: msg });
+      const summary = await runSequentialBatch(
+        files,
+        (fileItem, onItemProgress) => compressPdfFile(fileItem, { level }, onItemProgress),
+        {
+          onProgress: (curr, tot, msg) => {
+            setProgress({ current: curr, total: tot, message: msg });
+          },
+          signal: controller.signal,
         }
       );
-      setResult(compressRes);
-      setStatus('success');
+
+      abortControllerRef.current = null;
+
+      if (summary.cancelled) {
+        setStatus('idle');
+        setErrorMessage('Batch processing was cancelled. Your queued files remain ready.');
+        return;
+      }
+
+      if (summary.successCount === 0) {
+        const firstError = summary.items.find((item) => item.error)?.error;
+        setStatus('error');
+        setErrorMessage(firstError || 'Failed to compress selected PDF documents.');
+        trackToolError('compress-pdf', 'BatchCompressFailed');
+        return;
+      }
+
+      const totalPagesProcessed = summary.items.reduce(
+        (sum, item) => sum + (item.result?.pageCount ?? item.fileItem.pageCount ?? 0),
+        0
+      );
+
+      if (files.length === 1 && summary.items[0]?.status === 'success' && summary.items[0].result) {
+        setResult(summary.items[0].result);
+        setBatchItems(null);
+        setBatchZip(null);
+        setStatus('success');
+      } else {
+        setProgress({
+          current: files.length * 100,
+          total: files.length * 100,
+          message: 'Packaging compressed PDFs into ZIP archive...',
+        });
+        const zipSummary = await packageBatchPdfsToZip(summary.items, 'compressed-pdfs-batch.zip');
+        setResult(null);
+        setBatchItems(summary.items);
+        setBatchZip(zipSummary);
+        setStatus('success');
+      }
+
       trackToolSuccess('compress-pdf', {
         durationMs: Date.now() - startTime,
-        pageCount: file.pageCount,
+        pageCount: totalPagesProcessed,
       });
     } catch (err: any) {
+      abortControllerRef.current = null;
       setStatus('error');
       setErrorMessage(err.message || 'Failed to compress document.');
       trackToolError('compress-pdf', err.name || 'CompressError');
@@ -126,9 +176,13 @@ export const CompressPdfTool: React.FC = () => {
   };
 
   const handleReset = () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setStatus('idle');
     setResult(null);
-    setFile(null);
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles([]);
     setErrorMessage(null);
   };
 
@@ -145,6 +199,20 @@ export const CompressPdfTool: React.FC = () => {
     );
   }
 
+  if (status === 'success' && batchItems) {
+    return (
+      <BatchSuccessDownload
+        title="Batch Compression Complete"
+        items={batchItems}
+        zipSummary={batchZip}
+        onReset={handleReset}
+        showSizeComparison={true}
+        relatedToolPath="/split-pdf"
+        relatedToolName="Split PDF"
+      />
+    );
+  }
+
   if (status === 'processing') {
     return (
       <ProcessingProgress
@@ -152,22 +220,23 @@ export const CompressPdfTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.compress.title')}
+        onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
   }
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-      {!file ? (
+      {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
             accept="application/pdf,.pdf"
-            multiple={false}
+            multiple={true}
             delegateValidation={true}
-            onFilesSelected={handleFileSelected}
+            onFilesSelected={handleFilesSelected}
             onSampleRequested={handleLoadSample}
-            sampleLabel="Load a 3-page test PDF"
-            helperText="Select 1 PDF file (up to 250 MB) to optimize. All processing runs privately inside your browser."
+            sampleLabel="Load 2 sample PDFs for batch compression"
+            helperText="Select 1 or more PDF files (up to 250 MB total). Multiple PDFs compress sequentially inside your browser."
           />
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
@@ -178,27 +247,12 @@ export const CompressPdfTool: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* File Overview */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
-                  Current size: {formatBytes(file.size)} · {file.pageCount} {file.pageCount === 1 ? 'page' : 'pages'}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
-            >
-              Choose different file
-            </button>
-          </div>
+          <BatchFileQueue
+            files={files}
+            onAddFiles={handleFilesSelected}
+            onRemoveFile={handleRemoveFile}
+            onClearAll={handleReset}
+          />
 
           {/* Honest Notice */}
           <div className="p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-lg flex items-start gap-2.5 text-xs text-slate-700">
@@ -212,7 +266,7 @@ export const CompressPdfTool: React.FC = () => {
           {/* Optimization Options */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-2">
-              Compression Level
+              Compression Level {files.length > 1 ? '(applied to all queued PDFs)' : ''}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
@@ -283,7 +337,9 @@ export const CompressPdfTool: React.FC = () => {
               className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
             >
               <Minimize2 className="w-4 h-4" />
-              <span>Compress PDF Now</span>
+              <span>
+                {files.length > 1 ? `Compress ${files.length} PDFs Sequentially` : 'Compress PDF Now'}
+              </span>
             </button>
           </div>
         </div>
@@ -291,3 +347,4 @@ export const CompressPdfTool: React.FC = () => {
     </div>
   );
 };
+

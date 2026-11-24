@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown, Trash2, Plus, FileText, AlertCircle } from 'lucide-react';
 import { ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
+import { InlineDropTarget } from '../InlineDropTarget';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { mergePdfFiles } from '../../lib/mergePdf';
@@ -310,6 +311,14 @@ export const MergePdfTool: React.FC = () => {
               </div>
             ))}
           </div>
+
+          <InlineDropTarget
+            accept="application/pdf,.pdf"
+            multiple={true}
+            label="Drag and drop more PDFs here or click to add"
+            dragActiveLabel="Release to append PDFs to merge queue"
+            onFilesSelected={handleFilesSelected}
+          />
 
           {/* Merge Options */}
           <div className="pt-4 border-t border-slate-200">

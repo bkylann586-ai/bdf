@@ -1,4 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { encryptSamplePdfBytes } from './unlockPdf';
 
 /**
  * Generate a realistic multi-page sample PDF file for testing
@@ -93,6 +94,54 @@ export async function createSamplePdf(
   const bytes = await doc.save();
   const safeName = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   return new File([bytes.buffer as ArrayBuffer], `${safeName}-${pageCount}p.pdf`, {
+    type: 'application/pdf',
+  });
+}
+
+/**
+ * Generate a sample PDF with populated Info metadata (Title, Author, Creation Date, etc.)
+ * for testing the Edit PDF Metadata tool.
+ */
+export async function createSampleMetadataPdf(): Promise<File> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  doc.setTitle('Q4 Financial Summary Report', { showInWindowTitleBar: true });
+  doc.setAuthor('Jordan Taylor');
+  doc.setSubject('Quarterly operational review and budget variance summary');
+  doc.setKeywords(['finance', 'quarterly-report', 'budget', '2025']);
+  doc.setCreator('PDFQuick Document Studio');
+  doc.setProducer('PDFQuick Client Metadata Engine');
+  doc.setCreationDate(new Date(2025, 10, 15, 9, 30, 0));
+  doc.setModificationDate(new Date(2025, 10, 18, 14, 15, 0));
+
+  for (let i = 1; i <= 2; i++) {
+    const page = doc.addPage([612, 792]); // US Letter
+    const { height } = page.getSize();
+    page.drawText(`Q4 Financial Summary Report – Page ${i} of 2`, {
+      x: 54,
+      y: height - 72,
+      size: 18,
+      font: boldFont,
+      color: rgb(0.1, 0.16, 0.28),
+    });
+    page.drawText(
+      'Sample document with embedded Title, Author, Creation Date, Subject, and Keywords properties ready for client-side metadata inspection and editing.',
+      {
+        x: 54,
+        y: height - 114,
+        size: 11,
+        font,
+        color: rgb(0.3, 0.36, 0.45),
+        maxWidth: 504,
+        lineHeight: 16,
+      }
+    );
+  }
+
+  const bytes = await doc.save();
+  return new File([bytes.buffer as ArrayBuffer], 'q4-summary-sample.pdf', {
     type: 'application/pdf',
   });
 }
@@ -253,4 +302,52 @@ export async function createSampleScannedPdf(): Promise<File> {
     type: 'application/pdf',
   });
 }
+
+export const SAMPLE_ENCRYPTED_PDF_PASSWORD = 'pdfquick-demo';
+
+/**
+ * Generate a 2-page AES-256 encrypted sample PDF locally so users can test
+ * the Unlock PDF tool immediately with the demo password ("pdfquick-demo").
+ */
+export async function createSampleEncryptedPdf(): Promise<File> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  for (let i = 1; i <= 2; i++) {
+    const page = doc.addPage([612, 792]);
+    const { height } = page.getSize();
+    page.drawText(`Protected Sample Statement – Page ${i} of 2`, {
+      x: 54,
+      y: height - 72,
+      size: 18,
+      font: boldFont,
+      color: rgb(0.1, 0.16, 0.28),
+    });
+    page.drawText(
+      'This PDF was encrypted locally inside your browser with AES-256 encryption using the demo password "pdfquick-demo". After unlocking, all vector text remains crisp and searchable.',
+      {
+        x: 54,
+        y: height - 114,
+        size: 11,
+        font,
+        color: rgb(0.3, 0.36, 0.45),
+        maxWidth: 504,
+        lineHeight: 16,
+      }
+    );
+  }
+
+  const plainBytes = await doc.save();
+  const encryptedBytes = await encryptSamplePdfBytes(
+    plainBytes,
+    SAMPLE_ENCRYPTED_PDF_PASSWORD,
+    'pdfquick-owner-demo'
+  );
+
+  return new File([encryptedBytes], 'protected-statement-sample.pdf', {
+    type: 'application/pdf',
+  });
+}
+
 

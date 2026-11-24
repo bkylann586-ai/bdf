@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Hash, AlertCircle } from 'lucide-react';
+import { Hash, AlertCircle } from 'lucide-react';
 import {
   PageNumberFormat,
   PageNumberPosition,
@@ -9,18 +9,25 @@ import {
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
+import { BatchFileQueue } from '../BatchFileQueue';
+import { BatchSuccessDownload } from '../BatchSuccessDownload';
 import { addPageNumbersToPdf } from '../../lib/addPageNumbersPdf';
-import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
-import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
 import { useGlobalDrop } from '../../lib/globalDrop';
 import { trackToolStart, trackToolSuccess, trackToolError, trackSampleUse } from '../../lib/analytics';
+import {
+  BatchItemOutcome,
+  BatchPdfZipSummary,
+  packageBatchPdfsToZip,
+  runSequentialBatch,
+  validateAndInspectPdfQueue,
+} from '../../lib/batchProcessing';
 
 export const AddPageNumbersTool: React.FC = () => {
   const { t } = useTranslation();
   const { registerDropHandler } = useGlobalDrop();
-  const [file, setFile] = useState<ProcessingFile | null>(null);
+  const [files, setFiles] = useState<ProcessingFile[]>([]);
   const [position, setPosition] = useState<PageNumberPosition>('bottom-center');
   const [format, setFormat] = useState<PageNumberFormat>('page_n_of_total');
   const [startNumber, setStartNumber] = useState(1);
@@ -29,111 +36,158 @@ export const AddPageNumbersTool: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState({ current: 0, total: 0, message: '' });
   const [result, setResult] = useState<ProcessingResult | null>(null);
+  const [batchItems, setBatchItems] = useState<BatchItemOutcome<ProcessingResult>[] | null>(null);
+  const [batchZip, setBatchZip] = useState<BatchPdfZipSummary | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const statusRef = useRef(status);
+  const filesRef = useRef(files);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     statusRef.current = status;
   }, [status]);
 
-  const handleFileSelected = async (files: File[]) => {
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  const handleFilesSelected = async (incomingFiles: File[]) => {
     if (statusRef.current === 'processing' || statusRef.current === 'success') return;
-    if (files.length === 0) return;
+    if (incomingFiles.length === 0) return;
     setErrorMessage(null);
 
-    const validation = validateSelectedFiles(files, {
-      accept: 'application/pdf,.pdf',
-      multiple: false,
-    });
+    const { validItems, errorMessage: validationError } = await validateAndInspectPdfQueue(
+      incomingFiles,
+      filesRef.current
+    );
 
-    const errorParts: string[] = [];
-    if (validation.errorMessage) {
-      errorParts.push(validation.errorMessage);
+    if (validationError) {
+      setErrorMessage(validationError);
     }
-    if (validation.validFiles.length === 0) {
-      if (errorParts.length > 0) setErrorMessage(errorParts.join(' '));
-      return;
-    }
-
-    const selected = validation.validFiles[0];
-    const id = `${selected.name}-${Date.now()}`;
-
-    let pageCount = 1;
-    try {
-      pageCount = await getPdfPageCount(selected);
-    } catch (e: any) {
-      errorParts.push(`${e?.message || 'Failed to read PDF.'}`);
-      setErrorMessage(errorParts.join(' '));
-      return;
-    }
-
-    if (errorParts.length > 0) {
-      setErrorMessage(errorParts.join(' '));
-    }
+    if (validItems.length === 0) return;
 
     setStatus('idle');
     setResult(null);
-    setFile({
-      id,
-      file: selected,
-      name: selected.name,
-      size: selected.size,
-      type: selected.type,
-      pageCount,
-    });
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles((prev) => [...prev, ...validItems]);
   };
 
   useEffect(() => {
     const canAcceptDrop = status === 'idle' || status === 'error';
     return registerDropHandler(
       (dropped) => {
-        handleFileSelected(dropped);
+        handleFilesSelected(dropped);
       },
       t('tool.pageNumbers.title'),
       canAcceptDrop
     );
   }, [registerDropHandler, t, status]);
 
+  const handleRemoveFile = (id: string) => {
+    setFiles((prev) => prev.filter((item) => item.id !== id));
+    setErrorMessage(null);
+  };
+
   const handleLoadSample = async () => {
     setErrorMessage(null);
     trackSampleUse('add-page-numbers');
     try {
-      const sample = await createSamplePdf('Legal Filing Brief', 4);
-      await handleFileSelected([sample]);
+      const [sample1, sample2] = await Promise.all([
+        createSamplePdf('Legal Filing Brief', 4),
+        createSamplePdf('Supporting Exhibit A', 3),
+      ]);
+      filesRef.current = [];
+      setFiles([]);
+      await handleFilesSelected([sample1, sample2]);
     } catch (err: any) {
-      setErrorMessage(`Could not create sample PDF: ${err.message}`);
+      setErrorMessage(`Could not create sample PDFs: ${err.message}`);
     }
   };
 
+  const handleCancelBatch = () => {
+    abortControllerRef.current?.abort();
+  };
+
   const handleApplyNumbers = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setErrorMessage(null);
     setStatus('processing');
-    setProgress({ current: 0, total: 3, message: t('progress.processing') });
+    setProgress({ current: 0, total: Math.max(1, files.length * 100), message: t('progress.processing') });
     trackToolStart('add-page-numbers');
     const startTime = Date.now();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
-      const res = await addPageNumbersToPdf(
-        file,
+      const summary = await runSequentialBatch(
+        files,
+        (fileItem, onItemProgress) =>
+          addPageNumbersToPdf(
+            fileItem,
+            {
+              position,
+              format,
+              startNumber,
+              skipFirstPage,
+              fontSize,
+            },
+            onItemProgress
+          ),
         {
-          position,
-          format,
-          startNumber,
-          skipFirstPage,
-          fontSize,
-        },
-        (curr, tot, msg) => {
-          setProgress({ current: curr, total: tot, message: msg });
+          onProgress: (curr, tot, msg) => {
+            setProgress({ current: curr, total: tot, message: msg });
+          },
+          signal: controller.signal,
         }
       );
-      setResult(res);
-      setStatus('success');
+
+      abortControllerRef.current = null;
+
+      if (summary.cancelled) {
+        setStatus('idle');
+        setErrorMessage('Batch processing was cancelled. Your queued files remain ready.');
+        return;
+      }
+
+      if (summary.successCount === 0) {
+        const firstError = summary.items.find((item) => item.error)?.error;
+        setStatus('error');
+        setErrorMessage(firstError || 'Failed to add page numbers.');
+        trackToolError('add-page-numbers', 'BatchPageNumbersFailed');
+        return;
+      }
+
+      const totalPages = summary.items.reduce(
+        (sum, item) => sum + (item.result?.pageCount ?? item.fileItem.pageCount ?? 0),
+        0
+      );
+
+      if (files.length === 1 && summary.items[0]?.status === 'success' && summary.items[0].result) {
+        setResult(summary.items[0].result);
+        setBatchItems(null);
+        setBatchZip(null);
+        setStatus('success');
+      } else {
+        setProgress({
+          current: files.length * 100,
+          total: files.length * 100,
+          message: 'Packaging numbered PDFs into ZIP archive...',
+        });
+        const zipSummary = await packageBatchPdfsToZip(summary.items, 'numbered-pdfs-batch.zip');
+        setResult(null);
+        setBatchItems(summary.items);
+        setBatchZip(zipSummary);
+        setStatus('success');
+      }
+
       trackToolSuccess('add-page-numbers', {
         durationMs: Date.now() - startTime,
-        pageCount: res.pageCount,
+        pageCount: totalPages,
       });
     } catch (err: any) {
+      abortControllerRef.current = null;
       setStatus('error');
       setErrorMessage(err.message || 'Failed to add page numbers.');
       trackToolError('add-page-numbers', err.name || 'PageNumbersError');
@@ -141,9 +195,13 @@ export const AddPageNumbersTool: React.FC = () => {
   };
 
   const handleReset = () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setStatus('idle');
     setResult(null);
-    setFile(null);
+    setBatchItems(null);
+    setBatchZip(null);
+    setFiles([]);
     setErrorMessage(null);
   };
 
@@ -159,6 +217,19 @@ export const AddPageNumbersTool: React.FC = () => {
     );
   }
 
+  if (status === 'success' && batchItems) {
+    return (
+      <BatchSuccessDownload
+        title="Batch Pagination Complete"
+        items={batchItems}
+        zipSummary={batchZip}
+        onReset={handleReset}
+        relatedToolPath="/watermark-pdf"
+        relatedToolName="Watermark PDF"
+      />
+    );
+  }
+
   if (status === 'processing') {
     return (
       <ProcessingProgress
@@ -166,6 +237,7 @@ export const AddPageNumbersTool: React.FC = () => {
         total={progress.total}
         message={progress.message}
         operationTitle={t('tool.pageNumbers.title')}
+        onCancel={files.length > 1 ? handleCancelBatch : undefined}
       />
     );
   }
@@ -179,23 +251,23 @@ export const AddPageNumbersTool: React.FC = () => {
   ];
 
   const formats: { value: PageNumberFormat; label: string; example: string }[] = [
-    { value: 'page_n_of_total', label: 'Page 1 of N', example: `Page ${startNumber} of ${file?.pageCount || 4}` },
+    { value: 'page_n_of_total', label: 'Page 1 of N', example: `Page ${startNumber} of ${files[0]?.pageCount || 4}` },
     { value: 'page_n', label: 'Page 1', example: `Page ${startNumber}` },
     { value: 'number', label: 'Number Only', example: `${startNumber}` },
   ];
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-      {!file ? (
+      {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
             accept="application/pdf,.pdf"
-            multiple={false}
+            multiple={true}
             delegateValidation={true}
-            onFilesSelected={handleFileSelected}
+            onFilesSelected={handleFilesSelected}
             onSampleRequested={handleLoadSample}
-            sampleLabel="Load a 4-page sample PDF to number pages"
-            helperText="Select 1 PDF file (up to 250 MB) to add sequential header or footer numbers."
+            sampleLabel="Load 2 sample PDFs to number pages"
+            helperText="Select 1 or more PDF files (up to 250 MB total) to add sequential header or footer numbers."
           />
           {errorMessage && (
             <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
@@ -206,27 +278,12 @@ export const AddPageNumbersTool: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* File Overview */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
-                  {formatBytes(file.size)} · {file.pageCount} {file.pageCount === 1 ? 'page' : 'pages'} total
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
-            >
-              Choose different file
-            </button>
-          </div>
+          <BatchFileQueue
+            files={files}
+            onAddFiles={handleFilesSelected}
+            onRemoveFile={handleRemoveFile}
+            onClearAll={handleReset}
+          />
 
           {/* Options Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -330,7 +387,11 @@ export const AddPageNumbersTool: React.FC = () => {
               className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
             >
               <Hash className="w-4 h-4" />
-              <span>{t('tool.pageNumbers.button')}</span>
+              <span>
+                {files.length > 1
+                  ? `Number ${files.length} PDFs Sequentially`
+                  : t('tool.pageNumbers.button')}
+              </span>
             </button>
           </div>
         </div>
@@ -338,3 +399,4 @@ export const AddPageNumbersTool: React.FC = () => {
     </div>
   );
 };
+

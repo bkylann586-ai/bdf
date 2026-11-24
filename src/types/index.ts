@@ -9,7 +9,9 @@ export type ToolId =
   | 'reorder-pdf-pages'
   | 'add-page-numbers'
   | 'watermark-pdf'
-  | 'ocr-pdf';
+  | 'ocr-pdf'
+  | 'edit-pdf-metadata'
+  | 'unlock-pdf';
 
 export type ToolCategory = 'organize' | 'optimize' | 'convert' | 'edit';
 
@@ -265,4 +267,42 @@ export interface OcrPdfResult {
   totalCharacters: number;
   durationMs: number;
 }
+
+export interface PdfMetadataValues {
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string;
+  creator: string;
+  producer: string;
+  creationDate: string; // YYYY-MM-DDTHH:mm local datetime or ''
+  modificationDate: string; // YYYY-MM-DDTHH:mm local datetime or ''
+  hasXmpStream: boolean;
+  pageCount: number;
+}
+
+export interface EditPdfMetadataOptions {
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string;
+  creator: string;
+  producer: string;
+  creationDate: string; // YYYY-MM-DDTHH:mm local datetime or ''
+  modificationDate: string; // YYYY-MM-DDTHH:mm local datetime or ''
+  updateModificationToNow: boolean;
+  stripXmpMetadata: boolean;
+  showTitleInWindowBar: boolean;
+}
+
+export type PdfEncryptionStatus = 'password-required' | 'owner-locked' | 'unencrypted';
+
+export interface UnlockPdfInspection {
+  status: PdfEncryptionStatus;
+  encrypted: boolean;
+  requiresPassword: boolean;
+  pdfVersion?: string;
+  pageCount?: number;
+}
+
 

@@ -35,6 +35,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
     { label: t('nav.pageNumbers'), href: '/add-page-numbers' },
     { label: t('nav.watermark'), href: '/watermark-pdf' },
     { label: t('nav.ocrPdf'), href: '/ocr-pdf' },
+    { label: t('nav.editMetadata'), href: '/edit-pdf-metadata' },
+    { label: t('nav.unlockPdf'), href: '/unlock-pdf' },
   ];
 
   const isMoreToolActive = moreToolLinks.some((item) => item.href === currentPath);
