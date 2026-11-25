@@ -1,27 +1,62 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { getSiteConfig } from '../lib/siteConfig';
 
 interface AdPlaceholderProps {
   className?: string;
   format?: 'horizontal' | 'rectangle';
+  adSlot?: string;
+}
+
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
 }
 
 export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
   className = '',
   format = 'horizontal',
+  adSlot,
 }) => {
+  const { adsense } = getSiteConfig();
+  const pushedRef = useRef(false);
+
+  useEffect(() => {
+    if (!adsense.isConfigured || !adsense.clientId || !adSlot || pushedRef.current) {
+      return;
+    }
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushedRef.current = true;
+    } catch {
+      // Ignore AdSense initialization errors if blocked or deferred by CMP
+    }
+  }, [adsense.isConfigured, adsense.clientId, adSlot]);
+
+  // Do not render empty placeholder boxes before AdSense is approved and enabled by the owner
+  if (!adsense.isConfigured || !adsense.clientId) {
+    return null;
+  }
+
   return (
     <aside
-      className={`my-10 mx-auto w-full max-w-4xl border border-dashed border-slate-300 bg-slate-50/80 rounded-xl p-5 flex flex-col items-center justify-center text-center transition-all ${
-        format === 'horizontal' ? 'min-h-[110px]' : 'min-h-[260px]'
+      className={`my-10 mx-auto w-full max-w-4xl border border-slate-200 bg-slate-50/60 rounded-xl p-4 flex flex-col items-center justify-center text-center ${
+        format === 'horizontal' ? 'min-h-[100px]' : 'min-h-[250px]'
       } ${className}`}
-      aria-label="Sponsorship & Advertisement Space"
+      aria-label="Advertisement"
     >
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-200/70 text-[10px] font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-        <span>Advertisement</span>
-      </div>
-      <p className="text-xs text-slate-500 max-w-md leading-relaxed">
-        Reserved for non-intrusive sponsor messaging. Placed below instructional guides to ensure complete visual separation from document upload and download controls.
-      </p>
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
+        Advertisement
+      </span>
+      {adSlot ? (
+        <ins
+          className="adsbygoogle block w-full"
+          data-ad-client={adsense.clientId}
+          data-ad-slot={adSlot}
+          data-ad-format={format === 'horizontal' ? 'horizontal' : 'rectangle'}
+          data-full-width-responsive="true"
+        />
+      ) : null}
     </aside>
   );
 };

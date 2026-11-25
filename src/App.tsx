@@ -11,6 +11,7 @@ import { LanguageProvider } from './lib/i18n';
 import { trackPageView } from './lib/analytics';
 import { GlobalDropProvider } from './lib/globalDrop';
 import { PerformanceMonitorProvider, usePerformanceMonitor } from './lib/performanceMonitor';
+import { initConsentDefaults } from './lib/consent';
 
 // Eagerly loaded homepage & 404 page
 import { HomePage } from './pages/HomePage';
@@ -121,6 +122,10 @@ interface AppContentProps {
 function AppContent({ ssrPageElement }: AppContentProps) {
   const currentPath = usePathname();
   const { resetRun } = usePerformanceMonitor();
+
+  useEffect(() => {
+    initConsentDefaults();
+  }, []);
 
   useEffect(() => {
     // Canonicalize /home -> / cleanly if reached via client router

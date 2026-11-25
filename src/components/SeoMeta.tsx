@@ -4,6 +4,11 @@ import {
   DEFAULT_FAQ_SCHEMA_SCRIPT_ID,
   FaqSchemaItem,
 } from '../lib/faqSchema';
+import {
+  DEFAULT_PRODUCTION_URL,
+  getSiteBaseUrl,
+  getSiteConfig,
+} from '../lib/siteConfig';
 
 interface SeoMetaProps {
   title: string;
@@ -36,25 +41,10 @@ export const SeoCollectorProvider: React.FC<{
   return <SeoCollectorContext.Provider value={collector}>{children}</SeoCollectorContext.Provider>;
 };
 
-export const VERIFIED_PRODUCTION_DOMAIN = 'https://bdf-mufv.vercel.app';
+export const VERIFIED_PRODUCTION_DOMAIN = DEFAULT_PRODUCTION_URL;
 
 export function getProductionBaseUrl(): string {
-  const envUrl = (import.meta as any).env?.VITE_APP_URL || (import.meta as any).env?.APP_URL;
-  if (envUrl && typeof envUrl === 'string' && envUrl.startsWith('http')) {
-    return envUrl.replace(/\/+$/, '');
-  }
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    const origin = window.location.origin.replace(/\/+$/, '');
-    if (
-      origin.startsWith('http') &&
-      !origin.includes('localhost') &&
-      !origin.includes('127.0.0.1') &&
-      !origin.includes('ais-dev-')
-    ) {
-      return origin;
-    }
-  }
-  return VERIFIED_PRODUCTION_DOMAIN;
+  return getSiteBaseUrl();
 }
 
 export function buildCanonicalHref(path: string, baseUrl = getProductionBaseUrl()): string {
@@ -64,11 +54,12 @@ export function buildCanonicalHref(path: string, baseUrl = getProductionBaseUrl(
   return trimmed === '/' ? `${baseUrl}/` : `${baseUrl}${trimmed}`;
 }
 
-export function buildOrganizationSchema(baseUrl = VERIFIED_PRODUCTION_DOMAIN): Record<string, any> {
-  return {
+export function buildOrganizationSchema(baseUrl = getProductionBaseUrl()): Record<string, any> {
+  const { operator } = getSiteConfig();
+  const org: Record<string, any> = {
     '@type': 'Organization',
     '@id': `${baseUrl}/#organization`,
-    name: 'PDFQuick',
+    name: operator.legalName || 'PDFQuick',
     url: `${baseUrl}/`,
     logo: {
       '@type': 'ImageObject',
@@ -77,6 +68,10 @@ export function buildOrganizationSchema(baseUrl = VERIFIED_PRODUCTION_DOMAIN): R
     description:
       'Independent browser-based PDF tools and financial document privacy utilities processed 100% locally inside browser memory.',
   };
+  if (operator.supportEmail) {
+    org.email = operator.supportEmail;
+  }
+  return org;
 }
 
 export function buildBreadcrumbSchema(
@@ -163,12 +158,34 @@ export const SeoMeta: React.FC<SeoMetaProps> = ({
     }
     robotsMeta.setAttribute('content', noindex ? 'noindex, nofollow' : 'index, follow');
 
-    // 4. OpenGraph Title & Description
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', title);
+    // 4. OpenGraph Title, Description & Social Share Image (1200x630)
+    const ogImageHref = `${baseUrl}/og-image.png`;
+    const upsertMetaByProp = (prop: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${prop}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('property', prop);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    };
+    const upsertMetaByName = (name: string, content: string) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('name', name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    };
 
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', description);
+    upsertMetaByProp('og:title', title);
+    upsertMetaByProp('og:description', description);
+    upsertMetaByProp('og:image', ogImageHref);
+    upsertMetaByProp('og:image:width', '1200');
+    upsertMetaByProp('og:image:height', '630');
+    upsertMetaByProp('og:image:type', 'image/png');
+    upsertMetaByProp('og:image:alt', 'PDFQuick – Free, Private Online PDF and Financial Document Tools');
 
     // 5. Canonical URL & OpenGraph URL (removed cleanly on 404/noindex pages)
     const canonicalLink = document.querySelector('link[rel="canonical"]');
@@ -198,11 +215,10 @@ export const SeoMeta: React.FC<SeoMetaProps> = ({
     }
 
     // 6. Twitter Card Tags
-    const twTitle = document.querySelector('meta[name="twitter:title"]');
-    if (twTitle) twTitle.setAttribute('content', title);
-
-    const twDesc = document.querySelector('meta[name="twitter:description"]');
-    if (twDesc) twDesc.setAttribute('content', description);
+    upsertMetaByName('twitter:title', title);
+    upsertMetaByName('twitter:description', description);
+    upsertMetaByName('twitter:image', ogImageHref);
+    upsertMetaByName('twitter:image:alt', 'PDFQuick – Free, Private Online PDF and Financial Document Tools');
 
     // 7. Valid Hreflang Tags: only 'en' and 'x-default' (all public URLs serve English HTML).
     // Clean up any stale non-existent language hreflang tags (es/fr/ar/de) if previously injected.

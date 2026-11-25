@@ -9,6 +9,69 @@ import { injectManifest } from 'workbox-build';
 const ROOT_DIR = path.resolve(import.meta.dirname, '..');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const SSR_OUT_DIR = path.join(ROOT_DIR, '.ssr-tmp');
+const DEFAULT_PRODUCTION_URL = 'https://bdf-mufv.vercel.app';
+
+function cleanEnvValue(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  const trimmed = raw.trim();
+  if (!trimmed || /^(MY_|YOUR_|example|placeholder|changeme)/i.test(trimmed)) {
+    return '';
+  }
+  return trimmed;
+}
+
+function resolveProductionBaseUrl() {
+  const candidates = [process.env.VITE_SITE_URL, process.env.VITE_PUBLIC_SITE_URL];
+  for (const raw of candidates) {
+    const cleaned = cleanEnvValue(raw);
+    if (!cleaned) continue;
+    try {
+      const parsed = new URL(cleaned);
+      const host = parsed.hostname.toLowerCase();
+      if (
+        (parsed.protocol === 'https:' || parsed.protocol === 'http:') &&
+        host !== 'localhost' &&
+        host !== '127.0.0.1' &&
+        !host.includes('ais-dev-') &&
+        !host.endsWith('.run.app')
+      ) {
+        return parsed.origin.replace(/\/+$/, '');
+      }
+    } catch {
+      // ignore invalid URL
+    }
+  }
+  return DEFAULT_PRODUCTION_URL;
+}
+
+function resolveAdSenseIds() {
+  const rawPub = cleanEnvValue(process.env.VITE_ADSENSE_PUBLISHER_ID);
+  const match = rawPub.match(/^(?:ca-)?(pub-\d{16})$/i);
+  if (!match) return { enabled: false, clientId: null, publisherId: null };
+  const publisherId = match[1].toLowerCase();
+  return {
+    enabled: process.env.VITE_ADSENSE_ENABLED === 'true',
+    clientId: `ca-${publisherId}`,
+    publisherId,
+  };
+}
+
+function resolveCmpScriptUrl(adsense) {
+  const explicit = cleanEnvValue(process.env.VITE_CMP_SCRIPT_URL);
+  if (explicit) {
+    try {
+      const parsed = new URL(explicit);
+      if (parsed.protocol === 'https:') return parsed.toString();
+    } catch {
+      return null;
+    }
+  }
+  const provider = cleanEnvValue(process.env.VITE_CMP_PROVIDER).toLowerCase();
+  if (provider === 'funding-choices' && adsense.clientId && adsense.enabled) {
+    return `https://fundingchoicesmessages.google.com/i/${adsense.clientId}?ers=1`;
+  }
+  return null;
+}
 
 function escapeHtmlText(str) {
   return String(str)
@@ -68,8 +131,10 @@ function ssrBrowserLibStubPlugin() {
   };
 }
 
-function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head) {
+function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, options) {
+  const { baseUrl, adsense, cmpScriptUrl } = options;
   const canonical = head.canonicalHref;
+  const ogImageUrl = `${baseUrl}/og-image.png`;
   const escapedTitle = escapeHtmlText(head.title);
   const escapedTitleAttr = escapeHtmlAttr(head.title);
   const escapedDescAttr = escapeHtmlAttr(head.description);
@@ -116,7 +181,7 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head) {
     );
   }
 
-  // Replace OpenGraph & Twitter Card tags
+  // Replace OpenGraph & Twitter Card tags (including 1200x630 social image bound to baseUrl)
   html = html.replace(
     /<meta\s+property="og:title"[^>]*\/?>/i,
     `<meta property="og:title" content="${escapedTitleAttr}" />`
@@ -124,6 +189,10 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head) {
   html = html.replace(
     /<meta\s+property="og:description"[\s\S]*?\/>/i,
     `<meta property="og:description" content="${escapedDescAttr}" />`
+  );
+  html = html.replace(
+    /<meta\s+property="og:image"[^>]*\/?>/i,
+    `<meta property="og:image" content="${escapeHtmlAttr(ogImageUrl)}" />`
   );
   if (canonical) {
     html = html.replace(
@@ -142,23 +211,40 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head) {
     /<meta\s+name="twitter:description"[\s\S]*?\/>/i,
     `<meta name="twitter:description" content="${escapedDescAttr}" />`
   );
+  html = html.replace(
+    /<meta\s+name="twitter:image"[^>]*\/?>/i,
+    `<meta name="twitter:image" content="${escapeHtmlAttr(ogImageUrl)}" />`
+  );
 
   // Inject JSON-LD structured data cleanly before </head>
-  const jsonLdScripts = [];
+  const headInjections = [];
   if (!head.noindex && head.schema) {
-    jsonLdScripts.push(
+    headInjections.push(
       `<script id="pdfquick-seo-structured-data" type="application/ld+json">${safeJsonLd(head.schema)}</script>`
     );
   }
   if (!head.noindex && head.faqSchema) {
     const toolAttr = routePath === '/' ? 'home' : routePath.replace(/^\//, '');
-    jsonLdScripts.push(
+    headInjections.push(
       `<script id="pdfquick-faq-jsonld" type="application/ld+json" data-tool="${escapeHtmlAttr(toolAttr)}">${safeJsonLd(head.faqSchema)}</script>`
     );
   }
 
-  if (jsonLdScripts.length > 0) {
-    html = html.replace('</head>', `    ${jsonLdScripts.join('\n    ')}\n  </head>`);
+  // Only inject CMP / AdSense tags when explicitly enabled & configured by the site owner
+  if (cmpScriptUrl) {
+    headInjections.push(`<script async src="${escapeHtmlAttr(cmpScriptUrl)}"></script>`);
+  }
+  if (adsense.enabled && adsense.clientId) {
+    headInjections.push(
+      `<meta name="google-adsense-account" content="${escapeHtmlAttr(adsense.clientId)}" />`
+    );
+    headInjections.push(
+      `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsense.clientId)}" crossorigin="anonymous"></script>`
+    );
+  }
+
+  if (headInjections.length > 0) {
+    html = html.replace('</head>', `    ${headInjections.join('\n    ')}\n  </head>`);
   }
 
   // Inject rendered React HTML & data-ssr-route marker into #root
@@ -189,16 +275,47 @@ async function verifySitemapParity(routes) {
       `Sitemap/prerender route mismatch. Missing from prerender: [${missingFromPrerender.join(', ')}], missing from sitemap: [${missingFromSitemap.join(', ')}]`
     );
   }
+  return sitemapXml;
+}
+
+async function emitDomainAwareDistArtifacts(sitemapTemplateXml, baseUrl, adsense) {
+  // 1. Emit dist/robots.txt matched to active baseUrl
+  const robotsTxt = [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${baseUrl}/sitemap.xml`,
+    '',
+  ].join('\n');
+  await fs.writeFile(path.join(DIST_DIR, 'robots.txt'), robotsTxt, 'utf8');
+
+  // 2. Emit dist/sitemap.xml matched to active baseUrl
+  const updatedSitemap = sitemapTemplateXml.replaceAll(DEFAULT_PRODUCTION_URL, baseUrl);
+  await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), updatedSitemap, 'utf8');
+
+  // 3. Emit dist/ads.txt ONLY with real publisher ID if configured; otherwise retain safe comment template
+  if (adsense.publisherId) {
+    const adsTxt = [
+      '# PDFQuick Authorized Digital Sellers (IAB ads.txt)',
+      `google.com, ${adsense.publisherId}, DIRECT, f08c47fec0942fa0`,
+      '',
+    ].join('\n');
+    await fs.writeFile(path.join(DIST_DIR, 'ads.txt'), adsTxt, 'utf8');
+  }
 }
 
 async function run() {
+  const baseUrl = resolveProductionBaseUrl();
+  const adsense = resolveAdSenseIds();
+  const cmpScriptUrl = resolveCmpScriptUrl(adsense);
+
   const templatePath = path.join(DIST_DIR, 'index.html');
   const templateHtml = await fs.readFile(templatePath, 'utf8');
 
   await fs.rm(SSR_OUT_DIR, { recursive: true, force: true });
 
   try {
-    console.log('[prerender] Compiling SSR bundle for static route generation...');
+    console.log(`[prerender] Compiling SSR bundle for static route generation (baseUrl=${baseUrl})...`);
     await viteBuild({
       configFile: false,
       root: ROOT_DIR,
@@ -229,7 +346,7 @@ async function run() {
     const serverModuleUrl = pathToFileURL(path.join(SSR_OUT_DIR, 'entry-server.mjs')).href;
     const { CANONICAL_PRERENDER_ROUTES, renderRouteToHtml } = await import(serverModuleUrl);
 
-    await verifySitemapParity(CANONICAL_PRERENDER_ROUTES);
+    const sitemapTemplateXml = await verifySitemapParity(CANONICAL_PRERENDER_ROUTES);
 
     const seenTitles = new Map();
     const seenDescs = new Map();
@@ -255,7 +372,11 @@ async function run() {
       seenTitles.set(head.title, routePath);
       seenDescs.set(head.description, routePath);
 
-      const finalHtml = buildRouteHtmlDocument(templateHtml, routePath, appHtml, head);
+      const finalHtml = buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, {
+        baseUrl,
+        adsense,
+        cmpScriptUrl,
+      });
 
       const outFile =
         routePath === '/'
@@ -266,11 +387,13 @@ async function run() {
       await fs.writeFile(outFile, finalHtml, 'utf8');
     }
 
+    await emitDomainAwareDistArtifacts(sitemapTemplateXml, baseUrl, adsense);
+
     console.log(`[prerender] Successfully pre-rendered ${CANONICAL_PRERENDER_ROUTES.length} static routes.`);
 
     // Rebuild custom sw.ts and inject Workbox precache manifest after writing prerendered HTML files
     // so precache revisions match 100%, each canonical route resolves to its own SSR HTML,
-    // and verification files / nonexistent routes are never caught or precached.
+    // and verification files / crawler-only assets / nonexistent routes are never precached.
     const swTemplatePath = path.join(SSR_OUT_DIR, 'sw-template.js');
     await esbuildBuild({
       entryPoints: [SW_SRC_PATH],
@@ -295,6 +418,7 @@ async function run() {
         'tesseract/**',
         'fonts/**',
         '404.html',
+        'og-image.png',
         'google*.html',
         '**/google*.html',
         'assets/aistudio/**',

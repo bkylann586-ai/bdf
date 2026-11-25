@@ -1,5 +1,11 @@
-import React from 'react';
-import { ShieldCheck, Lock, AlertTriangle, EyeOff, HardDrive } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {
+  ShieldCheck,
+  AlertTriangle,
+  EyeOff,
+  SlidersHorizontal,
+  CheckCircle2,
+} from 'lucide-react';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import {
   SeoMeta,
@@ -7,9 +13,83 @@ import {
   getProductionBaseUrl,
 } from '../components/SeoMeta';
 import { Link } from '../components/Link';
+import { getSiteConfig } from '../lib/siteConfig';
+import {
+  ConsentState,
+  DEFAULT_DENIED_CONSENT,
+  getCmpIntegrationStatus,
+  getSavedConsentState,
+  openCmpPreferences,
+  resetConsentPreference,
+  saveConsentPreference,
+} from '../lib/consent';
 
 export const PrivacyPage: React.FC = () => {
   const baseUrl = getProductionBaseUrl();
+  const { operator, cmp, adsense } = getSiteConfig();
+
+  const [consentState, setConsentState] = useState<ConsentState>(DEFAULT_DENIED_CONSENT);
+  const [cmpStatus, setCmpStatus] = useState({
+    hasLiveTcfApi: false,
+    hasGoogleFundingChoices: false,
+    configuredProvider: cmp.provider as string,
+    adsenseConfigured: adsense.isConfigured,
+  });
+  const [savedNotice, setSavedNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setConsentState(getSavedConsentState());
+    setCmpStatus(getCmpIntegrationStatus());
+
+    const handleConsentUpdate = (ev: Event) => {
+      const detail = (ev as CustomEvent<ConsentState>).detail;
+      if (detail) setConsentState(detail);
+    };
+    window.addEventListener('pdfquick:consent-updated', handleConsentUpdate);
+    return () => window.removeEventListener('pdfquick:consent-updated', handleConsentUpdate);
+  }, []);
+
+  const handleRejectAll = () => {
+    const next = saveConsentPreference({
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+    });
+    setConsentState(next);
+    setSavedNotice('All optional ad & analytics storage signals set to Denied.');
+    setTimeout(() => setSavedNotice(null), 3000);
+  };
+
+  const handleAcceptEssential = () => {
+    const next = saveConsentPreference({
+      ad_storage: 'granted',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+    });
+    setConsentState(next);
+    setSavedNotice('Consent Mode v2 updated (Non-personalized ad storage granted; personalization denied).');
+    setTimeout(() => setSavedNotice(null), 3000);
+  };
+
+  const handleResetDefault = () => {
+    const next = resetConsentPreference();
+    setConsentState(next);
+    setSavedNotice('Reset to default privacy-first Denied state.');
+    setTimeout(() => setSavedNotice(null), 3000);
+  };
+
+  const handleOpenExternalCmp = () => {
+    const opened = openCmpPreferences();
+    if (!opened) {
+      setSavedNotice(
+        'External Google-certified CMP banner is currently inactive (AdSense is disabled). Local Consent Mode controls remain active below.'
+      );
+      setTimeout(() => setSavedNotice(null), 4000);
+    }
+  };
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -19,7 +99,7 @@ export const PrivacyPage: React.FC = () => {
         name: 'Privacy Policy – Client-Side Data Protection | PDFQuick',
         url: `${baseUrl}/privacy`,
         description:
-          'Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our zero-upload commitment.',
+          'Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our EEA/UK consent controls.',
       },
       buildBreadcrumbSchema(
         [
@@ -35,7 +115,7 @@ export const PrivacyPage: React.FC = () => {
     <div className="flex-1 bg-white pb-16">
       <SeoMeta
         title="Privacy Policy – Client-Side Data Protection | PDFQuick"
-        description="Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our zero-upload commitment."
+        description="Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our EEA/UK consent controls."
         path="/privacy"
         schema={schema}
       />
@@ -52,7 +132,7 @@ export const PrivacyPage: React.FC = () => {
             Privacy Policy
           </h1>
           <p className="text-xs text-slate-500">
-            Effective Date: October 2026 · Plain Language Privacy Disclosures
+            Effective Date: {operator.effectiveDate} · Plain Language Privacy &amp; EEA/UK Consent Disclosures
           </p>
         </div>
 
@@ -64,9 +144,15 @@ export const PrivacyPage: React.FC = () => {
               Summary of Our Privacy Commitments
             </h2>
             <ul className="text-xs space-y-2 text-slate-600">
-              <li>• <strong>No Document Uploads:</strong> When you use Merge, Split, Compress, Images to PDF, or PDF to Images, files are loaded directly into your browser's local sandbox memory. They are never transmitted across the network to our servers.</li>
-              <li>• <strong>No Accounts Required:</strong> You do not need to register, provide an email address, or create a profile to use PDFQuick.</li>
-              <li>• <strong>No Tracking of Document Content:</strong> We cannot see your document text, images, filenames, or metadata.</li>
+              <li>
+                • <strong>No Document Uploads:</strong> When you use Merge, Split, Compress, OCR, Redaction, Unlock, or conversion tools, files load directly into your browser&apos;s local sandbox memory. They are never transmitted across the network to our servers.
+              </li>
+              <li>
+                • <strong>No Accounts Required:</strong> You do not need to register, provide an email address, or create a profile to use PDFQuick.
+              </li>
+              <li>
+                • <strong>No Tracking of Document Content:</strong> We cannot inspect, log, or read your document text, images, filenames, bank statements, or metadata.
+              </li>
             </ul>
           </div>
 
@@ -78,56 +164,50 @@ export const PrivacyPage: React.FC = () => {
               Unlike traditional cloud-based PDF web services that upload your documents to backend servers, PDFQuick is engineered as a client-side web application.
             </p>
             <p className="mt-2">
-              Using the HTML5 File API, HTML5 Canvas, and local JavaScript libraries (such as pdf-lib and PDF.js), all PDF parsing, page extraction, image rendering, and document compression happen locally on your computer, tablet, or smartphone. When processing finishes, output files are downloaded directly from browser memory via generated <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">blob:</code> URLs.
+              Using the HTML5 File API, HTML5 Canvas, and local WebAssembly/JavaScript libraries (pdf-lib, PDF.js, JSZip, and Tesseract.js), all PDF parsing, OCR text recognition, financial form filling, true redaction, and document compression happen locally on your computer, tablet, or smartphone. When processing finishes, output files download directly from browser memory via local <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">blob:</code> URLs.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">
-              2. Memory Management & Resource Disposal
+              2. Memory Management, Offline PWA Cache &amp; Resource Disposal
             </h2>
-            <p>
-              When a document is loaded:
-            </p>
+            <p>When a document is loaded:</p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
-              <li>Temporary binary buffers reside in your web browser's RAM allocated specifically to that browser tab.</li>
-              <li>Generated download URLs are revoked using standard <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">URL.revokeObjectURL()</code> methods after download or when a new operation is started.</li>
-              <li>Closing or refreshing the browser tab immediately purges all allocated document buffers from RAM.</li>
+              <li>Temporary binary buffers reside exclusively in your web browser&apos;s volatile RAM allocated to that tab.</li>
+              <li>Generated download URLs are revoked via <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">URL.revokeObjectURL()</code> once complete.</li>
+              <li>Closing or refreshing the browser tab purges allocated document buffers from RAM.</li>
+              <li>PDFQuick&apos;s Service Worker caches only static application code, PDF worker scripts, fonts, and optional OCR language packs for offline capability—never user-selected PDF files.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2 text-amber-700">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
-              3. Important User Security Guidance (Shared & Public Devices)
+              3. Important User Security Guidance (Shared &amp; Public Devices)
             </h2>
             <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-lg not-prose text-xs text-amber-900 leading-relaxed">
               <p className="font-semibold mb-1">
                 Do not process sensitive documents on untrusted or public devices:
               </p>
               <p>
-                While PDFQuick does not transmit your files over the Internet, your browser still accesses local storage when downloading files. If you are using a shared computer (such as in an internet cafe, school computer lab, public library, or kiosk):
+                While PDFQuick does not transmit your files over the Internet, your browser still writes downloaded output to your device&apos;s Downloads folder. On a shared or public computer, always use a Private/Incognito window and delete downloaded files before signing out.
               </p>
-              <ul className="list-disc pl-4 mt-2 space-y-1">
-                <li>Others with physical or administrator access to that machine might view downloaded files in the browser's "Downloads" folder.</li>
-                <li>Malicious browser extensions installed on that computer could inspect webpage DOM contents.</li>
-                <li>Always use a Private/Incognito window and delete downloaded documents before logging out of shared workstations.</li>
-              </ul>
             </div>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">
-              4. Cookies, Analytics & Privacy Tracking
+              4. Cookies, Local Storage &amp; Privacy Tracking
             </h2>
             <p>
-              PDFQuick does not use invasive tracking cookies, cross-site trackers, or third-party behavioral advertising profilers.
+              PDFQuick does not use third-party behavioral advertising cookies, fingerprinting scripts, or cross-site tracking pixels.
             </p>
             <p className="mt-2">
-              PDFQuick also provides strictly optional, opt-in local operation counters stored only inside your browser&rsquo;s <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">localStorage</code> (disabled by default). Even when enabled, only anonymous aggregate tool counts and relative route paths are kept—never PDF files, file names, bank accounts, or financial amounts. You can toggle or clear local counters anytime from the Banking &amp; Finance Hub or browser settings.
+              Strictly local preferences—your selected UI language (<code className="bg-slate-100 px-1 py-0.5 rounded text-xs">pdfquick_lang</code>), optional opt-in operation counters (disabled by default in the Banking &amp; Finance Hub), and your Consent Mode preference (<code className="bg-slate-100 px-1 py-0.5 rounded text-xs">pdfquick_consent_v1</code>)—stay solely inside your browser&apos;s localStorage.
             </p>
             <p className="mt-2">
-              Standard web hosting logs (such as HTTP request IP addresses and user-agent strings) may be recorded by web hosting servers solely for infrastructure maintenance, DDoS mitigation, and network diagnostics. These logs do not contain any document content or file data.
+              Standard web hosting logs (such as HTTP request IP addresses and user-agent strings) may be recorded by infrastructure providers strictly for reliability, security headers, and DDoS mitigation. These logs never contain document contents.
             </p>
           </section>
 
@@ -136,32 +216,125 @@ export const PrivacyPage: React.FC = () => {
               5. Advertising Disclosures
             </h2>
             <p>
-              To keep PDFQuick free and available to users worldwide, we may present clearly labeled, non-intrusive sponsorships and advertising slots. Any advertising partners are strictly prohibited from accessing, intercepting, or indexing files processed within the browser canvas.
+              {adsense.isConfigured
+                ? 'To keep PDFQuick free, clearly labeled Google AdSense units may be displayed below instructional guides, strictly separated from file upload and download controls and governed by your consent preferences.'
+                : 'PDFQuick currently operates in ad-free mode with zero active advertising scripts or unverified ad placeholders. Should the operator enable Google AdSense after review, ads will remain separated from document controls and gated behind EEA/UK user consent.'}
             </p>
           </section>
 
-          <section>
+          <section id="consent-settings" className="scroll-mt-20">
             <h2 className="text-lg font-bold text-slate-900 mb-3">
-              6. European Economic Area (EEA) & UK User Consent Disclosures
+              6. European Economic Area (EEA) &amp; UK User Consent (CMP &amp; Consent Mode v2)
             </h2>
             <p>
-              PDFQuick currently operates in a tracker-free posture: no third-party advertising cookies or behavioral profiling pixels are embedded in the application.
+              In accordance with Google&apos;s EU User Consent Policy, GDPR, and the ePrivacy Directive, PDFQuick implements Google Consent Mode v2 privacy-first defaults: <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">ad_storage</code>, <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">ad_user_data</code>, <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">ad_personalization</code>, and <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">analytics_storage</code> default to <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">denied</code> for EEA, UK, and Swiss visitors until explicit consent is granted through a Google-certified Consent Management Platform (CMP) compliant with IAB TCF v2.2.
             </p>
-            <p className="mt-2">
-              In accordance with Google's EU User Consent Policy, the EU General Data Protection Regulation (GDPR), and the ePrivacy Directive, if and when commercial Google AdSense advertisements are deployed, website operators must collect informed user consent for the use of cookies and advertising personalization from visitors residing in the European Economic Area (EEA) and the United Kingdom (UK).
-            </p>
-            <p className="mt-2 text-xs text-slate-500">
-              Site Operator Requirement: Before enabling live Google AdSense ad units for European and British visitors, the production operator must configure a Google-certified Consent Management Platform (CMP) compliant with the IAB Europe Transparency and Consent Framework (TCF v2.2), such as Google Funding Choices or an equivalent certified CMP provider.
-            </p>
+
+            {/* Interactive Privacy & Consent Preferences Panel */}
+            <div className="not-prose mt-4 p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Privacy &amp; Consent Settings (Google Consent Mode v2)
+                  </h3>
+                </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                  {cmpStatus.hasGoogleFundingChoices || cmpStatus.hasLiveTcfApi
+                    ? 'Certified CMP Active'
+                    : adsense.isConfigured
+                      ? 'Consent Mode Active'
+                      : 'Standby · Zero Trackers Loaded'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <div className="bg-white border border-slate-200 rounded-lg p-2.5">
+                  <div className="text-slate-500 text-[11px]">ad_storage</div>
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">{consentState.ad_storage}</div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-lg p-2.5">
+                  <div className="text-slate-500 text-[11px]">ad_user_data</div>
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">{consentState.ad_user_data}</div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-lg p-2.5">
+                  <div className="text-slate-500 text-[11px]">ad_personalization</div>
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">{consentState.ad_personalization}</div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-lg p-2.5">
+                  <div className="text-slate-500 text-[11px]">analytics_storage</div>
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">{consentState.analytics_storage}</div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleRejectAll}
+                  className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  Deny All Ad &amp; Analytics Storage
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAcceptEssential}
+                  className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-300 text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Allow Non-Personalized Ads Only
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetDefault}
+                  className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Reset Default
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenExternalCmp}
+                  className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
+                >
+                  Open Certified CMP Banner
+                </button>
+              </div>
+
+              {savedNotice && (
+                <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>{savedNotice}</span>
+                </div>
+              )}
+
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Google-certified CMP readiness: supports Google Funding Choices (<code className="bg-slate-100 px-1 rounded">window.googlefc</code>) and any IAB TCF v2.2 (<code className="bg-slate-100 px-1 rounded">window.__tcfapi</code>) provider configured via <code className="bg-slate-100 px-1 rounded">VITE_CMP_PROVIDER</code> / <code className="bg-slate-100 px-1 rounded">VITE_CMP_SCRIPT_URL</code>. No external CMP or ad script is loaded until activated by the site owner.
+              </p>
+            </div>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">
               7. Contacting Us Regarding Privacy
             </h2>
-            <p>
-              If you have any questions or inquiries regarding our privacy posture or technical architecture, you can contact the maintenance team via our <Link to="/contact" className="text-blue-600 underline">Contact & Support page</Link>.
-            </p>
+            {operator.privacyEmail ? (
+              <p>
+                For privacy inquiries, data protection questions, or EEA/UK consent requests, email{' '}
+                <a href={`mailto:${operator.privacyEmail}`} className="text-blue-600 underline font-medium">
+                  {operator.privacyEmail}
+                </a>{' '}
+                {operator.legalName ? `(${operator.legalName}) ` : ''}
+                or review troubleshooting guidance on our{' '}
+                <Link to="/contact" className="text-blue-600 underline">
+                  Contact &amp; Support page
+                </Link>.
+              </p>
+            ) : (
+              <p>
+                The operator&apos;s verified privacy contact email is awaiting owner configuration prior to commercial launch. Current operator contact status and guidance are published on our{' '}
+                <Link to="/contact" className="text-blue-600 underline">
+                  Contact &amp; Support page
+                </Link>.
+              </p>
+            )}
           </section>
         </div>
       </div>

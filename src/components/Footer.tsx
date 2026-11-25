@@ -125,8 +125,10 @@ export const Footer: React.FC = () => {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} PDFQuick. {t('footer.allRights')}</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/privacy" className="hover:text-slate-400 transition-colors">Privacy</Link>
+            <span>·</span>
+            <Link to="/privacy#consent-settings" className="hover:text-slate-400 transition-colors">Consent Settings</Link>
             <span>·</span>
             <Link to="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>
             <span>·</span>

@@ -1,0 +1,5 @@
+# PDFQuick Authorized Digital Sellers (IAB ads.txt)
+# No AdSense publisher ID is activated yet.
+# Once your Google AdSense account is approved and ready, set VITE_ADSENSE_PUBLISHER_ID
+# in your build environment (e.g., pub-XXXXXXXXXXXXXXXX) or replace this file's content
+# with: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

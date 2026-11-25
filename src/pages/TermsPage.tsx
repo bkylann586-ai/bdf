@@ -6,9 +6,12 @@ import {
   getProductionBaseUrl,
 } from '../components/SeoMeta';
 import { Link } from '../components/Link';
+import { getSiteConfig } from '../lib/siteConfig';
 
 export const TermsPage: React.FC = () => {
   const baseUrl = getProductionBaseUrl();
+  const { operator } = getSiteConfig();
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -47,7 +50,7 @@ export const TermsPage: React.FC = () => {
             Terms of Use
           </h1>
           <p className="text-xs text-slate-500">
-            Last Updated: October 2026 · Governing Service Terms
+            Last Updated: {operator.effectiveDate} · Governing Service Terms
           </p>
         </div>
 
@@ -55,29 +58,27 @@ export const TermsPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-2">1. Agreement to Terms</h2>
             <p>
-              By accessing and using PDFQuick (the "Service"), you agree to be bound by these Terms of Use. If you do not agree with any part of these terms, you should not access or use the Service.
+              By accessing and using PDFQuick (the &quot;Service&quot;), you agree to be bound by these Terms of Use. If you do not agree with any part of these terms, you should not access or use the Service.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">2. Permitted Use & Software License</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">2. Permitted Use &amp; Software License</h2>
             <p>
               PDFQuick grants you a personal, non-exclusive, non-transferable, revocable license to access and use the client-side utilities provided on this website for lawful personal, academic, and business document processing tasks.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">3. User Document Ownership & Intellectual Property</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">3. User Document Ownership &amp; Intellectual Property</h2>
             <p>
               You retain full, exclusive copyright and ownership over all documents, files, graphics, and data processed using PDFQuick. Because processing occurs entirely within your local browser runtime, PDFQuick does not take possession of, claim any intellectual property in, or license any rights to your files.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">4. User Responsibilities & Acceptable Conduct</h2>
-            <p>
-              You agree not to use the Service:
-            </p>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">4. User Responsibilities &amp; Acceptable Conduct</h2>
+            <p>You agree not to use the Service:</p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
               <li>To process documents in violation of any applicable local, state, national, or international law or intellectual property rights.</li>
               <li>To attempt to circumvent, disable, or interfere with security features of the website.</li>
@@ -88,7 +89,7 @@ export const TermsPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-2">5. Disclaimer of Warranties</h2>
             <p>
-              THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+              THE SERVICE IS PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
             </p>
             <p className="mt-2">
               PDFQuick does not warrant that the Service will meet your specific requirements, that document processing will be uninterrupted or error-free, or that all document formatting, form fields, and annotations will be reconstructed identically across unusual or non-standard PDF specifications.
@@ -110,10 +111,32 @@ export const TermsPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">8. Operator Transparency &amp; Legal Notices</h2>
-            <p>
-              PDFQuick is an independent client-side web utility. Formal legal entity details and direct administrative contact information are pending owner configuration and will be published on the <Link to="/contact" className="text-blue-600 underline">Contact &amp; Support page</Link> prior to commercial deployment.
-            </p>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">8. Operator Transparency &amp; Governing Notices</h2>
+            <div className="not-prose p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 space-y-2">
+              <p>
+                <strong>Operator / Legal Entity:</strong>{' '}
+                {operator.legalName || 'Pending owner confirmation prior to commercial launch'}
+              </p>
+              <p>
+                <strong>Governing Jurisdiction:</strong>{' '}
+                {operator.jurisdiction || 'Pending owner confirmation prior to commercial launch'}
+              </p>
+              <p>
+                <strong>Administrative Contact:</strong>{' '}
+                {operator.supportEmail ? (
+                  <a href={`mailto:${operator.supportEmail}`} className="text-blue-600 underline font-medium">
+                    {operator.supportEmail}
+                  </a>
+                ) : (
+                  <>
+                    Pending owner configuration on the{' '}
+                    <Link to="/contact" className="text-blue-600 underline font-medium">
+                      Contact &amp; Support page
+                    </Link>
+                  </>
+                )}
+              </p>
+            </div>
           </section>
         </div>
       </div>

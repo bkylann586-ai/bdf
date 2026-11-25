@@ -6,9 +6,12 @@ import {
   getProductionBaseUrl,
 } from '../components/SeoMeta';
 import { Link } from '../components/Link';
+import { getSiteConfig } from '../lib/siteConfig';
 
 export const DmcaPage: React.FC = () => {
   const baseUrl = getProductionBaseUrl();
+  const { operator } = getSiteConfig();
+
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -44,18 +47,18 @@ export const DmcaPage: React.FC = () => {
 
         <div className="py-8 sm:py-10 border-b border-slate-200">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Copyright & Intellectual Property Notice
+            Copyright &amp; Intellectual Property Notice
           </h1>
           <p className="text-xs text-slate-500">
-            Intellectual Property Policy · In-Browser Document Processing
+            Effective Date: {operator.effectiveDate} · Intellectual Property Policy · In-Browser Document Processing
           </p>
         </div>
 
         <div className="prose prose-slate max-w-none py-8 space-y-6 text-sm text-slate-700 leading-relaxed">
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-2">1. Local Processing Architecture & Document Ownership</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">1. Local Processing Architecture &amp; Document Ownership</h2>
             <p>
-              PDFQuick operates exclusively as a client-side web utility. When you merge, split, compress, or convert documents, all processing occurs within your browser's local sandbox memory using client-side JavaScript and HTML5 Canvas.
+              PDFQuick operates exclusively as a client-side web utility. When you merge, split, compress, or convert documents, all processing occurs within your browser&apos;s local sandbox memory using client-side JavaScript and HTML5 Canvas.
             </p>
             <p className="mt-2">
               <strong>Your files are never transmitted to, uploaded to, hosted on, or stored on our servers.</strong> Consequently, PDFQuick does not possess, catalog, publish, or publicly distribute any documents processed by users. You retain full and exclusive copyright and ownership over your documents.
@@ -72,15 +75,29 @@ export const DmcaPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-2">3. Website Content Copyright Inquiries</h2>
             <p>
-              This website does not maintain a registered designated copyright agent with the U.S. Copyright Office. If you are a copyright owner or an authorized agent who believes that any material authored and published directly on the PDFQuick website itself (such as instructional text, custom graphics, or site copy) infringes upon your copyright, you may submit a detailed inquiry to the site administrators.
+              If you are a copyright owner or an authorized representative who believes that any material authored and published directly on the PDFQuick website itself (such as instructional text, custom graphics, or site copy) infringes upon your copyright, you may submit a detailed written notice to the site operator.
             </p>
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg not-prose text-xs text-slate-700 space-y-2">
-              <p><strong>How to submit an inquiry:</strong></p>
-              <p>
-                Direct contact details are pending configuration by the website owner prior to public release. Current contact status and guidance are available on our <Link to="/contact" className="text-blue-600 underline font-medium">Contact &amp; Support page</Link>.
-              </p>
+              <p><strong>Copyright &amp; Takedown Contact:</strong></p>
+              {operator.dmcaEmail ? (
+                <p>
+                  Submit copyright notices directly to{' '}
+                  <a href={`mailto:${operator.dmcaEmail}`} className="text-blue-600 underline font-semibold">
+                    {operator.dmcaEmail}
+                  </a>
+                  {operator.legalName ? ` (Attn: ${operator.legalName})` : ''}.
+                  {operator.address ? ` Postal address: ${operator.address}.` : ''}
+                </p>
+              ) : (
+                <p>
+                  Direct copyright notice email details are awaiting owner confirmation prior to commercial launch. Current operator contact status and guidance are published on our{' '}
+                  <Link to="/contact" className="text-blue-600 underline font-medium">
+                    Contact &amp; Support page
+                  </Link>.
+                </p>
+              )}
               <p className="text-slate-500 text-[11px]">
-                Please note: Because user documents never touch our infrastructure, we cannot inspect, access, delete, or remove files that reside solely on individual users' local personal devices.
+                Please note: Because user documents never touch our infrastructure, we cannot inspect, access, delete, or remove files that reside solely on individual users&apos; local personal devices.
               </p>
             </div>
           </section>

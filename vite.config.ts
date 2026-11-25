@@ -59,6 +59,7 @@ export default defineConfig(() => {
             'tesseract/**',
             'fonts/**',
             '404.html',
+            'og-image.png',
             'google*.html',
             '**/google*.html',
             'assets/aistudio/**',
@@ -67,7 +68,7 @@ export default defineConfig(() => {
           maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         },
         devOptions: {
-          enabled: true,
+          enabled: process.env.DISABLE_HMR !== 'true',
           type: 'module',
         },
       }),
