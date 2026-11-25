@@ -3,7 +3,8 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build as viteBuild } from 'vite';
 import react from '@vitejs/plugin-react';
-import { generateSW } from 'workbox-build';
+import { build as esbuildBuild } from 'esbuild';
+import { injectManifest } from 'workbox-build';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '..');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
@@ -28,35 +29,7 @@ function safeJsonLd(obj) {
   return JSON.stringify(obj).replace(/<\//g, '<\\/');
 }
 
-const VALID_NAVIGATION_ALLOWLIST = [
-  /^\/$/,
-  /^\/home\/?$/,
-  /^\/tools\/?$/,
-  /^\/merge-pdf\/?$/,
-  /^\/split-pdf\/?$/,
-  /^\/compress-pdf\/?$/,
-  /^\/images-to-pdf\/?$/,
-  /^\/pdf-to-images\/?$/,
-  /^\/rotate-pdf\/?$/,
-  /^\/delete-pdf-pages\/?$/,
-  /^\/reorder-pdf-pages\/?$/,
-  /^\/add-page-numbers\/?$/,
-  /^\/watermark-pdf\/?$/,
-  /^\/ocr-pdf\/?$/,
-  /^\/edit-pdf-metadata\/?$/,
-  /^\/unlock-pdf\/?$/,
-  /^\/banking-finance\/?$/,
-  /^\/banking\/us-banks\/?$/,
-  /^\/banking\/us-banks\/(chase|bank-of-america|wells-fargo|citi|us-bank)\/?$/,
-  /^\/banking\/financial-templates\/?$/,
-  /^\/banking\/financial-pdf-form-filler\/?$/,
-  /^\/banking\/financial-document-privacy\/?$/,
-  /^\/about\/?$/,
-  /^\/contact\/?$/,
-  /^\/privacy\/?$/,
-  /^\/terms\/?$/,
-  /^\/dmca\/?$/,
-];
+const SW_SRC_PATH = path.join(ROOT_DIR, 'src', 'sw.ts');
 
 /**
  * Vite SSR plugin that replaces browser-only PDF viewer packages (react-pdf / pdfjs_viewer)
@@ -295,68 +268,42 @@ async function run() {
 
     console.log(`[prerender] Successfully pre-rendered ${CANONICAL_PRERENDER_ROUTES.length} static routes.`);
 
-    // Regenerate Workbox sw.js after writing prerendered HTML files so precache revisions match 100%
-    // and nonexistent routes are NEVER rewritten to cached /index.html by the service worker.
-    const swDest = path.join(DIST_DIR, 'sw.js');
-    const { count, size } = await generateSW({
-      swDest,
-      globDirectory: DIST_DIR,
-      globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff,woff2,ttf}'],
-      globIgnores: ['tesseract/**', '404.html', 'google*.html'],
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-      cleanupOutdatedCaches: true,
-      clientsClaim: true,
-      skipWaiting: true,
-      navigateFallback: '/index.html',
-      navigateFallbackAllowlist: VALID_NAVIGATION_ALLOWLIST,
-      navigateFallbackDenylist: [/^\/api\//, /^\/google[a-z0-9]+\.html$/i],
-      runtimeCaching: [
-        {
-          urlPattern: /^\/tesseract\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'local-tesseract-ocr-cache',
-            expiration: {
-              maxEntries: 20,
-              maxAgeSeconds: 60 * 60 * 24 * 180,
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-        {
-          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'google-fonts-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 365,
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-        {
-          urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'gstatic-fonts-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 365,
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-      ],
+    // Rebuild custom sw.ts and inject Workbox precache manifest after writing prerendered HTML files
+    // so precache revisions match 100%, each canonical route resolves to its own SSR HTML,
+    // and verification files / nonexistent routes are never caught or precached.
+    const swTemplatePath = path.join(SSR_OUT_DIR, 'sw-template.js');
+    await esbuildBuild({
+      entryPoints: [SW_SRC_PATH],
+      outfile: swTemplatePath,
+      bundle: true,
+      minify: true,
+      format: 'iife',
+      platform: 'browser',
+      target: ['es2020'],
+      define: {
+        'process.env.NODE_ENV': '"production"',
+      },
     });
 
-    console.log(`[prerender] Regenerated sw.js precache manifest (${count} entries, ${(size / 1024 / 1024).toFixed(2)} MB).`);
+    const swDest = path.join(DIST_DIR, 'sw.js');
+    const { count, size } = await injectManifest({
+      swSrc: swTemplatePath,
+      swDest,
+      globDirectory: DIST_DIR,
+      globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff2}'],
+      globIgnores: [
+        'tesseract/**',
+        'fonts/**',
+        '404.html',
+        'google*.html',
+        '**/google*.html',
+        'assets/aistudio/**',
+        '**/*.map',
+      ],
+      maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+    });
+
+    console.log(`[prerender] Injected sw.js precache manifest (${count} entries, ${(size / 1024 / 1024).toFixed(2)} MB).`);
   } finally {
     await fs.rm(SSR_OUT_DIR, { recursive: true, force: true });
   }

@@ -1,8 +1,8 @@
 import { pdfjs } from 'react-pdf';
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { PDF_WORKER_URL } from './pdfWorkerUrl';
 
 if (typeof window !== 'undefined' && pdfjs?.GlobalWorkerOptions) {
-  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+  pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
 }
 
 export { pdfjs };

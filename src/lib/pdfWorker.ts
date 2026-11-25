@@ -1,5 +1,5 @@
 import * as pdfjsLib from 'pdfjs-dist';
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { PDF_WORKER_URL } from './pdfWorkerUrl';
 
 if (typeof (Promise as any).try !== 'function') {
   (Promise as any).try = function (fn: (...args: any[]) => any, ...args: any[]) {
@@ -8,7 +8,7 @@ if (typeof (Promise as any).try !== 'function') {
 }
 
 if (typeof window !== 'undefined' && pdfjsLib?.GlobalWorkerOptions) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
 }
 
 export { pdfjsLib };

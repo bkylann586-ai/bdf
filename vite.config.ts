@@ -10,7 +10,10 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: 'autoUpdate',
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.ts',
+        registerType: 'prompt',
         includeAssets: [
           'icon.svg',
           'apple-touch-icon.png',
@@ -50,69 +53,18 @@ export default defineConfig(() => {
             },
           ],
         },
-        workbox: {
-          globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff,woff2,ttf}'],
-          globIgnores: ['tesseract/**', '404.html', 'google*.html'],
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-          cleanupOutdatedCaches: true,
-          clientsClaim: true,
-          skipWaiting: true,
-          navigateFallback: '/index.html',
-          navigateFallbackAllowlist: [
-            /^\/$/,
-            /^\/home\/?$/,
-            /^\/tools\/?$/,
-            /^\/(merge-pdf|split-pdf|compress-pdf|images-to-pdf|pdf-to-images|rotate-pdf|delete-pdf-pages|reorder-pdf-pages|add-page-numbers|watermark-pdf|ocr-pdf|edit-pdf-metadata|unlock-pdf)\/?$/,
-            /^\/banking-finance\/?$/,
-            /^\/banking\/us-banks(\/(chase|bank-of-america|wells-fargo|citi|us-bank))?\/?$/,
-            /^\/banking\/(financial-templates|financial-pdf-form-filler|financial-document-privacy)\/?$/,
-            /^\/(about|contact|privacy|terms|dmca)\/?$/,
+        injectManifest: {
+          globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg,woff2}'],
+          globIgnores: [
+            'tesseract/**',
+            'fonts/**',
+            '404.html',
+            'google*.html',
+            '**/google*.html',
+            'assets/aistudio/**',
+            '**/*.map',
           ],
-          navigateFallbackDenylist: [/^\/api\//, /^\/google[a-z0-9]+\.html$/i],
-          runtimeCaching: [
-            {
-              urlPattern: /^\/tesseract\/.*/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'local-tesseract-ocr-cache',
-                expiration: {
-                  maxEntries: 20,
-                  maxAgeSeconds: 60 * 60 * 24 * 180,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
-            {
-              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'google-fonts-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
-            {
-              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'gstatic-fonts-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
-          ],
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         },
         devOptions: {
           enabled: true,
@@ -120,6 +72,31 @@ export default defineConfig(() => {
         },
       }),
     ],
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              {
+                name: 'vendor-react',
+                test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                priority: 30,
+              },
+              {
+                name: 'pdfjs-core',
+                test: /[\\/]node_modules[\\/]pdfjs-dist[\\/]/,
+                priority: 25,
+              },
+              {
+                name: 'pdf-lib',
+                test: /[\\/]node_modules[\\/]pdf-lib[\\/]/,
+                priority: 20,
+              },
+            ],
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),

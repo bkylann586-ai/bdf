@@ -62,14 +62,13 @@ export function usePWAInstall() {
 }
 
 export function useOnlineStatus() {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean'
-      ? navigator.onLine
-      : true
-  );
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean') {
+      setIsOnline(navigator.onLine);
+    }
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -83,4 +82,63 @@ export function useOnlineStatus() {
   }, []);
 
   return isOnline;
+}
+
+const SW_UPDATE_EVENT = 'pdfquick:sw-update-state';
+let swUpdateApplyFn: (() => Promise<void>) | null = null;
+let swUpdateDismissed = false;
+let swIsUpdating = false;
+
+function emitSwUpdateEvent() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SW_UPDATE_EVENT));
+  }
+}
+
+export function notifySwUpdateAvailable(applyFn: () => Promise<void>): void {
+  swUpdateApplyFn = applyFn;
+  swUpdateDismissed = false;
+  swIsUpdating = false;
+  emitSwUpdateEvent();
+}
+
+export async function applySwUpdate(): Promise<void> {
+  if (!swUpdateApplyFn || swIsUpdating) return;
+  swIsUpdating = true;
+  emitSwUpdateEvent();
+  try {
+    await swUpdateApplyFn();
+  } catch {
+    swIsUpdating = false;
+    emitSwUpdateEvent();
+  }
+}
+
+export function dismissSwUpdate(): void {
+  swUpdateDismissed = true;
+  emitSwUpdateEvent();
+}
+
+export function useSwUpdatePrompt() {
+  const [state, setState] = useState({
+    updateAvailable: false,
+    isUpdating: false,
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const sync = () => {
+      setState({
+        updateAvailable: Boolean(swUpdateApplyFn) && !swUpdateDismissed,
+        isUpdating: swIsUpdating,
+      });
+    };
+    sync();
+    window.addEventListener(SW_UPDATE_EVENT, sync);
+    return () => {
+      window.removeEventListener(SW_UPDATE_EVENT, sync);
+    };
+  }, []);
+
+  return state;
 }

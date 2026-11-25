@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineIndicator } from './components/OfflineIndicator';
+import { SwUpdatePrompt } from './components/SwUpdatePrompt';
 import { SsrRouterProvider, normalizePath, usePathname } from './lib/router';
 import { SeoCollectorProvider, SeoHeadCollector } from './components/SeoMeta';
 import { LanguageProvider } from './lib/i18n';
@@ -11,18 +12,18 @@ import { trackPageView } from './lib/analytics';
 import { GlobalDropProvider } from './lib/globalDrop';
 import { PerformanceMonitorProvider, usePerformanceMonitor } from './lib/performanceMonitor';
 
-// Eagerly loaded core & lightweight static pages
+// Eagerly loaded homepage & 404 page
 import { HomePage } from './pages/HomePage';
-import { AllToolsPage } from './pages/AllToolsPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { DmcaPage } from './pages/DmcaPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 // Lazy-loaded tool page chunk loaders (shared with preloadRouteComponent for zero-flash hydration)
 const routeLoaders = {
+  '/tools': () => import('./pages/AllToolsPage').then((m) => ({ default: m.AllToolsPage })),
+  '/about': () => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })),
+  '/contact': () => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })),
+  '/privacy': () => import('./pages/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
+  '/terms': () => import('./pages/TermsPage').then((m) => ({ default: m.TermsPage })),
+  '/dmca': () => import('./pages/DmcaPage').then((m) => ({ default: m.DmcaPage })),
   '/merge-pdf': () => import('./pages/MergePdfPage').then((m) => ({ default: m.MergePdfPage })),
   '/split-pdf': () => import('./pages/SplitPdfPage').then((m) => ({ default: m.SplitPdfPage })),
   '/compress-pdf': () => import('./pages/CompressPdfPage').then((m) => ({ default: m.CompressPdfPage })),
@@ -75,7 +76,13 @@ export async function preloadRouteComponent(path: string): Promise<void> {
   }
 }
 
-// Lazy-loaded tool pages (code-split to reduce initial bundle size)
+// Lazy-loaded pages (code-split to reduce initial bundle size)
+const AllToolsPage = lazy(routeLoaders['/tools']);
+const AboutPage = lazy(routeLoaders['/about']);
+const ContactPage = lazy(routeLoaders['/contact']);
+const PrivacyPage = lazy(routeLoaders['/privacy']);
+const TermsPage = lazy(routeLoaders['/terms']);
+const DmcaPage = lazy(routeLoaders['/dmca']);
 const MergePdfPage = lazy(routeLoaders['/merge-pdf']);
 const SplitPdfPage = lazy(routeLoaders['/split-pdf']);
 const CompressPdfPage = lazy(routeLoaders['/compress-pdf']);
@@ -208,6 +215,7 @@ function AppContent({ ssrPageElement }: AppContentProps) {
       </main>
       <Footer />
       <OfflineIndicator />
+      <SwUpdatePrompt />
     </div>
   );
 }

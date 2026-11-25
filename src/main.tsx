@@ -2,12 +2,23 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App, { preloadRouteComponent } from './App.tsx';
 import { getCurrentPath } from './lib/router';
+import { notifySwUpdateAvailable } from './lib/pwa';
 import './index.css';
+
+let userApprovedRefresh = false;
 
 const updateSW = registerSW({
   immediate: true,
   onNeedRefresh() {
-    updateSW(true);
+    notifySwUpdateAvailable(async () => {
+      userApprovedRefresh = true;
+      await updateSW(true);
+    });
+  },
+  onNeedReload() {
+    if (userApprovedRefresh) {
+      window.location.reload();
+    }
   },
   onRegisteredSW(_swUrl, registration) {
     if (registration) {
@@ -18,16 +29,6 @@ const updateSW = registerSW({
     }
   },
 });
-
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
-    }
-  });
-}
 
 async function mountApp() {
   const rootEl = document.getElementById('root');
