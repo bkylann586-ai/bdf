@@ -58,6 +58,7 @@ export default defineConfig(() => {
           globIgnores: [
             'tesseract/**',
             'fonts/**',
+            'monetag/**',
             '404.html',
             'og-image.png',
             'google*.html',

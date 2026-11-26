@@ -34,6 +34,18 @@ export interface SiteCmpConfig {
   isConfigured: boolean;
 }
 
+export interface SiteMonetagConfig {
+  enabled: boolean;
+  domain: string;
+  zoneId: number;
+  scriptUrl: string | null;
+  swPath: string;
+  swScope: string;
+  verificationToken: string | null;
+  requireConsent: boolean;
+  isConfigured: boolean;
+}
+
 export interface SiteConfig {
   brandName: string;
   defaultProductionUrl: string;
@@ -42,6 +54,7 @@ export interface SiteConfig {
   operator: SiteOperatorConfig;
   adsense: SiteAdSenseConfig;
   cmp: SiteCmpConfig;
+  monetag: SiteMonetagConfig;
 }
 
 function readEnv(key: string): string | undefined {
@@ -186,6 +199,50 @@ export function getSiteConfig(): SiteConfig {
     clientId
   );
 
+  const monetagEnabled = readEnv('VITE_MONETAG_ENABLED') === 'true';
+  const rawMonetagDomain = cleanText(readEnv('VITE_MONETAG_DOMAIN')) || '5gvci.com';
+  const monetagDomain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(rawMonetagDomain)
+    ? rawMonetagDomain.toLowerCase()
+    : '5gvci.com';
+  const parsedZoneId = Number.parseInt(
+    cleanText(readEnv('VITE_MONETAG_ZONE_ID')) || '12336654',
+    10
+  );
+  const monetagZoneId =
+    Number.isFinite(parsedZoneId) && parsedZoneId > 0 ? parsedZoneId : 12336654;
+
+  let monetagScriptUrl: string | null = null;
+  const rawMonetagScriptUrl = cleanText(readEnv('VITE_MONETAG_SCRIPT_URL'));
+  if (rawMonetagScriptUrl) {
+    try {
+      const parsed = new URL(rawMonetagScriptUrl);
+      if (parsed.protocol === 'https:') {
+        monetagScriptUrl = parsed.toString();
+      }
+    } catch {
+      monetagScriptUrl = null;
+    }
+  }
+
+  const rawSwScope = cleanText(readEnv('VITE_MONETAG_SW_SCOPE')) || '/monetag/';
+  const monetagSwScope =
+    rawSwScope.startsWith('/') && rawSwScope !== '/'
+      ? rawSwScope.endsWith('/')
+        ? rawSwScope
+        : `${rawSwScope}/`
+      : '/monetag/';
+  const rawSwPath = cleanText(readEnv('VITE_MONETAG_SW_PATH')) || '/monetag/sw.js';
+  const monetagSwPath =
+    rawSwPath.startsWith(monetagSwScope) && rawSwPath !== '/sw.js'
+      ? rawSwPath
+      : `${monetagSwScope}sw.js`;
+
+  const monetagVerificationToken = cleanText(readEnv('VITE_MONETAG_VERIFICATION_TOKEN'));
+  const monetagRequireConsent = readEnv('VITE_MONETAG_REQUIRE_CONSENT') !== 'false';
+  const monetagConfigured = Boolean(
+    monetagEnabled && monetagDomain && monetagZoneId > 0 && (monetagScriptUrl || monetagSwPath)
+  );
+
   return {
     brandName: 'PDFQuick',
     defaultProductionUrl: DEFAULT_PRODUCTION_URL,
@@ -211,6 +268,17 @@ export function getSiteConfig(): SiteConfig {
       provider: cmpProvider,
       scriptUrl: cmpScriptUrl,
       isConfigured: Boolean(cmpScriptUrl),
+    },
+    monetag: {
+      enabled: monetagEnabled,
+      domain: monetagDomain,
+      zoneId: monetagZoneId,
+      scriptUrl: monetagScriptUrl,
+      swPath: monetagSwPath,
+      swScope: monetagSwScope,
+      verificationToken: monetagVerificationToken,
+      requireConsent: monetagRequireConsent,
+      isConfigured: monetagConfigured,
     },
   };
 }

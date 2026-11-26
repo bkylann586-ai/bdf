@@ -15,6 +15,7 @@ import {
 import { Link } from '../components/Link';
 import { getSiteConfig } from '../lib/siteConfig';
 import {
+  CmpIntegrationStatus,
   ConsentState,
   DEFAULT_DENIED_CONSENT,
   getCmpIntegrationStatus,
@@ -26,12 +27,15 @@ import {
 
 export const PrivacyPage: React.FC = () => {
   const baseUrl = getProductionBaseUrl();
-  const { operator, cmp, adsense } = getSiteConfig();
+  const { operator, cmp, adsense, monetag } = getSiteConfig();
 
   const [consentState, setConsentState] = useState<ConsentState>(DEFAULT_DENIED_CONSENT);
-  const [cmpStatus, setCmpStatus] = useState({
+  const [cmpStatus, setCmpStatus] = useState<CmpIntegrationStatus>({
     hasLiveTcfApi: false,
+    tcfCmpId: null,
+    hasValidTcfString: false,
     hasGoogleFundingChoices: false,
+    isExternalCmpActive: false,
     configuredProvider: cmp.provider as string,
     adsenseConfigured: adsense.isConfigured,
   });
@@ -84,7 +88,7 @@ export const PrivacyPage: React.FC = () => {
     const opened = openCmpPreferences();
     if (!opened) {
       setSavedNotice(
-        'External Google-certified CMP banner is currently inactive (AdSense is disabled). Local Consent Mode controls remain active below.'
+        'No external CMP script is currently loaded (AdSense is disabled). Local Consent Mode v2 controls remain active below.'
       );
       setTimeout(() => setSavedNotice(null), 4000);
     }
@@ -216,9 +220,14 @@ export const PrivacyPage: React.FC = () => {
               5. Advertising Disclosures
             </h2>
             <p>
-              {adsense.isConfigured
-                ? 'To keep PDFQuick free, clearly labeled Google AdSense units may be displayed below instructional guides, strictly separated from file upload and download controls and governed by your consent preferences.'
-                : 'PDFQuick currently operates in ad-free mode with zero active advertising scripts or unverified ad placeholders. Should the operator enable Google AdSense after review, ads will remain separated from document controls and gated behind EEA/UK user consent.'}
+              {adsense.isConfigured || monetag.isConfigured
+                ? `To keep PDFQuick free, ${[
+                    adsense.isConfigured ? 'Google AdSense' : null,
+                    monetag.isConfigured ? 'Monetag' : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' and ')} monetization may run strictly outside document dropzones and download controls, and only after your explicit consent preferences are granted.`
+                : 'PDFQuick currently operates in ad-free mode with zero active advertising scripts or unverified ad placeholders. Should the operator enable Google AdSense or Monetag after review, ad scripts and notifications remain separated from document controls and gated behind EEA/UK user consent.'}
             </p>
           </section>
 
@@ -240,11 +249,13 @@ export const PrivacyPage: React.FC = () => {
                   </h3>
                 </div>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-                  {cmpStatus.hasGoogleFundingChoices || cmpStatus.hasLiveTcfApi
-                    ? 'Certified CMP Active'
-                    : adsense.isConfigured
-                      ? 'Consent Mode Active'
-                      : 'Standby · Zero Trackers Loaded'}
+                  {cmpStatus.hasGoogleFundingChoices
+                    ? 'Funding Choices Loaded'
+                    : cmpStatus.isExternalCmpActive && cmpStatus.tcfCmpId
+                      ? `External TCF CMP Loaded (ID #${cmpStatus.tcfCmpId})`
+                      : adsense.isConfigured
+                        ? 'Consent Mode Active (Verify External CMP)'
+                        : 'Consent Mode v2 Ready · Zero Trackers Loaded'}
                 </span>
               </div>
 
@@ -294,7 +305,7 @@ export const PrivacyPage: React.FC = () => {
                   onClick={handleOpenExternalCmp}
                   className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
                 >
-                  Open Certified CMP Banner
+                  Open External CMP Preferences
                 </button>
               </div>
 
@@ -306,7 +317,7 @@ export const PrivacyPage: React.FC = () => {
               )}
 
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                Google-certified CMP readiness: supports Google Funding Choices (<code className="bg-slate-100 px-1 rounded">window.googlefc</code>) and any IAB TCF v2.2 (<code className="bg-slate-100 px-1 rounded">window.__tcfapi</code>) provider configured via <code className="bg-slate-100 px-1 rounded">VITE_CMP_PROVIDER</code> / <code className="bg-slate-100 px-1 rounded">VITE_CMP_SCRIPT_URL</code>. No external CMP or ad script is loaded until activated by the site owner.
+                Consent Mode v2 integration: sets <code className="bg-slate-100 px-1 rounded">denied</code> defaults in <code className="bg-slate-100 px-1 rounded">&lt;head&gt;</code> for EEA/UK/CH visitors and listens to Google Funding Choices (<code className="bg-slate-100 px-1 rounded">window.googlefc</code>) or external IAB TCF v2.2 (<code className="bg-slate-100 px-1 rounded">window.__tcfapi</code>) providers configured via <code className="bg-slate-100 px-1 rounded">VITE_CMP_PROVIDER</code> / <code className="bg-slate-100 px-1 rounded">VITE_CMP_SCRIPT_URL</code>. This local panel does not itself serve a TCF <code className="bg-slate-100 px-1 rounded">TCString</code>; before enabling AdSense in EEA/UK/CH, the operator must activate and verify a provider listed on Google&apos;s certified CMP registry.
               </p>
             </div>
           </section>

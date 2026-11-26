@@ -1,12 +1,13 @@
 /**
- * Google Consent Mode v2 + Google-Certified CMP (Funding Choices / IAB TCF v2.2) Integration
+ * Google Consent Mode v2 + External CMP (Funding Choices / IAB TCF v2.2) Integration
  *
  * Design guarantees:
  * - Zero tracking requests or ad scripts are executed by default.
  * - EEA/UK/CH visitors default to 'denied' for ad_storage, ad_user_data,
- *   ad_personalization, and analytics_storage until explicit consent is granted.
- * - Interoperates cleanly with Google Funding Choices (window.googlefc) and any
- *   IAB TCF v2.2 certified CMP exposing window.__tcfapi when enabled by the owner.
+ *   ad_personalization, and analytics_storage before any ad/CMP scripts load.
+ * - Does NOT claim Google CMP certification on its own; certification applies only
+ *   when an external CMP listed on Google's certified CMP registry (such as Google
+ *   Funding Choices or a verified IAB TCF v2.2 CMP) is activated by the owner.
  */
 
 import { getSiteConfig } from './siteConfig';
@@ -46,8 +47,11 @@ interface GoogleFcApi {
 }
 
 interface TcfData {
+  cmpId?: number;
+  cmpStatus?: string;
   eventStatus?: string;
   gdprApplies?: boolean;
+  tcString?: string;
   purpose?: {
     consents?: Record<string, boolean>;
   };
@@ -57,12 +61,16 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
+    __pdfquickConsentDefaultSet?: boolean;
     __tcfapi?: (
       command: string,
       version: number,
       callback: (data: TcfData | null, success: boolean) => void
     ) => void;
     googlefc?: GoogleFcApi;
+    Cookiebot?: { renew?: () => void };
+    UC_UI?: { showSecondLayer?: () => void };
+    Didomi?: { preferences?: { show?: () => void } };
   }
 }
 
@@ -153,9 +161,36 @@ export function resetConsentPreference(): ConsentState {
 }
 
 let initialized = false;
+let observedTcfCmpId: number | null = null;
+let observedTcfString = false;
+
+function handleTcfPayload(tcData: TcfData | null, success: boolean): void {
+  if (!success || !tcData) return;
+  if (typeof tcData.cmpId === 'number' && tcData.cmpId > 0) {
+    observedTcfCmpId = tcData.cmpId;
+  }
+  if (typeof tcData.tcString === 'string' && tcData.tcString.length > 0) {
+    observedTcfString = true;
+  }
+  if (tcData.eventStatus === 'useractioncomplete' || tcData.eventStatus === 'tcloaded') {
+    const consents = tcData.purpose?.consents || {};
+    const gdprApplies = tcData.gdprApplies !== false;
+    const hasPurpose1 = !gdprApplies || Boolean(consents['1']);
+    const hasPersonalization = !gdprApplies || (Boolean(consents['3']) && Boolean(consents['4']));
+    saveConsentPreference(
+      {
+        ad_storage: hasPurpose1 ? 'granted' : 'denied',
+        ad_user_data: hasPurpose1 ? 'granted' : 'denied',
+        ad_personalization: hasPersonalization ? 'granted' : 'denied',
+        analytics_storage: hasPurpose1 ? 'granted' : 'denied',
+      },
+      'tcf_cmp'
+    );
+  }
+}
 
 /**
- * Initialize Google Consent Mode v2 default state in memory (denied by default for EEA/UK/CH).
+ * Ensure Google Consent Mode v2 default state is set in memory (idempotent if already set in <head>).
  * Does NOT load any external tracking or ad scripts unless explicitly configured by owner env vars.
  */
 export function initConsentDefaults(): void {
@@ -163,70 +198,69 @@ export function initConsentDefaults(): void {
   initialized = true;
 
   const gtag = ensureGtagQueue();
-  gtag('consent', 'default', {
-    ad_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    analytics_storage: 'denied',
-    wait_for_update: 500,
-    region: [...EEA_UK_CH_REGIONS],
-  });
+  if (!window.__pdfquickConsentDefaultSet) {
+    window.__pdfquickConsentDefaultSet = true;
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      wait_for_update: 500,
+      region: [...EEA_UK_CH_REGIONS],
+    });
 
-  const saved = getSavedConsentState();
-  if (saved.updatedAt) {
-    applyConsentModeUpdate(saved);
+    const saved = getSavedConsentState();
+    if (saved.updatedAt) {
+      applyConsentModeUpdate(saved);
+    }
   }
 
-  // Subscribe to any Google-certified IAB TCF v2.2 CMP if loaded by production host
+  // Subscribe to an active external IAB TCF v2.2 CMP using standard TCF v2.2 commands
   if (typeof window.__tcfapi === 'function') {
     try {
-      window.__tcfapi('addEventListener', 2, (tcData, success) => {
-        if (!success || !tcData) return;
-        if (tcData.eventStatus === 'useractioncomplete' || tcData.eventStatus === 'tcloaded') {
-          const consents = tcData.purpose?.consents || {};
-          const gdprApplies = tcData.gdprApplies !== false;
-          const hasPurpose1 = !gdprApplies || Boolean(consents['1']);
-          const hasPersonalization = !gdprApplies || (Boolean(consents['3']) && Boolean(consents['4']));
-          saveConsentPreference(
-            {
-              ad_storage: hasPurpose1 ? 'granted' : 'denied',
-              ad_user_data: hasPurpose1 ? 'granted' : 'denied',
-              ad_personalization: hasPersonalization ? 'granted' : 'denied',
-              analytics_storage: hasPurpose1 ? 'granted' : 'denied',
-            },
-            'tcf_cmp'
-          );
-        }
-      });
+      window.__tcfapi('getTCData', 2, handleTcfPayload);
+      window.__tcfapi('addEventListener', 2, handleTcfPayload);
     } catch {
       // ignore malformed third-party CMP listener
     }
   }
 }
 
-export function getCmpIntegrationStatus(): {
+export interface CmpIntegrationStatus {
   hasLiveTcfApi: boolean;
+  tcfCmpId: number | null;
+  hasValidTcfString: boolean;
   hasGoogleFundingChoices: boolean;
+  isExternalCmpActive: boolean;
   configuredProvider: string;
   adsenseConfigured: boolean;
-} {
+}
+
+export function getCmpIntegrationStatus(): CmpIntegrationStatus {
   const cfg = getSiteConfig();
   const hasLiveTcfApi =
     typeof window !== 'undefined' && typeof window.__tcfapi === 'function';
   const hasGoogleFundingChoices =
-    typeof window !== 'undefined' && Boolean(window.googlefc);
+    typeof window !== 'undefined' &&
+    typeof window.googlefc === 'object' &&
+    window.googlefc !== null;
+  const isExternalCmpActive =
+    hasGoogleFundingChoices || (hasLiveTcfApi && observedTcfCmpId !== null && observedTcfCmpId > 0);
 
   return {
     hasLiveTcfApi,
+    tcfCmpId: observedTcfCmpId,
+    hasValidTcfString: observedTcfString,
     hasGoogleFundingChoices,
+    isExternalCmpActive,
     configuredProvider: cfg.cmp.provider,
     adsenseConfigured: cfg.adsense.isConfigured,
   };
 }
 
 /**
- * Open the active Google-certified CMP revocation/preferences dialog if present,
- * or invoke the fallback callback (e.g., scroll/navigate to Privacy & Consent controls).
+ * Open an active external CMP's revocation/preferences dialog (Funding Choices,
+ * Cookiebot, Usercentrics, or Didomi) if loaded on the page, or invoke fallback.
  */
 export function openCmpPreferences(fallback?: () => void): boolean {
   if (typeof window === 'undefined') return false;
@@ -236,13 +270,19 @@ export function openCmpPreferences(fallback?: () => void): boolean {
     return true;
   }
 
-  if (typeof window.__tcfapi === 'function') {
-    try {
-      window.__tcfapi('displayConsentUi', 2, () => {});
-      return true;
-    } catch {
-      // fall through
-    }
+  if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') {
+    window.Cookiebot.renew();
+    return true;
+  }
+
+  if (window.UC_UI && typeof window.UC_UI.showSecondLayer === 'function') {
+    window.UC_UI.showSecondLayer();
+    return true;
+  }
+
+  if (window.Didomi?.preferences && typeof window.Didomi.preferences.show === 'function') {
+    window.Didomi.preferences.show();
+    return true;
   }
 
   if (fallback) {

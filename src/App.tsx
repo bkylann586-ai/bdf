@@ -12,6 +12,7 @@ import { trackPageView } from './lib/analytics';
 import { GlobalDropProvider } from './lib/globalDrop';
 import { PerformanceMonitorProvider, usePerformanceMonitor } from './lib/performanceMonitor';
 import { initConsentDefaults } from './lib/consent';
+import { initMonetag } from './lib/ads/monetag';
 
 // Eagerly loaded homepage & 404 page
 import { HomePage } from './pages/HomePage';
@@ -125,6 +126,7 @@ function AppContent({ ssrPageElement }: AppContentProps) {
 
   useEffect(() => {
     initConsentDefaults();
+    return initMonetag();
   }, []);
 
   useEffect(() => {

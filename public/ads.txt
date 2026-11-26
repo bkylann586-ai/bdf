@@ -1,5 +1,18 @@
 # PDFQuick Authorized Digital Sellers (IAB ads.txt)
+#
+# --- Monetag Official Partner Entries ---
+# Official Monetag partner documentation notes that ads.txt seller lines are
+# account-specific (no universal static Monetag line applies to all publishers).
+# Copy your exact authorized seller lines from:
+#   Monetag Publisher Dashboard -> Account Settings / Ads.txt (or Monetag Support)
+# and paste them verbatim below (or supply via VITE_MONETAG_ADS_TXT at build time):
+#
+# Standard IAB ads.txt syntax (example structure only; do NOT use unverified IDs):
+# <monetag-ssp-domain>, <MONETAG_PUBLISHER_ID>, DIRECT, <TAG_ID_IF_PROVIDED>
+# <partner-ssp-domain>, <MONETAG_SEAT_OR_ACCOUNT_ID>, RESELLER, <TAG_ID_IF_PROVIDED>
+#
+# --- Google AdSense Authorized Seller ---
 # No AdSense publisher ID is activated yet.
-# Once your Google AdSense account is approved and ready, set VITE_ADSENSE_PUBLISHER_ID
-# in your build environment (e.g., pub-XXXXXXXXXXXXXXXX) or replace this file's content
-# with: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+# Once approved, set VITE_ADSENSE_PUBLISHER_ID=pub-XXXXXXXXXXXXXXXX in your build
+# environment; scripts/prerender.mjs will safely merge and deduplicate:
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

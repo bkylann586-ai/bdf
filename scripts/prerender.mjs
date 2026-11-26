@@ -73,6 +73,99 @@ function resolveCmpScriptUrl(adsense) {
   return null;
 }
 
+const EEA_UK_CH_REGIONS = [
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+  'DE', 'GR', 'HU', 'IS', 'IE', 'IT', 'LV', 'LI', 'LT', 'LU',
+  'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+  'GB', 'CH',
+];
+
+function buildConsentHeadScript() {
+  const regionsJson = JSON.stringify(EEA_UK_CH_REGIONS);
+  const inlineJs = `(function(){window.dataLayer=window.dataLayer||[];function gtag(){window.dataLayer.push(arguments);}if(typeof window.gtag!=='function'){window.gtag=gtag;}if(!window.__pdfquickConsentDefaultSet){window.__pdfquickConsentDefaultSet=true;window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500,region:${regionsJson}});try{var raw=localStorage.getItem('pdfquick_consent_v1');if(raw){var p=JSON.parse(raw);if(p&&p.updatedAt&&(p.ad_storage==='granted'||p.ad_storage==='denied')){window.gtag('consent','update',{ad_storage:p.ad_storage,ad_user_data:p.ad_user_data||'denied',ad_personalization:p.ad_personalization||'denied',analytics_storage:p.analytics_storage||'denied'});}}}catch(e){}}})();`;
+  return `<script id="pdfquick-consent-default">${inlineJs}</script>`;
+}
+
+function buildFundingChoicesPresentScript() {
+  return `<script id="pdfquick-googlefc-present">(function(){function signalGooglefcPresent(){if(!window.frames['googlefcPresent']){if(document.body){var iframe=document.createElement('iframe');iframe.style.cssText='width:0;height:0;border:none;z-index:-1000;left:-1000px;top:-1000px;display:none;';iframe.name='googlefcPresent';document.body.appendChild(iframe);}else{setTimeout(signalGooglefcPresent,0);}}}signalGooglefcPresent();})();</script>`;
+}
+
+/**
+ * Safely merge new authorized seller entries into existing ads.txt content
+ * without deleting Monetag or other ad network records and without duplicating lines.
+ */
+function mergeAdsTxtContent(existingContent, googlePublisherId, extraPartnerLines = []) {
+  const rawLines = [
+    ...String(existingContent || '').split(/\r?\n/),
+    ...extraPartnerLines,
+  ];
+  const outputLines = [];
+  const seenRecords = new Set();
+  const seenDirectives = new Set();
+
+  const normalizeRecordKey = (line) => {
+    const withoutComment = line.split('#')[0].trim();
+    if (!withoutComment) return null;
+    if (withoutComment.includes('=')) {
+      const [k, ...rest] = withoutComment.split('=');
+      return `var:${k.trim().toLowerCase()}=${rest.join('=').trim().toLowerCase()}`;
+    }
+    const parts = withoutComment.split(',').map((p) => p.trim().toLowerCase());
+    if (parts.length < 3) return `raw:${withoutComment.toLowerCase()}`;
+    return `rec:${parts.slice(0, 4).join('|')}`;
+  };
+
+  for (const line of rawLines) {
+    const trimmed = String(line || '').trim();
+    if (!trimmed) {
+      if (outputLines.length > 0 && outputLines[outputLines.length - 1] !== '') {
+        outputLines.push('');
+      }
+      continue;
+    }
+    if (trimmed.startsWith('#')) {
+      if (!seenDirectives.has(trimmed)) {
+        seenDirectives.add(trimmed);
+        outputLines.push(trimmed);
+      }
+      continue;
+    }
+    const key = normalizeRecordKey(trimmed);
+    if (key && seenRecords.has(key)) {
+      continue;
+    }
+    if (key) seenRecords.add(key);
+    outputLines.push(trimmed);
+  }
+
+  if (googlePublisherId) {
+    const googleLine = `google.com, ${googlePublisherId}, DIRECT, f08c47fec0942fa0`;
+    const googleKey = normalizeRecordKey(googleLine);
+    if (googleKey && !seenRecords.has(googleKey)) {
+      seenRecords.add(googleKey);
+      if (outputLines.length > 0 && outputLines[outputLines.length - 1] !== '') {
+        outputLines.push('');
+      }
+      outputLines.push('# Google AdSense Authorized Seller');
+      outputLines.push(googleLine);
+    }
+  }
+
+  while (outputLines.length > 0 && outputLines[outputLines.length - 1] === '') {
+    outputLines.pop();
+  }
+  return outputLines.join('\n') + '\n';
+}
+
+function resolveMonetagExtraAdsTxtLines() {
+  const raw = cleanEnvValue(process.env.VITE_MONETAG_ADS_TXT);
+  if (!raw) return [];
+  return raw
+    .split(/\r?\n|;/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function escapeHtmlText(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -132,7 +225,7 @@ function ssrBrowserLibStubPlugin() {
 }
 
 function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, options) {
-  const { baseUrl, adsense, cmpScriptUrl } = options;
+  const { baseUrl, adsense, cmpScriptUrl, monetagVerificationToken } = options;
   const canonical = head.canonicalHref;
   const ogImageUrl = `${baseUrl}/og-image.png`;
   const escapedTitle = escapeHtmlText(head.title);
@@ -216,8 +309,11 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, options)
     `<meta name="twitter:image" content="${escapeHtmlAttr(ogImageUrl)}" />`
   );
 
+  // Inject Consent Mode v2 default in <head> BEFORE any CMP/AdSense script
+  // (in-memory dataLayer push only; zero network calls, zero cookies, zero ads)
+  const headInjections = [buildConsentHeadScript()];
+
   // Inject JSON-LD structured data cleanly before </head>
-  const headInjections = [];
   if (!head.noindex && head.schema) {
     headInjections.push(
       `<script id="pdfquick-seo-structured-data" type="application/ld+json">${safeJsonLd(head.schema)}</script>`
@@ -230,9 +326,12 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, options)
     );
   }
 
-  // Only inject CMP / AdSense tags when explicitly enabled & configured by the site owner
+  // Only inject external CMP / AdSense tags when explicitly enabled & configured by the site owner
   if (cmpScriptUrl) {
     headInjections.push(`<script async src="${escapeHtmlAttr(cmpScriptUrl)}"></script>`);
+    if (cmpScriptUrl.includes('fundingchoicesmessages.google.com')) {
+      headInjections.push(buildFundingChoicesPresentScript());
+    }
   }
   if (adsense.enabled && adsense.clientId) {
     headInjections.push(
@@ -240,6 +339,11 @@ function buildRouteHtmlDocument(templateHtml, routePath, appHtml, head, options)
     );
     headInjections.push(
       `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsense.clientId)}" crossorigin="anonymous"></script>`
+    );
+  }
+  if (monetagVerificationToken) {
+    headInjections.push(
+      `<meta name="monetag" content="${escapeHtmlAttr(monetagVerificationToken)}" />`
     );
   }
 
@@ -293,21 +397,24 @@ async function emitDomainAwareDistArtifacts(sitemapTemplateXml, baseUrl, adsense
   const updatedSitemap = sitemapTemplateXml.replaceAll(DEFAULT_PRODUCTION_URL, baseUrl);
   await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), updatedSitemap, 'utf8');
 
-  // 3. Emit dist/ads.txt ONLY with real publisher ID if configured; otherwise retain safe comment template
-  if (adsense.publisherId) {
-    const adsTxt = [
-      '# PDFQuick Authorized Digital Sellers (IAB ads.txt)',
-      `google.com, ${adsense.publisherId}, DIRECT, f08c47fec0942fa0`,
-      '',
-    ].join('\n');
-    await fs.writeFile(path.join(DIST_DIR, 'ads.txt'), adsTxt, 'utf8');
+  // 3. Safely merge public/ads.txt with optional Monetag & Google publisher records without deleting or duplicating lines
+  const publicAdsPath = path.join(ROOT_DIR, 'public', 'ads.txt');
+  let existingAdsTxt = '';
+  try {
+    existingAdsTxt = await fs.readFile(publicAdsPath, 'utf8');
+  } catch {
+    existingAdsTxt = '';
   }
+  const monetagLines = resolveMonetagExtraAdsTxtLines();
+  const mergedAdsTxt = mergeAdsTxtContent(existingAdsTxt, adsense.publisherId, monetagLines);
+  await fs.writeFile(path.join(DIST_DIR, 'ads.txt'), mergedAdsTxt, 'utf8');
 }
 
 async function run() {
   const baseUrl = resolveProductionBaseUrl();
   const adsense = resolveAdSenseIds();
   const cmpScriptUrl = resolveCmpScriptUrl(adsense);
+  const monetagVerificationToken = cleanEnvValue(process.env.VITE_MONETAG_VERIFICATION_TOKEN);
 
   const templatePath = path.join(DIST_DIR, 'index.html');
   const templateHtml = await fs.readFile(templatePath, 'utf8');
@@ -376,6 +483,7 @@ async function run() {
         baseUrl,
         adsense,
         cmpScriptUrl,
+        monetagVerificationToken,
       });
 
       const outFile =
@@ -417,6 +525,7 @@ async function run() {
       globIgnores: [
         'tesseract/**',
         'fonts/**',
+        'monetag/**',
         '404.html',
         'og-image.png',
         'google*.html',
