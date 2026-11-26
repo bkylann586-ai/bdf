@@ -199,19 +199,10 @@ export function getSiteConfig(): SiteConfig {
     clientId
   );
 
-  const monetagEnabled = readEnv('VITE_MONETAG_ENABLED') === 'true';
-  const rawMonetagDomain = cleanText(readEnv('VITE_MONETAG_DOMAIN')) || '5gvci.com';
-  const monetagDomain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(rawMonetagDomain)
-    ? rawMonetagDomain.toLowerCase()
-    : '5gvci.com';
-  const parsedZoneId = Number.parseInt(
-    cleanText(readEnv('VITE_MONETAG_ZONE_ID')) || '12336654',
-    10
-  );
-  const monetagZoneId =
-    Number.isFinite(parsedZoneId) && parsedZoneId > 0 ? parsedZoneId : 12336654;
+  const rawMonetagEnabled = cleanText(readEnv('VITE_MONETAG_ENABLED'));
+  const monetagEnabled = rawMonetagEnabled ? rawMonetagEnabled === 'true' : true;
 
-  let monetagScriptUrl: string | null = null;
+  let monetagScriptUrl = 'https://quge5.com/88/tag.min.js';
   const rawMonetagScriptUrl = cleanText(readEnv('VITE_MONETAG_SCRIPT_URL'));
   if (rawMonetagScriptUrl) {
     try {
@@ -220,9 +211,27 @@ export function getSiteConfig(): SiteConfig {
         monetagScriptUrl = parsed.toString();
       }
     } catch {
-      monetagScriptUrl = null;
+      monetagScriptUrl = 'https://quge5.com/88/tag.min.js';
     }
   }
+
+  let derivedHost = 'quge5.com';
+  try {
+    derivedHost = new URL(monetagScriptUrl).hostname.toLowerCase();
+  } catch {
+    derivedHost = 'quge5.com';
+  }
+
+  const rawMonetagDomain = cleanText(readEnv('VITE_MONETAG_DOMAIN')) || derivedHost;
+  const monetagDomain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(rawMonetagDomain)
+    ? rawMonetagDomain.toLowerCase()
+    : derivedHost;
+  const parsedZoneId = Number.parseInt(
+    cleanText(readEnv('VITE_MONETAG_ZONE_ID')) || '316384',
+    10
+  );
+  const monetagZoneId =
+    Number.isFinite(parsedZoneId) && parsedZoneId > 0 ? parsedZoneId : 316384;
 
   const rawSwScope = cleanText(readEnv('VITE_MONETAG_SW_SCOPE')) || '/monetag/';
   const monetagSwScope =
@@ -238,7 +247,7 @@ export function getSiteConfig(): SiteConfig {
       : `${monetagSwScope}sw.js`;
 
   const monetagVerificationToken = cleanText(readEnv('VITE_MONETAG_VERIFICATION_TOKEN'));
-  const monetagRequireConsent = readEnv('VITE_MONETAG_REQUIRE_CONSENT') !== 'false';
+  const monetagRequireConsent = readEnv('VITE_MONETAG_REQUIRE_CONSENT') === 'true';
   const monetagConfigured = Boolean(
     monetagEnabled && monetagDomain && monetagZoneId > 0 && (monetagScriptUrl || monetagSwPath)
   );

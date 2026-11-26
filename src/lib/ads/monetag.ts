@@ -1,8 +1,9 @@
 import { getSavedConsentState, type ConsentState } from '../consent';
 import { getSiteConfig, type SiteMonetagConfig } from '../siteConfig';
 
-export const MONETAG_DEFAULT_DOMAIN = '5gvci.com';
-export const MONETAG_DEFAULT_ZONE_ID = 12336654;
+export const MONETAG_DEFAULT_DOMAIN = 'quge5.com';
+export const MONETAG_DEFAULT_ZONE_ID = 316384;
+export const MONETAG_DEFAULT_SCRIPT_URL = 'https://quge5.com/88/tag.min.js';
 export const MONETAG_ISOLATED_SW_PATH = '/monetag/sw.js';
 export const MONETAG_ISOLATED_SW_SCOPE = '/monetag/';
 
@@ -98,10 +99,21 @@ export function canLoadMonetag(
   if (!isMonetagActivationEnabled(config)) {
     return { allowed: false, reason: 'disabled' };
   }
-  // Never execute Monetag scripts or register its worker before CMP consent is confirmed
-  if (!hasExplicitCmpConsent(consent)) {
+
+  // Always honor an explicit user/CMP opt-out
+  const explicitlyDenied =
+    consent.ad_storage === 'denied' &&
+    consent.source !== 'default_denied' &&
+    Boolean(consent.updatedAt);
+  if (explicitlyDenied) {
     return { allowed: false, reason: 'consent' };
   }
+
+  // When strict pre-consent gating is requested, wait for explicit grant
+  if (config.requireConsent && !hasExplicitCmpConsent(consent)) {
+    return { allowed: false, reason: 'consent' };
+  }
+
   return { allowed: true, reason: 'ok' };
 }
 
@@ -192,12 +204,11 @@ function injectMonetagPageScript(config: SiteMonetagConfig): boolean {
   setRuntimeState({ status: 'loading', lastError: null });
 
   const script = document.createElement('script');
-  script.async = true;
   script.src = config.scriptUrl;
   script.setAttribute('data-zone', String(config.zoneId));
-  script.setAttribute('data-domain', config.domain);
-  script.setAttribute('data-pdfquick-monetag', 'true');
+  script.async = true;
   script.setAttribute('data-cfasync', 'false');
+  script.setAttribute('data-pdfquick-monetag', 'true');
 
   script.onload = () => {
     setRuntimeState({
@@ -325,7 +336,9 @@ export function initMonetag(): () => void {
     consentEventHandler = (ev: Event) => {
       const detail = (ev as CustomEvent<ConsentState>).detail;
       if (!detail) return;
-      if (hasExplicitCmpConsent(detail)) {
+      const { monetag } = getSiteConfig();
+      const check = canLoadMonetag(monetag, detail);
+      if (check.allowed) {
         void mountMonetag(detail);
       } else {
         void teardownMonetag();

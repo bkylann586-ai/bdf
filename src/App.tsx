@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { SwUpdatePrompt } from './components/SwUpdatePrompt';
+import { ConsentBanner } from './components/ConsentBanner';
 import { SsrRouterProvider, normalizePath, usePathname } from './lib/router';
 import { SeoCollectorProvider, SeoHeadCollector } from './components/SeoMeta';
 import { LanguageProvider } from './lib/i18n';
@@ -223,6 +224,7 @@ function AppContent({ ssrPageElement }: AppContentProps) {
       <Footer />
       <OfflineIndicator />
       <SwUpdatePrompt />
+      <ConsentBanner />
     </div>
   );
 }
