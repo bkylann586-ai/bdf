@@ -35,11 +35,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
   const displaySampleLabel = sampleLabel || t('dropzone.sample');
   const displayHelperText = helperText || t('dropzone.helper');
-  const acceptedDisplay = accept
-    .split(',')
-    .filter((token) => token.startsWith('.'))
-    .map((token) => token.replace('.', '').toUpperCase())
-    .join(', ') || accept.replace(/\./g, ' ').toUpperCase();
+  const acceptedDisplay =
+    accept
+      .split(',')
+      .filter((token) => token.startsWith('.'))
+      .map((token) => token.replace('.', '').toUpperCase())
+      .join(', ') || accept.replace(/\./g, ' ').toUpperCase();
 
   useEffect(() => {
     const resetDragState = () => {
@@ -129,7 +130,6 @@ export const DropZone: React.FC<DropZoneProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       processFiles(Array.from(e.target.files));
     }
-    // Reset input value so same file can be re-selected if user cleared it
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -158,10 +158,10 @@ export const DropZone: React.FC<DropZoneProps> = ({
         onDrop={handleDrop}
         onClick={() => !disabled && fileInputRef.current?.click()}
         onKeyDown={handleKeyDown}
-        className={`group relative border-2 border-dashed rounded-xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 ${
+        className={`group relative border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
           isDragOver
-            ? 'border-blue-600 bg-blue-50/90 ring-4 ring-blue-500/15 shadow-md scale-[1.005]'
-            : 'border-slate-300 hover:border-blue-400 bg-white hover:bg-slate-50/70 shadow-sm'
+            ? 'border-[#2563EB] bg-[#EFF6FF] ring-4 ring-[#38BDF8]/25 shadow-sm scale-[1.004]'
+            : 'border-[#CBD5E1] hover:border-[#2563EB] bg-[#F4F7FB]/55 hover:bg-[#F4F7FB]'
         } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
       >
         <input
@@ -178,22 +178,22 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
         <div className="flex flex-col items-center justify-center max-w-lg mx-auto pointer-events-none">
           <div
-            className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-all duration-150 ${
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border transition-all duration-150 ${
               isDragOver
-                ? 'bg-blue-600 text-white shadow-sm scale-110'
-                : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:scale-105'
+                ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-sm scale-105'
+                : 'bg-white text-[#2563EB] border-[#E2E8F0] shadow-xs group-hover:bg-[#102A56] group-hover:text-white group-hover:border-[#102A56]'
             }`}
           >
             {isDragOver ? (
-              <ArrowDownToLine className="w-7 h-7" />
+              <ArrowDownToLine className="w-6 h-6" />
             ) : (
-              <UploadCloud className="w-7 h-7" />
+              <UploadCloud className="w-6 h-6" />
             )}
           </div>
 
           <h3
-            className={`text-base sm:text-lg font-semibold mb-1 transition-colors ${
-              isDragOver ? 'text-blue-800' : 'text-slate-900'
+            className={`text-base sm:text-lg font-bold mb-1.5 transition-colors ${
+              isDragOver ? 'text-[#102A56]' : 'text-[#17243A]'
             }`}
           >
             {isDragOver ? t('dropzone.dragActive') : t('dropzone.clickToSelect')}
@@ -201,7 +201,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
           <p
             className={`text-xs sm:text-sm mb-4 transition-colors ${
-              isDragOver ? 'text-blue-700 font-medium' : 'text-slate-500'
+              isDragOver ? 'text-[#2563EB] font-semibold' : 'text-[#64748B]'
             }`}
           >
             {isDragOver
@@ -212,18 +212,20 @@ export const DropZone: React.FC<DropZoneProps> = ({
           </p>
 
           <div
-            className={`flex items-center gap-2 text-xs font-mono tabular-nums mb-2 transition-colors ${
-              isDragOver ? 'text-blue-700 font-semibold' : 'text-slate-500'
+            className={`flex flex-wrap items-center justify-center gap-2 text-xs font-mono tabular-nums mb-2 transition-colors ${
+              isDragOver ? 'text-[#102A56] font-semibold' : 'text-[#64748B]'
             }`}
           >
-            <span>{acceptedDisplay}</span>
+            <span className="px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#102A56] font-semibold">
+              {acceptedDisplay}
+            </span>
             <span aria-hidden="true">·</span>
             <span>{multiple ? 'Single or batch' : 'Single file'}</span>
             <span aria-hidden="true">·</span>
             <span>Up to 250 MB</span>
           </div>
 
-          <p className="text-[11px] text-slate-500 mt-1 max-w-md leading-relaxed">
+          <p className="text-[11px] text-[#64748B] mt-1 max-w-md leading-relaxed">
             {displayHelperText}
           </p>
         </div>
@@ -231,8 +233,11 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
       {/* Error notification banner */}
       {errorMessage && (
-        <div role="alert" className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+        <div
+          role="alert"
+          className="mt-3 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2.5 text-xs text-red-700"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -246,9 +251,9 @@ export const DropZone: React.FC<DropZoneProps> = ({
               e.stopPropagation();
               onSampleRequested();
             }}
-            className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline bg-blue-50/60 px-3.5 py-2 rounded-lg border border-blue-200/60 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-2 text-xs text-[#102A56] hover:text-[#2563EB] font-semibold bg-[#F4F7FB] hover:bg-[#EFF6FF] px-4 min-h-[40px] rounded-xl border border-[#E2E8F0] hover:border-[#2563EB]/40 transition-colors whitespace-nowrap cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
             <span>{displaySampleLabel}</span>
           </button>
         </div>
@@ -256,4 +261,3 @@ export const DropZone: React.FC<DropZoneProps> = ({
     </div>
   );
 };
-

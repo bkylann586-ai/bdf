@@ -11,11 +11,11 @@ export const SwUpdatePrompt: React.FC = () => {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-xl bg-slate-900 border border-slate-700 px-4 py-3 text-xs text-white shadow-xl max-w-sm"
+      className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-2xl bg-[#102A56] border border-[#38BDF8]/25 px-4 py-3 text-xs text-white shadow-xl max-w-sm"
     >
       <div className="flex-1">
         <p className="font-semibold text-white">App update ready</p>
-        <p className="text-slate-300 mt-0.5">
+        <p className="text-slate-300 mt-0.5 leading-relaxed">
           Refresh when ready to apply the latest version. Your current files will clear on reload.
         </p>
       </div>
@@ -25,7 +25,7 @@ export const SwUpdatePrompt: React.FC = () => {
         onClick={() => {
           void applySwUpdate();
         }}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 px-3 py-1.5 font-semibold text-white transition-colors shrink-0 cursor-pointer"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-60 px-3 py-2 font-semibold text-white transition-colors shrink-0 cursor-pointer"
       >
         <RefreshCw className={`w-3.5 h-3.5 ${isUpdating ? 'animate-spin' : ''}`} />
         <span>{isUpdating ? 'Updating...' : 'Refresh'}</span>
@@ -34,7 +34,7 @@ export const SwUpdatePrompt: React.FC = () => {
         type="button"
         aria-label="Dismiss update notification"
         onClick={dismissSwUpdate}
-        className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+        className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
       >
         <X className="w-3.5 h-3.5" />
       </button>

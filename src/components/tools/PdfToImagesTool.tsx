@@ -301,26 +301,26 @@ export const PdfToImagesTool: React.FC = () => {
     );
   }
 
-  // Single-PDF Result View (unchanged visual ergonomics)
+  // Single-PDF Result View
   if (status === 'success' && result && files[0]) {
     const singleFileId = files[0].id;
     return (
-      <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
           <div>
-            <h3 className="text-xl font-bold text-slate-900">
+            <h3 className="text-xl font-bold text-[#102A56]">
               Rendered {result.totalRendered} {result.format.toUpperCase()} {result.totalRendered === 1 ? 'Image' : 'Images'}
             </h3>
-            <p className="text-xs text-slate-500 font-mono tabular-nums mt-0.5">
+            <p className="text-xs text-[#64748B] font-mono tabular-nums mt-0.5">
               Archive size: {formatBytes(result.zipBlob.size)} · Ready for immediate download
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={handleDownloadZip}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <Archive className="w-4 h-4" />
               <span>Download All as ZIP</span>
@@ -329,7 +329,7 @@ export const PdfToImagesTool: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="px-3.5 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-colors whitespace-nowrap"
+              className="min-h-[44px] px-4 py-2.5 text-sm font-semibold text-[#17243A] hover:text-[#102A56] bg-white hover:bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
             >
               Convert another PDF
             </button>
@@ -344,7 +344,7 @@ export const PdfToImagesTool: React.FC = () => {
         />
 
         {result.warnings && result.warnings.length > 0 && (
-          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start gap-2.5">
+          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               {result.warnings.map((w, i) => (
@@ -359,9 +359,9 @@ export const PdfToImagesTool: React.FC = () => {
           {result.images.map((img) => (
             <div
               key={img.pageNumber}
-              className="border border-slate-200 rounded-lg bg-slate-50 p-3 flex flex-col justify-between hover:border-slate-300 transition-colors"
+              className="border border-[#E2E8F0] rounded-2xl bg-[#F4F7FB] p-3 flex flex-col justify-between hover:border-[#2563EB]/50 transition-colors"
             >
-              <div className="aspect-[3/4] bg-white rounded border border-slate-200 overflow-hidden flex items-center justify-center p-2 mb-3 shadow-inner">
+              <div className="aspect-[3/4] bg-white rounded-xl border border-[#E2E8F0] overflow-hidden flex items-center justify-center p-2 mb-3">
                 <img
                   src={previewUrls[`${singleFileId}:${img.pageNumber}`]}
                   alt={`Page ${img.pageNumber}`}
@@ -371,8 +371,8 @@ export const PdfToImagesTool: React.FC = () => {
 
               <div>
                 <div className="flex items-center justify-between text-xs mb-3">
-                  <span className="font-semibold text-slate-900">Page {img.pageNumber}</span>
-                  <span className="text-[11px] text-slate-500 font-mono tabular-nums">
+                  <span className="font-bold text-[#17243A]">Page {img.pageNumber}</span>
+                  <span className="text-[11px] text-[#64748B] font-mono tabular-nums">
                     {img.width} × {img.height}px ({formatBytes(img.size)})
                   </span>
                 </div>
@@ -380,7 +380,7 @@ export const PdfToImagesTool: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDownloadSingle(img)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-slate-700 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-300 rounded transition-colors"
+                  className="w-full min-h-[38px] inline-flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-[#17243A] hover:text-[#2563EB] bg-white hover:bg-[#EFF6FF] border border-[#E2E8F0] hover:border-[#2563EB]/40 rounded-xl transition-colors cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Page {img.pageNumber}</span>
@@ -399,11 +399,11 @@ export const PdfToImagesTool: React.FC = () => {
     const errorCount = batchItems.length - successCount;
 
     return (
-      <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
           <div className="flex items-start gap-3">
             <div
-              className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${
+              className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
                 errorCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
               }`}
             >
@@ -414,10 +414,10 @@ export const PdfToImagesTool: React.FC = () => {
               )}
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h3 className="text-lg sm:text-xl font-bold text-[#102A56]">
                 Batch Image Export Complete
               </h3>
-              <p className="text-xs text-slate-500 font-mono tabular-nums mt-0.5">
+              <p className="text-xs text-[#64748B] font-mono tabular-nums mt-0.5">
                 {successCount} of {batchItems.length} PDFs converted · {batchZip.totalImages} total images · ZIP archive{' '}
                 {formatBytes(batchZip.zipBlob.size)}
               </p>
@@ -428,7 +428,7 @@ export const PdfToImagesTool: React.FC = () => {
             <button
               type="button"
               onClick={() => downloadBlob(batchZip.zipBlob, batchZip.zipFilename)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <Archive className="w-4 h-4" />
               <span>Download All Images as ZIP</span>
@@ -437,9 +437,9 @@ export const PdfToImagesTool: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-colors whitespace-nowrap"
+              className="min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-[#17243A] hover:text-[#102A56] bg-white hover:bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4 text-slate-500" />
+              <RotateCcw className="w-4 h-4 text-[#64748B]" />
               <span>Process More Files</span>
             </button>
           </div>
@@ -453,7 +453,7 @@ export const PdfToImagesTool: React.FC = () => {
         />
 
         {batchItems.some((it) => it.result?.warnings && it.result.warnings.length > 0) && (
-          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start gap-2.5">
+          <div className="mt-4 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               {batchItems.flatMap((it) =>
@@ -475,14 +475,14 @@ export const PdfToImagesTool: React.FC = () => {
             return (
               <div
                 key={item.fileItem.id}
-                className="border border-slate-200 rounded-lg overflow-hidden bg-white"
+                className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3.5 bg-slate-50/70">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3.5 bg-[#F4F7FB]">
                   <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div
-                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 mt-0.5 ${
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
                         item.status === 'success'
-                          ? 'bg-blue-50 text-blue-600'
+                          ? 'bg-[#EFF6FF] text-[#2563EB]'
                           : 'bg-red-50 text-red-600'
                       }`}
                     >
@@ -493,11 +493,11 @@ export const PdfToImagesTool: React.FC = () => {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
+                      <p className="text-xs sm:text-sm font-bold text-[#17243A] truncate">
                         {item.fileItem.name}
                       </p>
                       {item.status === 'success' && res ? (
-                        <p className="text-[11px] text-slate-500 font-mono tabular-nums mt-0.5">
+                        <p className="text-[11px] text-[#64748B] font-mono tabular-nums mt-0.5">
                           {res.totalRendered} {res.format.toUpperCase()}{' '}
                           {res.totalRendered === 1 ? 'image' : 'images'} · ZIP {formatBytes(res.zipBlob.size)}
                         </p>
@@ -514,7 +514,7 @@ export const PdfToImagesTool: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => toggleExpanded(item.fileItem.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-md transition-colors whitespace-nowrap"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-[#17243A] bg-white hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap cursor-pointer"
                       >
                         {isExpanded ? (
                           <>
@@ -532,7 +532,7 @@ export const PdfToImagesTool: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => downloadBlob(res.zipBlob, res.zipFilename)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-200 rounded-md transition-colors whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#2563EB] bg-white hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download ZIP</span>
@@ -542,13 +542,13 @@ export const PdfToImagesTool: React.FC = () => {
                 </div>
 
                 {item.status === 'success' && res && isExpanded && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-t border-slate-200 bg-white">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-4 border-t border-[#E2E8F0] bg-white">
                     {res.images.map((img) => (
                       <div
                         key={img.pageNumber}
-                        className="border border-slate-200 rounded-lg bg-slate-50 p-2.5 flex flex-col justify-between"
+                        className="border border-[#E2E8F0] rounded-xl bg-[#F4F7FB] p-2.5 flex flex-col justify-between"
                       >
-                        <div className="aspect-[3/4] bg-white rounded border border-slate-200 overflow-hidden flex items-center justify-center p-1.5 mb-2">
+                        <div className="aspect-[3/4] bg-white rounded-lg border border-[#E2E8F0] overflow-hidden flex items-center justify-center p-1.5 mb-2">
                           <img
                             src={previewUrls[`${item.fileItem.id}:${img.pageNumber}`]}
                             alt={`${item.fileItem.name} page ${img.pageNumber}`}
@@ -556,13 +556,13 @@ export const PdfToImagesTool: React.FC = () => {
                           />
                         </div>
                         <div className="flex items-center justify-between text-[11px] mb-2">
-                          <span className="font-semibold text-slate-900">Page {img.pageNumber}</span>
-                          <span className="text-slate-500 font-mono tabular-nums">{formatBytes(img.size)}</span>
+                          <span className="font-bold text-[#17243A]">Page {img.pageNumber}</span>
+                          <span className="text-[#64748B] font-mono tabular-nums">{formatBytes(img.size)}</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleDownloadSingle(img)}
-                          className="w-full inline-flex items-center justify-center gap-1 py-1.5 text-[11px] font-semibold text-slate-700 hover:text-blue-700 bg-white hover:bg-blue-50 border border-slate-300 rounded transition-colors"
+                          className="w-full inline-flex items-center justify-center gap-1 py-1.5 text-[11px] font-semibold text-[#17243A] hover:text-[#2563EB] bg-white hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors cursor-pointer"
                         >
                           <Download className="w-3 h-3" />
                           <span>Download</span>
@@ -580,7 +580,7 @@ export const PdfToImagesTool: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
@@ -593,7 +593,7 @@ export const PdfToImagesTool: React.FC = () => {
             helperText="Upload 1 or more PDF files (up to 250 MB total). High-resolution canvas rendering converts each document sequentially into crisp PNG or JPEG images."
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -611,14 +611,14 @@ export const PdfToImagesTool: React.FC = () => {
           {/* Options Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="formatSelect" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="formatSelect" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                 Image Format
               </label>
               <select
                 id="formatSelect"
                 value={format}
                 onChange={(e) => setFormat(e.target.value as ImageFormatOption)}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 <option value="image/png">PNG (Lossless, sharpest text)</option>
                 <option value="image/jpeg">JPEG (Compact file size)</option>
@@ -626,14 +626,14 @@ export const PdfToImagesTool: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="resolutionSelect" className="block text-xs font-semibold text-slate-700 mb-1">
-                Resolution & Scale
+              <label htmlFor="resolutionSelect" className="block text-xs font-semibold text-[#17243A] mb-1.5">
+                Resolution &amp; Scale
               </label>
               <select
                 id="resolutionSelect"
                 value={scale}
                 onChange={(e) => setScale(parseFloat(e.target.value))}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 <option value={1.5}>Standard Quality (1.5× scale / ~110 DPI)</option>
                 <option value={2.0}>High Quality (2.0× scale / ~150 DPI)</option>
@@ -642,14 +642,14 @@ export const PdfToImagesTool: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="pageSelectionSelect" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="pageSelectionSelect" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                 Pages to Render
               </label>
               <select
                 id="pageSelectionSelect"
                 value={pageSelection}
                 onChange={(e) => setPageSelection(e.target.value as 'all' | 'range')}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 <option value="all">
                   {files.length === 1
@@ -662,8 +662,8 @@ export const PdfToImagesTool: React.FC = () => {
           </div>
 
           {pageSelection === 'range' && (
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
-              <label htmlFor="targetRangeInput" className="block text-xs font-semibold text-slate-700 mb-1">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
+              <label htmlFor="targetRangeInput" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                 {files.length > 1
                   ? 'Specify Pages for Each PDF (e.g. 1-2, 3)'
                   : 'Specify Pages (e.g. 1-2, 3)'}
@@ -673,14 +673,14 @@ export const PdfToImagesTool: React.FC = () => {
                 type="text"
                 value={pageRange}
                 onChange={(e) => setPageRange(e.target.value)}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none font-mono"
                 placeholder="e.g. 1-3"
               />
             </div>
           )}
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -691,7 +691,7 @@ export const PdfToImagesTool: React.FC = () => {
             <button
               type="button"
               onClick={handleConvert}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <FileImage className="w-4 h-4" />
               <span>

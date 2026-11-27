@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Layers,
-  Scissors,
-  Minimize2,
-  Image,
-  FileImage,
-  RotateCw,
-  FileMinus,
-  ArrowUpDown,
-  Hash,
-  Stamp,
-  ScanText,
-  FilePenLine,
-  Unlock,
   ShieldCheck,
   Zap,
   Lock,
@@ -37,6 +24,12 @@ import {
   getProductionBaseUrl,
 } from '../components/SeoMeta';
 import { Link } from '../components/Link';
+import {
+  HeroPdfIllustration,
+  LocalSecurityIllustration,
+  EmptySearchIllustration,
+  ToolIcon,
+} from '../components/illustrations/PdfIllustrations';
 import { useTranslation } from '../lib/i18n';
 import { injectFaqSchema, FaqSchemaItem } from '../lib/faqSchema';
 
@@ -84,41 +77,9 @@ export const HomePage: React.FC = () => {
     });
   }, []);
 
-  const getToolIcon = (name: string) => {
-    switch (name) {
-      case 'Layers':
-        return <Layers className="w-5 h-5" />;
-      case 'Scissors':
-        return <Scissors className="w-5 h-5" />;
-      case 'RotateCw':
-        return <RotateCw className="w-5 h-5" />;
-      case 'FileMinus':
-        return <FileMinus className="w-5 h-5" />;
-      case 'ArrowUpDown':
-        return <ArrowUpDown className="w-5 h-5" />;
-      case 'Minimize2':
-        return <Minimize2 className="w-5 h-5" />;
-      case 'Image':
-        return <Image className="w-5 h-5" />;
-      case 'FileImage':
-        return <FileImage className="w-5 h-5" />;
-      case 'Hash':
-        return <Hash className="w-5 h-5" />;
-      case 'Stamp':
-        return <Stamp className="w-5 h-5" />;
-      case 'ScanText':
-        return <ScanText className="w-5 h-5" />;
-      case 'FilePenLine':
-        return <FilePenLine className="w-5 h-5" />;
-      case 'Unlock':
-        return <Unlock className="w-5 h-5" />;
-      default:
-        return <Layers className="w-5 h-5" />;
-    }
-  };
-
   const visibleTools = searchTools(searchQuery);
-  const matchedBankingServices = searchQuery.trim().length > 0 ? searchBankingServices(searchQuery) : [];
+  const matchedBankingServices =
+    searchQuery.trim().length > 0 ? searchBankingServices(searchQuery) : [];
 
   const baseUrl = getProductionBaseUrl();
   const homeUrl = `${baseUrl}/`;
@@ -156,74 +117,105 @@ export const HomePage: React.FC = () => {
         faqs={HOME_FAQS}
       />
 
-      {/* Hero Section */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 border-b border-slate-100 bg-gradient-to-b from-blue-50/40 via-white to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200/60 rounded-md text-xs font-medium mb-6">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            <span>Client-Side Processing · No Server Document Uploads</span>
-          </div>
+      {/* Asymmetric Architectural SaaS Hero */}
+      <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-white">
+        <div className="absolute inset-0 bg-pq-dots opacity-65 pointer-events-none" aria-hidden="true" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {/* Hero Copy & Primary Actions */}
+            <div className="lg:col-span-6 text-start">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-5">
+                <ShieldCheck className="w-4 h-4 text-[#2563EB] shrink-0" />
+                <span>Client-Side Processing · Zero Server Uploads</span>
+              </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight max-w-4xl mx-auto text-balance leading-tight mb-6">
-            Fast, private PDF tools that never upload your documents.
-          </h1>
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-[#102A56] tracking-tight leading-[1.12] mb-5">
+                Fast, private PDF tools that never upload your documents.
+              </h1>
 
-          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
-            Merge files, compress PDFs, run OCR on scans, edit PDF metadata, rotate or reorder pages, add page numbers, apply watermarks, and convert images directly inside your browser. Zero server uploads.
-          </p>
+              <p className="text-base sm:text-lg text-[#64748B] leading-relaxed mb-7 max-w-xl">
+                Merge files, compress PDFs, run OCR on scans, edit PDF metadata, rotate or reorder pages, add page numbers, apply watermarks, and convert images directly inside your browser. Zero server uploads.
+              </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/tools"
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
-            >
-              <span>Explore All 13 Tools</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/banking-finance"
-              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <Landmark className="w-4 h-4 text-emerald-700" />
-              <span>{t('nav.bankingFinance')}</span>
-            </Link>
-            <Link
-              to="/privacy"
-              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-colors whitespace-nowrap"
-            >
-              <span>How We Protect Privacy</span>
-            </Link>
+              <div className="flex flex-wrap items-center gap-3 mb-7">
+                <Link
+                  to="/tools"
+                  className="inline-flex items-center gap-2 px-6 min-h-[46px] text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap"
+                >
+                  <span>Explore All 13 Tools</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/merge-pdf"
+                  className="inline-flex items-center gap-2 px-5 min-h-[46px] text-sm font-semibold text-[#102A56] bg-[#F4F7FB] hover:bg-[#EFF6FF] border border-[#E2E8F0] hover:border-[#2563EB]/50 rounded-xl transition-colors whitespace-nowrap"
+                >
+                  <span>Start with Merge PDF</span>
+                </Link>
+                <Link
+                  to="/banking-finance"
+                  className="inline-flex items-center gap-2 px-4 min-h-[46px] text-sm font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors whitespace-nowrap"
+                >
+                  <Landmark className="w-4 h-4 text-emerald-700" />
+                  <span>{t('nav.bankingFinance')}</span>
+                </Link>
+              </div>
+
+              {/* Clean typographic specification bar (no pill clutter) */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-mono tabular-nums text-[#64748B]">
+                <span className="font-semibold text-[#102A56]">15 Browser Tools</span>
+                <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
+                <span>100% Local RAM</span>
+                <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
+                <span>Up to 250 MB</span>
+                <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
+                <Link to="/privacy" className="font-sans font-semibold text-[#2563EB] hover:underline">
+                  How We Protect Privacy
+                </Link>
+              </div>
+            </div>
+
+            {/* Hero Workspace Visual */}
+            <div className="lg:col-span-6">
+              <div className="rounded-2xl shadow-[0_12px_36px_rgba(16,42,86,0.08)] bg-white p-1.5 border border-[#E2E8F0]">
+                <HeroPdfIllustration />
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Tools Grid Section */}
-      <section className="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
-            Complete In-Browser PDF Toolkit
-          </h2>
-          <p className="text-sm text-slate-600 mb-6">
-            Search or select any tool below to edit, organize, or convert US Letter, UK A4, and international PDFs in seconds.
-          </p>
+      {/* Complete In-Browser PDF Toolkit Discovery */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="max-w-2xl text-start">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] block mb-1.5">
+              Document Workspace Suite
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#102A56] tracking-tight mb-2">
+              Complete In-Browser PDF Toolkit
+            </h2>
+            <p className="text-sm text-[#64748B]">
+              Search or select any tool below to edit, organize, or convert US Letter, UK A4, and international PDFs in seconds.
+            </p>
+          </div>
 
           {/* Quick Search Bar */}
-          <div className="relative max-w-lg mx-auto">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative w-full md:w-96 shrink-0">
+            <Search className="w-4 h-4 text-[#64748B] absolute start-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('tools.searchPlaceholder')}
               aria-label={t('tools.searchPlaceholder')}
-              className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-full ps-10 pe-10 min-h-[44px] text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] placeholder:text-[#64748B] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none transition-colors"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label={t('tools.searchClear')}
-                className="p-1 text-slate-400 hover:text-slate-700 absolute right-2.5 top-1/2 -translate-y-1/2 rounded"
+                className="p-1.5 text-[#64748B] hover:text-[#102A56] absolute end-2 top-1/2 -translate-y-1/2 rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -232,12 +224,13 @@ export const HomePage: React.FC = () => {
         </div>
 
         {visibleTools.length === 0 && matchedBankingServices.length === 0 ? (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center max-w-lg mx-auto">
-            <p className="text-sm text-slate-600 mb-3">{t('tools.noResults')}</p>
+          <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-2xl p-10 text-center max-w-lg mx-auto">
+            <EmptySearchIllustration className="mb-4" />
+            <p className="text-sm text-[#64748B] mb-4">{t('tools.noResults')}</p>
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+              className="px-5 min-h-[40px] text-xs font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-xl transition-colors cursor-pointer"
             >
               {t('tools.searchClear')}
             </button>
@@ -245,48 +238,51 @@ export const HomePage: React.FC = () => {
         ) : (
           <div className="space-y-10">
             {visibleTools.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {visibleTools.map((tool) => (
                   <Link
                     key={tool.id}
                     to={tool.path}
-                    className="group bg-white border border-slate-200 hover:border-blue-500 rounded-xl p-6 shadow-sm hover:shadow transition-all hover:-translate-y-0.5 flex flex-col justify-between text-left"
+                    className="group bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-2xl p-6 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(16,42,86,0.06)] flex flex-col justify-between text-start"
                   >
                     <div>
-                      <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center mb-4 transition-colors">
-                        {getToolIcon(tool.iconName)}
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <ToolIcon name={tool.iconName} size="lg" />
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-[#64748B] bg-[#F4F7FB] border border-[#E2E8F0] px-2 py-0.5 rounded-md">
+                          {tool.category}
+                        </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                      <h3 className="text-lg font-bold text-[#102A56] group-hover:text-[#2563EB] transition-colors mb-2">
                         {tool.name}
                       </h3>
 
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                         {tool.shortDescription}
                       </p>
                     </div>
 
-                    <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+                    <div className="pt-5 mt-5 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-semibold text-[#2563EB]">
                       <span>Launch tool</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
                 ))}
 
-                {/* Privacy Info Card */}
-                <div className="bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between shadow-sm">
+                {/* Deep Navy Private Architecture Callout Card */}
+                <div className="bg-[#102A56] text-white rounded-2xl p-6 flex flex-col justify-between border border-[#1A3C75]">
                   <div>
-                    <div className="w-12 h-12 rounded-lg bg-slate-800 text-blue-400 flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/15 text-[#38BDF8] flex items-center justify-center mb-4">
                       <Lock className="w-5 h-5" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2">Private & Confidential</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">Private & Confidential</h3>
                     <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                       Whether handling tax returns, client legal contracts, or confidential receipts, your files are processed locally in your browser memory and never uploaded to remote servers.
                     </p>
                   </div>
                   <Link
                     to="/about"
-                    className="pt-6 mt-6 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-blue-300 hover:text-white"
+                    className="pt-5 mt-5 border-t border-white/15 flex items-center justify-between text-xs font-semibold text-[#38BDF8] hover:text-white transition-colors"
                   >
                     <span>Learn about local security</span>
                     <ArrowRight className="w-4 h-4" />
@@ -296,15 +292,18 @@ export const HomePage: React.FC = () => {
             )}
 
             {matchedBankingServices.length > 0 && (
-              <div className="border-t border-slate-200 pt-8">
+              <div className="border-t border-[#E2E8F0] pt-8">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                   <div className="flex items-center gap-2">
                     <Landmark className="w-4 h-4 text-emerald-700" />
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                    <h3 className="text-xs font-bold text-[#102A56] uppercase tracking-wider">
                       {t('tools.cat.banking')} Matches ({matchedBankingServices.length})
                     </h3>
                   </div>
-                  <Link to="/banking-finance" className="text-xs font-semibold text-blue-600 hover:underline">
+                  <Link
+                    to="/banking-finance"
+                    className="text-xs font-semibold text-[#2563EB] hover:underline"
+                  >
                     View Full Banking Hub →
                   </Link>
                 </div>
@@ -316,11 +315,13 @@ export const HomePage: React.FC = () => {
                       <Link
                         key={service.id}
                         to={service.primaryPath}
-                        className="bg-slate-50/70 hover:bg-white border border-slate-200 hover:border-blue-500 rounded-xl p-4 transition-all flex items-start justify-between gap-4"
+                        className="bg-[#F4F7FB] hover:bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-xl p-4 transition-all flex items-start justify-between gap-4"
                       >
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-bold text-slate-900">{service.name}</span>
+                            <span className="text-sm font-bold text-[#102A56]">
+                              {service.name}
+                            </span>
                             <span
                               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
                                 isPlanned
@@ -328,15 +329,19 @@ export const HomePage: React.FC = () => {
                                   : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                               }`}
                             >
-                              {isPlanned ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                              {isPlanned ? (
+                                <Clock className="w-3 h-3" />
+                              ) : (
+                                <CheckCircle2 className="w-3 h-3" />
+                              )}
                               {isPlanned ? t('banking.statusPlanned') : t('banking.statusActive')}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-600 leading-relaxed">
+                          <p className="text-xs text-[#64748B] leading-relaxed">
                             {service.shortDescription}
                           </p>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-blue-600 shrink-0 mt-1" />
+                        <ArrowRight className="w-4 h-4 text-[#2563EB] shrink-0 mt-1" />
                       </Link>
                     );
                   })}
@@ -347,21 +352,21 @@ export const HomePage: React.FC = () => {
         )}
       </section>
 
-      {/* Ad Placement */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-10">
+      {/* Ad Placement (Preserved Safely Buffered Outside Interactive Dropzones) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-10">
         <AdPlaceholder />
       </div>
 
       {/* Banking & Finance Expansion Showcase */}
-      <section className="py-14 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950 text-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-800">
+      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-[#102A56] text-white rounded-2xl p-6 sm:p-10 border border-[#1A3C75] shadow-[0_10px_28px_rgba(16,42,86,0.12)]">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 rounded-md text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 text-[#38BDF8] border border-white/15 rounded-lg text-xs font-semibold mb-3">
                 <Landmark className="w-3.5 h-3.5" />
                 <span>{t('banking.badge')}</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
                 {t('banking.title')}
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -372,14 +377,14 @@ export const HomePage: React.FC = () => {
             <div className="flex flex-wrap gap-3 shrink-0">
               <Link
                 to="/banking-finance"
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-5 min-h-[42px] text-xs sm:text-sm font-semibold bg-[#2563EB] hover:bg-[#38BDF8] hover:text-[#102A56] text-white rounded-xl transition-colors"
               >
                 <span>Open Banking Hub</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/banking/us-banks"
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 px-4 min-h-[42px] text-xs sm:text-sm font-medium bg-white/10 hover:bg-white/15 text-white border border-white/15 rounded-xl transition-colors"
               >
                 <span>US Bank Guides</span>
               </Link>
@@ -387,7 +392,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
               <div className="flex items-center gap-2 text-emerald-300 font-bold mb-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>10 Live Financial PDF Workflows</span>
@@ -395,26 +400,30 @@ export const HomePage: React.FC = () => {
               <p className="text-slate-300 leading-relaxed mb-3">
                 Merge 60-day mortgage statements, split annual PDFs, compress check scans, remove blank disclosures, number binders, rotate 1099s, and watermark lender copies locally.
               </p>
-              <Link to="/banking-finance" className="text-blue-300 hover:text-white font-semibold inline-flex items-center gap-1">
+              <Link
+                to="/banking-finance"
+                className="text-[#38BDF8] hover:text-white font-semibold inline-flex items-center gap-1"
+              >
                 <span>Browse all 10 active workflows</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5">
-              <div className="flex items-center gap-2 text-blue-300 font-bold mb-2">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+              <div className="flex items-center gap-2 text-[#38BDF8] font-bold mb-2">
                 <Landmark className="w-4 h-4" />
                 <span>5 US Bank Statement Guides</span>
               </div>
               <p className="text-slate-300 leading-relaxed mb-3">
-                Independent user instructions for PDFs downloaded from {US_BANK_GUIDES.map((b) => b.bankName).join(', ')}—with zero logins or official affiliation.
+                Independent user instructions for PDFs downloaded from{' '}
+                {US_BANK_GUIDES.map((b) => b.bankName).join(', ')}—with zero logins or official affiliation.
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {US_BANK_GUIDES.map((bank) => (
                   <Link
                     key={bank.slug}
                     to={bank.path}
-                    className="px-2 py-1 bg-slate-900/80 hover:bg-slate-700 border border-slate-700 rounded text-[11px] text-slate-200 font-medium transition-colors"
+                    className="px-2.5 py-1 bg-[#1A3C75] hover:bg-[#2563EB] border border-white/15 rounded-md text-[11px] text-white font-medium transition-colors"
                   >
                     {bank.bankName}
                   </Link>
@@ -422,7 +431,7 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-slate-800/70 border border-slate-700/80 rounded-xl p-5">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-5">
               <div className="flex items-center gap-2 text-emerald-300 font-bold mb-2">
                 <FileSpreadsheet className="w-4 h-4" />
                 <span>Form Filler &amp; True Redaction</span>
@@ -430,12 +439,18 @@ export const HomePage: React.FC = () => {
               <p className="text-slate-300 leading-relaxed mb-3">
                 Fill 5 helper financial worksheets into print-ready US Letter/A4 PDFs, or permanently redact sensitive boxes and scrub Metadata/XMP offline.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Link to="/banking/financial-pdf-form-filler" className="text-blue-300 hover:text-white font-semibold inline-flex items-center gap-1">
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  to="/banking/financial-pdf-form-filler"
+                  className="text-[#38BDF8] hover:text-white font-semibold inline-flex items-center gap-1"
+                >
                   <span>Form Filler</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-                <Link to="/banking/financial-document-privacy" className="text-blue-300 hover:text-white font-semibold inline-flex items-center gap-1">
+                <Link
+                  to="/banking/financial-document-privacy"
+                  className="text-[#38BDF8] hover:text-white font-semibold inline-flex items-center gap-1"
+                >
                   <span>Privacy Redaction</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -445,51 +460,57 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Why Choose PDFQuick Section */}
-      <section className="py-16 bg-slate-50 border-t border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
-              Why Choose PDFQuick
-            </h2>
-            <p className="text-sm text-slate-600">
-              Designed around document privacy, technical integrity, and real performance.
-            </p>
+      {/* Security Architecture & Why Choose PDFQuick */}
+      <section className="py-16 bg-[#F4F7FB] border-t border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-12">
+            <div className="lg:col-span-6 text-start">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] block mb-1.5">
+                Browser-Native Architecture
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#102A56] tracking-tight mb-3">
+                Why Choose PDFQuick
+              </h2>
+              <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
+                Designed around strict document privacy, deterministic client-side processing, and transparent performance—so confidential PDFs stay inside your device memory from start to download.
+              </p>
+            </div>
+            <div className="lg:col-span-6">
+              <div className="rounded-2xl bg-white border border-[#E2E8F0] p-2">
+                <LocalSecurityIllustration />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                <HardDrive className="w-5 h-5" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-[#E2E8F0]">
+              <div className="w-10 h-10 rounded-xl bg-[#F4F7FB] border border-[#E2E8F0] text-[#102A56] flex items-center justify-center mb-4">
+                <HardDrive className="w-5 h-5 text-[#2563EB]" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 mb-2">
-                Zero Cloud Uploads
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="text-base font-bold text-[#102A56] mb-2">Zero Cloud Uploads</h3>
+              <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                 Most web PDF editors upload your sensitive documents to remote third-party cloud servers. PDFQuick processes all files right inside your device browser memory.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
-                <Zap className="w-5 h-5" />
+            <div className="bg-white p-6 rounded-2xl border border-[#E2E8F0]">
+              <div className="w-10 h-10 rounded-xl bg-[#F4F7FB] border border-[#E2E8F0] text-[#102A56] flex items-center justify-center mb-4">
+                <Zap className="w-5 h-5 text-[#2563EB]" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 mb-2">
+              <h3 className="text-base font-bold text-[#102A56] mb-2">
                 Fast In-Browser Execution
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                 Skip file upload delays and server queue bottlenecks. With modern JavaScript and HTML5 Canvas execution, operations finish directly on your device without network transit.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
-                <Cpu className="w-5 h-5" />
+            <div className="bg-white p-6 rounded-2xl border border-[#E2E8F0]">
+              <div className="w-10 h-10 rounded-xl bg-[#F4F7FB] border border-[#E2E8F0] text-[#102A56] flex items-center justify-center mb-4">
+                <Cpu className="w-5 h-5 text-[#2563EB]" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 mb-2">
-                Honest, Real Results
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h3 className="text-base font-bold text-[#102A56] mb-2">Honest, Real Results</h3>
+              <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
                 No fake user counts, no marketing hyperbole, and no bogus claims of guaranteed compression. We provide accurate byte breakdowns and transparent limitations.
               </p>
             </div>
@@ -498,37 +519,49 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Honest Limits Notice */}
-      <section className="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border border-slate-200 rounded-xl p-6 sm:p-8 bg-white shadow-sm">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">
+      <section className="py-14 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 bg-white">
+          <h2 className="text-lg sm:text-xl font-bold text-[#102A56] mb-3">
             In-Browser Performance Guidelines & Capabilities
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed mb-4">
             Because PDFQuick operates purely inside your web browser sandbox (without server processing), performance scales with your device CPU and available RAM:
           </p>
-          <ul className="space-y-2.5 text-xs text-slate-600">
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span><strong>Supported file sizes:</strong> Standard documents execute smoothly on modern computers. PDFQuick enforces a 250 MB safety limit per file and per multi-file queue to protect browser tab memory.</span>
+          <ul className="space-y-3 text-xs sm:text-sm text-[#64748B]">
+            <li className="flex items-start gap-2.5">
+              <CheckCircle className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
+              <span>
+                <strong className="text-[#17243A]">Supported file sizes:</strong> Standard documents execute smoothly on modern computers. PDFQuick enforces a 250 MB safety limit per file and per multi-file queue to protect browser tab memory.
+              </span>
             </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span><strong>Standard formats:</strong> Works with standard PDF specifications (1.3 through 2.0), JPG, PNG, and WebP raster imagery across US Letter, Legal, and ISO A4 paper geometries.</span>
+            <li className="flex items-start gap-2.5">
+              <CheckCircle className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
+              <span>
+                <strong className="text-[#17243A]">Standard formats:</strong> Works with standard PDF specifications (1.3 through 2.0), JPG, PNG, and WebP raster imagery across US Letter, Legal, and ISO A4 paper geometries.
+              </span>
             </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span><strong>Encrypted files:</strong> Password-locked PDFs can be decrypted locally in your browser using <Link to="/unlock-pdf" className="text-blue-600 hover:underline font-medium">Unlock PDF</Link> with your valid password before processing.</span>
+            <li className="flex items-start gap-2.5">
+              <CheckCircle className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
+              <span>
+                <strong className="text-[#17243A]">Encrypted files:</strong> Password-locked PDFs can be decrypted locally in your browser using{' '}
+                <Link to="/unlock-pdf" className="text-[#2563EB] hover:underline font-semibold">
+                  Unlock PDF
+                </Link>{' '}
+                with your valid password before processing.
+              </span>
             </li>
           </ul>
         </div>
       </section>
 
-      {/* Landing Page Frequently Asked Questions (Synced with JSON-LD FAQPage Schema) */}
+      {/* Landing Page Frequently Asked Questions */}
       <section id="faqs" className="pb-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="w-5 h-5 text-blue-600 shrink-0" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center">
+              <HelpCircle className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               Frequently Asked Questions
             </h2>
           </div>
@@ -538,14 +571,10 @@ export const HomePage: React.FC = () => {
               <div
                 key={faq.question}
                 id={`home-faq-${idx + 1}`}
-                className="pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+                className="pb-4 border-b border-[#E2E8F0] last:border-0 last:pb-0"
               >
-                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">
-                  {faq.question}
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {faq.answer}
-                </p>
+                <h3 className="text-sm font-bold text-[#17243A] mb-1.5">{faq.question}</h3>
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>

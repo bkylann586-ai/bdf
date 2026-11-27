@@ -72,7 +72,7 @@ export const FinancialTemplatesPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-slate-50/60 pb-16">
+    <div className="flex-1 bg-[#F4F7FB] pb-16">
       <SeoMeta
         title="Financial Worksheet Schemas & Fillable Templates Structure | PDFQuick"
         description="Explore the 5 structured financial helper schemas (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) powered by our offline US Letter & A4 PDF Form Filler."
@@ -81,29 +81,34 @@ export const FinancialTemplatesPage: React.FC = () => {
         faqs={FINANCIAL_TEMPLATES_FAQS}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <Breadcrumbs
-          items={[
-            { label: 'Banking & Finance', href: '/banking-finance' },
-            { label: 'Financial Helper Templates' },
-          ]}
-        />
+      {/* Editorial Header Band */}
+      <div className="bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
+          <Breadcrumbs
+            items={[
+              { label: 'Banking & Finance', href: '/banking-finance' },
+              { label: 'Financial Helper Templates' },
+            ]}
+          />
 
-        <div className="text-center py-8 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-md text-xs font-semibold mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Interactive US Letter &amp; A4 Form Filler Now Live</span>
+          <div className="text-center pt-5 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-3">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span>Interactive US Letter &amp; A4 Form Filler Now Live</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+              Structured Financial Form Templates
+            </h1>
+            <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
+              Explore the field architecture for all 5 personal and small-business helper worksheets designed around US Letter standards and strict PII minimization.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            Structured Financial Form Templates
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            Explore the field architecture for all 5 personal and small-business helper worksheets designed around US Letter standards and strict PII minimization.
-          </p>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Non-Official Form Legal Notice */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-8 flex items-start gap-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <p className="text-xs sm:text-sm text-amber-950 leading-relaxed font-medium">
             {HELPER_TEMPLATE_DISCLAIMER}
@@ -120,17 +125,25 @@ export const FinancialTemplatesPage: React.FC = () => {
                   key={tpl.id}
                   type="button"
                   onClick={() => setSelectedId(tpl.id)}
-                  className={`w-full text-left p-4 rounded-xl border transition-all ${
+                  className={`w-full text-start p-4 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                      : 'bg-white text-slate-900 border-slate-200 hover:border-blue-400'
+                      ? 'bg-[#102A56] text-white border-[#102A56] shadow-sm'
+                      : 'bg-white text-[#17243A] border-[#E2E8F0] hover:border-[#2563EB]'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <FileSpreadsheet className={`w-4 h-4 shrink-0 ${isSelected ? 'text-blue-100' : 'text-blue-600'}`} />
+                    <FileSpreadsheet
+                      className={`w-4 h-4 shrink-0 ${
+                        isSelected ? 'text-[#38BDF8]' : 'text-[#2563EB]'
+                      }`}
+                    />
                     <span className="text-sm font-bold">{tpl.name}</span>
                   </div>
-                  <p className={`text-xs leading-relaxed ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>
+                  <p
+                    className={`text-xs leading-relaxed ${
+                      isSelected ? 'text-slate-300' : 'text-[#64748B]'
+                    }`}
+                  >
                     {tpl.sections.length} sections ·{' '}
                     {tpl.sections.reduce((acc, s) => acc + s.fields.length, 0)} fields
                   </p>
@@ -139,19 +152,19 @@ export const FinancialTemplatesPage: React.FC = () => {
             })}
           </div>
 
-          <div className="lg:col-span-8 bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs">
-            <div className="flex flex-wrap items-start justify-between gap-3 pb-4 mb-6 border-b border-slate-100">
+          <div className="lg:col-span-8 bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+            <div className="flex flex-wrap items-start justify-between gap-3 pb-4 mb-6 border-b border-[#E2E8F0]">
               <div>
-                <h2 className="text-xl font-bold text-slate-900 mb-1">{activeTemplate.name}</h2>
-                <p className="text-xs sm:text-sm text-slate-600">{activeTemplate.shortSummary}</p>
+                <h2 className="text-xl font-bold text-[#102A56] mb-1">{activeTemplate.name}</h2>
+                <p className="text-xs sm:text-sm text-[#64748B]">{activeTemplate.shortSummary}</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-[11px] font-mono">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F4F7FB] border border-[#E2E8F0] text-[#17243A] rounded-lg text-[11px] font-mono">
                   {activeTemplate.paperStandard}
                 </span>
                 <Link
                   to={`/banking/financial-pdf-form-filler?template=${activeTemplate.id}`}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 min-h-[38px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
                 >
                   <span>Fill &amp; Export PDF</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -161,38 +174,41 @@ export const FinancialTemplatesPage: React.FC = () => {
 
             <div className="space-y-6">
               {activeTemplate.sections.map((section) => (
-                <div key={section.id} className="bg-slate-50 border border-slate-200/80 rounded-lg p-4">
-                  <h3 className="text-sm font-bold text-slate-900 mb-1">{section.title}</h3>
-                  <p className="text-xs text-slate-500 mb-3">{section.description}</p>
+                <div
+                  key={section.id}
+                  className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4 sm:p-5"
+                >
+                  <h3 className="text-sm font-bold text-[#102A56] mb-1">{section.title}</h3>
+                  <p className="text-xs text-[#64748B] mb-3">{section.description}</p>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
+                  <div className="overflow-x-auto bg-white border border-[#E2E8F0] rounded-lg px-3">
+                    <table className="w-full text-start text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-slate-200 text-slate-500">
-                          <th className="py-2 pr-3 font-semibold">Field Label</th>
-                          <th className="py-2 pr-3 font-semibold">Type</th>
-                          <th className="py-2 pr-3 font-semibold">Rule</th>
-                          <th className="py-2 font-semibold">Example Format</th>
+                        <tr className="border-b border-[#E2E8F0] text-[#64748B]">
+                          <th className="py-2.5 pe-3 font-semibold text-start">Field Label</th>
+                          <th className="py-2.5 pe-3 font-semibold text-start">Type</th>
+                          <th className="py-2.5 pe-3 font-semibold text-start">Rule</th>
+                          <th className="py-2.5 font-semibold text-start">Example Format</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200/60 text-slate-700">
+                      <tbody className="divide-y divide-[#E2E8F0] text-[#17243A]">
                         {section.fields.map((field) => (
                           <tr key={field.key}>
-                            <td className="py-2.5 pr-3 font-medium">
+                            <td className="py-2.5 pe-3 font-medium">
                               {field.label}
                               {field.sensitivity === 'pii-caution' && (
-                                <span className="ml-1.5 text-[10px] text-amber-700 font-normal">
+                                <span className="ms-1.5 text-[10px] text-amber-700 font-normal">
                                   (Local-only)
                                 </span>
                               )}
                             </td>
-                            <td className="py-2.5 pr-3 font-mono text-[11px] text-blue-700">
+                            <td className="py-2.5 pe-3 font-mono text-[11px] text-[#2563EB]">
                               {field.type}
                             </td>
-                            <td className="py-2.5 pr-3 text-[11px]">
+                            <td className="py-2.5 pe-3 text-[11px]">
                               {field.required ? 'Required' : 'Optional'}
                             </td>
-                            <td className="py-2.5 text-[11px] text-slate-500 font-mono">
+                            <td className="py-2.5 text-[11px] text-[#64748B] font-mono">
                               {field.examplePlaceholder}
                             </td>
                           </tr>
@@ -205,8 +221,8 @@ export const FinancialTemplatesPage: React.FC = () => {
             </div>
 
             {/* Active Companion Tools */}
-            <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
+            <div className="mt-6 pt-5 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Pair prepared worksheets with active tools:</span>
               </div>
@@ -215,7 +231,7 @@ export const FinancialTemplatesPage: React.FC = () => {
                   <Link
                     key={tool.path}
                     to={tool.path}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] hover:underline"
                   >
                     <span>{tool.label}</span>
                     <ArrowRight className="w-3 h-3" />
@@ -232,18 +248,20 @@ export const FinancialTemplatesPage: React.FC = () => {
         </div>
 
         {/* FAQs */}
-        <section id="faqs" className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-10 shadow-sm">
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+        <section id="faqs" className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-10 shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center">
+              <HelpCircle className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               Frequently Asked Questions
             </h2>
           </div>
           <div className="space-y-4">
             {FINANCIAL_TEMPLATES_FAQS.map((faq, idx) => (
-              <div key={idx} className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
-                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">{faq.question}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{faq.answer}</p>
+              <div key={idx} className="pb-4 border-b border-[#E2E8F0] last:border-0 last:pb-0">
+                <h3 className="text-sm font-bold text-[#17243A] mb-1.5">{faq.question}</h3>
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>

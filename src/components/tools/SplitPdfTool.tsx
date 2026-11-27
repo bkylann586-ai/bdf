@@ -176,7 +176,7 @@ export const SplitPdfTool: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {!file ? (
         <div className="space-y-3">
           <DropZone
@@ -189,7 +189,7 @@ export const SplitPdfTool: React.FC = () => {
             helperText="Select 1 PDF file (up to 250 MB) to extract pages or divide into separate files."
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -198,14 +198,14 @@ export const SplitPdfTool: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* File Overview */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl gap-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#102A56] text-[#38BDF8] flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
+                <p className="text-sm font-bold text-[#17243A] truncate">{file.name}</p>
+                <p className="text-xs text-[#64748B] font-mono tabular-nums">
                   {formatBytes(file.size)} · {file.pageCount} {file.pageCount === 1 ? 'page' : 'pages'} total
                 </p>
               </div>
@@ -213,7 +213,7 @@ export const SplitPdfTool: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
+              className="px-3 py-1.5 min-h-[36px] text-xs font-semibold text-[#64748B] hover:text-[#102A56] bg-white border border-[#E2E8F0] hover:border-[#2563EB]/40 rounded-lg shrink-0 cursor-pointer transition-colors"
             >
               Choose different file
             </button>
@@ -221,24 +221,24 @@ export const SplitPdfTool: React.FC = () => {
 
           {/* Mode Selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-2">
+            <label className="block text-xs font-semibold text-[#17243A] mb-2">
               Split Mode
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setMode('range')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   mode === 'range'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <Scissors className={`w-4 h-4 ${mode === 'range' ? 'text-blue-600' : 'text-slate-500'}`} />
-                  <span className="text-xs font-bold text-slate-900">Custom Page Range</span>
+                  <Scissors className={`w-4 h-4 ${mode === 'range' ? 'text-[#2563EB]' : 'text-[#64748B]'}`} />
+                  <span className="text-xs font-bold text-[#17243A]">Custom Page Range</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Extract specific pages (e.g. 1-3, 5) into 1 PDF.
                 </p>
               </button>
@@ -246,17 +246,17 @@ export const SplitPdfTool: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMode('all')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   mode === 'all'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <Layers className={`w-4 h-4 ${mode === 'all' ? 'text-blue-600' : 'text-slate-500'}`} />
-                  <span className="text-xs font-bold text-slate-900">Separate Every Page</span>
+                  <Layers className={`w-4 h-4 ${mode === 'all' ? 'text-[#2563EB]' : 'text-[#64748B]'}`} />
+                  <span className="text-xs font-bold text-[#17243A]">Separate Every Page</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Split into individual 1-page PDFs packaged in a ZIP.
                 </p>
               </button>
@@ -264,17 +264,17 @@ export const SplitPdfTool: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMode('chunk')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   mode === 'chunk'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <FileCheck className={`w-4 h-4 ${mode === 'chunk' ? 'text-blue-600' : 'text-slate-500'}`} />
-                  <span className="text-xs font-bold text-slate-900">Split by Page Groups</span>
+                  <FileCheck className={`w-4 h-4 ${mode === 'chunk' ? 'text-[#2563EB]' : 'text-[#64748B]'}`} />
+                  <span className="text-xs font-bold text-[#17243A]">Split by Page Groups</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Split every N pages into equal sized parts in a ZIP.
                 </p>
               </button>
@@ -282,10 +282,10 @@ export const SplitPdfTool: React.FC = () => {
           </div>
 
           {/* Mode Configuration Input */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
             {mode === 'range' && (
               <div>
-                <label htmlFor="pageRangeInput" className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="pageRangeInput" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                   Enter Pages or Ranges to Extract (Total Pages: {file.pageCount})
                 </label>
                 <input
@@ -293,15 +293,15 @@ export const SplitPdfTool: React.FC = () => {
                   type="text"
                   value={pageRange}
                   onChange={(e) => setPageRange(e.target.value)}
-                  className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                  className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none font-mono"
                   placeholder="e.g. 1-2, 4 or 2, 5"
                 />
-                <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-500">
+                <div className="flex flex-wrap items-center gap-2 mt-2.5 text-[11px] text-[#64748B]">
                   <span>Examples:</span>
                   <button
                     type="button"
                     onClick={() => setPageRange('1')}
-                    className="text-blue-600 hover:underline"
+                    className="text-[#2563EB] font-semibold hover:underline cursor-pointer"
                   >
                     Page 1
                   </button>
@@ -309,7 +309,7 @@ export const SplitPdfTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPageRange(`1-${Math.min(2, file.pageCount || 1)}`)}
-                    className="text-blue-600 hover:underline"
+                    className="text-[#2563EB] font-semibold hover:underline cursor-pointer"
                   >
                     1-{Math.min(2, file.pageCount || 1)}
                   </button>
@@ -317,7 +317,7 @@ export const SplitPdfTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPageRange(`1-${file.pageCount || 1}`)}
-                    className="text-blue-600 hover:underline"
+                    className="text-[#2563EB] font-semibold hover:underline cursor-pointer"
                   >
                     All pages (1-{file.pageCount})
                   </button>
@@ -326,17 +326,17 @@ export const SplitPdfTool: React.FC = () => {
             )}
 
             {mode === 'all' && (
-              <div className="text-xs text-slate-600">
-                <p className="font-semibold text-slate-900 mb-1">Single page extraction</p>
+              <div className="text-xs text-[#64748B]">
+                <p className="font-bold text-[#17243A] mb-1">Single page extraction</p>
                 <p>
-                  This will generate <strong className="font-mono tabular-nums">{file.pageCount}</strong> individual PDF documents (one per page) and package them neatly into a downloadable ZIP archive.
+                  This will generate <strong className="font-mono tabular-nums text-[#102A56]">{file.pageCount}</strong> individual PDF documents (one per page) and package them neatly into a downloadable ZIP archive.
                 </p>
               </div>
             )}
 
             {mode === 'chunk' && (
               <div>
-                <label htmlFor="chunkSizeInput" className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="chunkSizeInput" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                   Number of Pages per Document
                 </label>
                 <div className="flex items-center gap-3">
@@ -347,9 +347,9 @@ export const SplitPdfTool: React.FC = () => {
                     max={file.pageCount || 100}
                     value={chunkSize}
                     onChange={(e) => setChunkSize(parseInt(e.target.value, 10) || 1)}
-                    className="w-32 text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                    className="w-32 min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none font-mono"
                   />
-                  <span className="text-xs text-slate-500 font-mono tabular-nums">
+                  <span className="text-xs text-[#64748B] font-mono tabular-nums">
                     Yields approx. {Math.ceil((file.pageCount || 1) / Math.max(1, chunkSize))} separate files
                   </span>
                 </div>
@@ -388,7 +388,7 @@ export const SplitPdfTool: React.FC = () => {
           />
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -399,7 +399,7 @@ export const SplitPdfTool: React.FC = () => {
             <button
               type="button"
               onClick={handleSplit}
-              className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               {mode === 'range' ? 'Extract Selected Pages' : 'Split Document & Download'}
             </button>

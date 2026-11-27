@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ShieldCheck, Menu, X, FileText, ArrowRight, Globe, Check, ChevronDown } from 'lucide-react';
+import { ShieldCheck, Menu, X, ArrowRight, Globe, Check, ChevronDown } from 'lucide-react';
 import { Link } from './Link';
+import { BrandMark } from './BrandMark';
 import { PWAInstallButton } from './PWAInstallButton';
 import { useTranslation, LANGUAGES, SupportedLanguage } from '../lib/i18n';
 
@@ -41,7 +42,6 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
 
   const isMoreToolActive = moreToolLinks.some((item) => item.href === currentPath);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -61,24 +61,22 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Zone 1: Brand Wordmark */}
           <Link
             to="/"
-            className="flex items-center gap-2.5 text-slate-900 hover:text-blue-600 transition-colors whitespace-nowrap shrink-0 group"
+            className="flex items-center gap-2.5 text-[#102A56] hover:text-[#2563EB] transition-colors whitespace-nowrap shrink-0 group"
           >
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm group-hover:bg-blue-700 transition-colors">
-              <FileText className="w-4 h-4" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">
-              PDF<span className="text-blue-600">Quick</span>
+            <BrandMark variant="light" size="md" className="transition-transform duration-150 group-hover:scale-[1.03]" />
+            <span className="text-xl font-extrabold tracking-tight text-[#102A56]">
+              PDF<span className="text-[#2563EB]">Quick</span>
             </span>
           </Link>
 
           {/* Zone 2: Single-line text navigation links */}
-          <nav className="hidden lg:flex items-center gap-3.5 xl:gap-5 text-xs xl:text-sm font-medium text-slate-600">
+          <nav className="hidden lg:flex items-center gap-3.5 xl:gap-5 text-xs xl:text-sm font-medium text-[#64748B]">
             {navLinks.map((link) => {
               const isActive =
                 currentPath === link.href ||
@@ -87,8 +85,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
-                    isActive ? 'text-blue-600 font-semibold border-b-2 border-blue-600' : ''
+                  className={`hover:text-[#102A56] transition-colors whitespace-nowrap shrink-0 py-1.5 border-b-2 ${
+                    isActive
+                      ? 'text-[#102A56] font-semibold border-[#2563EB]'
+                      : 'border-transparent'
                   }`}
                 >
                   {link.label}
@@ -101,19 +101,25 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
               <button
                 type="button"
                 onClick={() => setMoreToolsOpen(!moreToolsOpen)}
-                className={`inline-flex items-center gap-1 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 cursor-pointer ${
-                  isMoreToolActive ? 'text-blue-600 font-semibold border-b-2 border-blue-600' : ''
+                className={`inline-flex items-center gap-1 hover:text-[#102A56] transition-colors whitespace-nowrap shrink-0 py-1.5 border-b-2 cursor-pointer ${
+                  isMoreToolActive
+                    ? 'text-[#102A56] font-semibold border-[#2563EB]'
+                    : 'border-transparent'
                 }`}
                 aria-expanded={moreToolsOpen}
                 aria-haspopup="true"
               >
                 <span>{t('nav.moreTools')}</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreToolsOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-150 ${
+                    moreToolsOpen ? 'rotate-180 text-[#2563EB]' : ''
+                  }`}
+                />
               </button>
 
               {moreToolsOpen && (
                 <div
-                  className="absolute left-0 mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50"
+                  className="absolute start-0 mt-2 w-56 bg-white border border-[#E2E8F0] rounded-xl shadow-[0_8px_24px_rgba(16,42,86,0.08)] py-1.5 z-50"
                   role="menu"
                 >
                   {moreToolLinks.map((item) => {
@@ -126,8 +132,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
                         role="menuitem"
                         className={`block px-3.5 py-2 text-xs transition-colors ${
                           isItemActive
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
-                            : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                            ? 'bg-[#F4F7FB] text-[#2563EB] font-semibold'
+                            : 'text-[#17243A] hover:bg-[#F4F7FB] hover:text-[#102A56]'
                         }`}
                       >
                         {item.label}
@@ -142,28 +148,32 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
           {/* Zone 3: Actions - Install CTA, Language selector & Privacy badge */}
           <div className="flex items-center gap-2.5 shrink-0">
             <PWAInstallButton />
-            {/* Desktop Language Selector Dropdown */}
+
+            {/* Desktop Language Selector Dropdown (typographic ISO badge, no flag emoji clutter) */}
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] text-xs font-semibold text-[#17243A] hover:text-[#102A56] bg-[#F4F7FB] hover:bg-[#E2E8F0]/60 border border-[#E2E8F0] rounded-lg transition-colors cursor-pointer"
                 aria-expanded={langDropdownOpen}
                 aria-haspopup="true"
                 aria-label={t('header.language')}
               >
-                <Globe className="w-3.5 h-3.5 text-slate-500" />
-                <span className="text-sm leading-none">{currentLangOption.flag}</span>
-                <span className="font-mono">{currentLangOption.shortLabel}</span>
-                <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} />
+                <Globe className="w-3.5 h-3.5 text-[#2563EB]" />
+                <span className="font-mono tracking-tight">{currentLangOption.shortLabel}</span>
+                <ChevronDown
+                  className={`w-3 h-3 text-[#64748B] transition-transform duration-150 ${
+                    langDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
               </button>
 
               {langDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-1.5 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                  className="absolute end-0 mt-1.5 w-44 bg-white border border-[#E2E8F0] rounded-xl shadow-[0_8px_24px_rgba(16,42,86,0.08)] py-1.5 z-50"
                   role="menu"
                 >
-                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
                     {t('header.language')}
                   </div>
                   {LANGUAGES.map((lang) => {
@@ -173,18 +183,20 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
                         key={lang.code}
                         type="button"
                         onClick={() => handleSelectLanguage(lang.code)}
-                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition-colors ${
+                        className={`w-full text-start px-3 py-2 text-xs flex items-center justify-between transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-blue-50 text-blue-700 font-bold'
-                            : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                            ? 'bg-[#F4F7FB] text-[#2563EB] font-bold'
+                            : 'text-[#17243A] hover:bg-[#F4F7FB] hover:text-[#102A56]'
                         }`}
                         role="menuitem"
                       >
                         <span className="flex items-center gap-2">
-                          <span className="text-sm">{lang.flag}</span>
+                          <span className="inline-flex items-center justify-center w-6 h-5 rounded bg-white border border-[#E2E8F0] text-[10px] font-mono font-bold text-[#102A56]">
+                            {lang.shortLabel}
+                          </span>
                           <span>{lang.name}</span>
                         </span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-[#2563EB]" />}
                       </button>
                     );
                   })}
@@ -192,26 +204,27 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
               )}
             </div>
 
-            {/* Privacy Trust Badge (shown cleanly on xl viewports so nav stays single-line) */}
+            {/* Privacy Trust Link (shown cleanly on xl viewports so nav stays single-line) */}
             <div className="hidden xl:flex items-center">
               <Link
                 to="/privacy"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-semibold text-[#102A56] hover:text-[#2563EB] bg-[#F4F7FB] hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
                 <span>{t('header.privacyBadge')}</span>
               </Link>
             </div>
 
-            {/* Mobile hamburger button */}
+            {/* Mobile hamburger button (>= 44px tap target) */}
             <div className="flex lg:hidden items-center">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+                className="inline-flex items-center justify-center w-11 h-11 text-[#17243A] hover:text-[#102A56] rounded-lg hover:bg-[#F4F7FB] border border-transparent hover:border-[#E2E8F0] transition-colors cursor-pointer"
                 aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
@@ -220,10 +233,10 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
 
       {/* Mobile menu dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2 shadow-lg max-h-[80vh] overflow-y-auto">
+        <div className="lg:hidden border-t border-[#E2E8F0] bg-white px-4 pt-3 pb-5 space-y-2 shadow-[0_10px_30px_rgba(16,42,86,0.08)] max-h-[82vh] overflow-y-auto">
           {/* Mobile Language Switcher Row */}
-          <div className="pb-3 mb-2 border-b border-slate-100">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
+          <div className="pb-3 mb-2 border-b border-[#E2E8F0]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] block mb-2">
               {t('header.language')}
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -233,16 +246,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
                   <button
                     key={lang.code}
                     type="button"
-                    onClick={() => {
-                      setLanguage(lang.code);
-                    }}
-                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                    onClick={() => setLanguage(lang.code)}
+                    className={`flex items-center justify-center gap-1.5 px-2.5 min-h-[44px] rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-xs'
-                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        ? 'bg-[#EFF6FF] border-[#2563EB] text-[#102A56]'
+                        : 'bg-[#F4F7FB] border-[#E2E8F0] text-[#17243A] hover:bg-white'
                     }`}
                   >
-                    <span>{lang.flag}</span>
+                    <span className="font-mono text-[11px] text-[#2563EB]">{lang.shortLabel}</span>
                     <span>{lang.name}</span>
                   </button>
                 );
@@ -250,35 +261,43 @@ export const Header: React.FC<HeaderProps> = ({ currentPath }) => {
             </div>
           </div>
 
-          {[...navLinks, ...moreToolLinks].map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50"
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+          {[...navLinks, ...moreToolLinks].map((link) => {
+            const isActive = currentPath === link.href;
+            return (
+              <Link
+                key={link.href}
+                to={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center px-3 min-h-[44px] rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold'
+                    : 'text-[#17243A] hover:text-[#2563EB] hover:bg-[#F4F7FB]'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          <div className="pt-3 border-t border-[#E2E8F0] flex flex-col gap-1.5">
             <Link
               to="/about"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm text-slate-600 px-3 py-1 hover:text-slate-900"
+              className="flex items-center text-sm text-[#64748B] px-3 min-h-[40px] hover:text-[#102A56]"
             >
               {t('nav.about')}
             </Link>
             <Link
               to="/privacy"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm text-slate-600 px-3 py-1 hover:text-slate-900"
+              className="flex items-center text-sm text-[#64748B] px-3 min-h-[40px] hover:text-[#102A56]"
             >
               {t('nav.privacy')}
             </Link>
             <Link
               to="/tools"
               onClick={() => setMobileMenuOpen(false)}
-              className="inline-flex items-center justify-center gap-2 mt-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center justify-center gap-2 mt-2 px-4 min-h-[44px] text-sm font-semibold text-white bg-[#2563EB] rounded-xl hover:bg-[#1D4ED8] transition-colors"
             >
               <span>{t('nav.exploreTools')}</span>
               <ArrowRight className="w-4 h-4" />

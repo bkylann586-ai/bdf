@@ -270,15 +270,17 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
   return (
     <section
       aria-label={title}
-      className={`w-full border border-slate-200 rounded-lg bg-slate-50/75 overflow-hidden text-left ${className}`}
+      className={`w-full border border-[#E2E8F0] rounded-2xl bg-[#F4F7FB] overflow-hidden text-start ${className}`}
     >
       {/* Top Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 bg-white border-b border-slate-200">
-        <div className="flex items-center gap-2 min-w-0">
-          <Eye className="w-4 h-4 text-blue-600 shrink-0" />
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-3 bg-white border-b border-[#E2E8F0]">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center shrink-0">
+            <Eye className="w-4 h-4" />
+          </div>
           <div className="min-w-0">
-            <h4 className="text-xs sm:text-sm font-semibold text-slate-900 truncate">{title}</h4>
-            <p className="text-[11px] text-slate-500 font-mono tabular-nums truncate">
+            <h4 className="text-xs sm:text-sm font-bold text-[#102A56] truncate">{title}</h4>
+            <p className="text-[11px] text-[#64748B] font-mono tabular-nums truncate">
               {subtitle ||
                 (effectiveNumPages > 0
                   ? `${totalSeqPages} ${totalSeqPages === 1 ? 'page' : 'pages'}`
@@ -295,15 +297,15 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
             <div
               role="group"
               aria-label="Compare before and after"
-              className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+              className="inline-flex items-center p-0.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg text-[11px] font-medium"
             >
               <button
                 type="button"
                 onClick={() => setCompareMode('after')}
-                className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   compareMode === 'after'
-                    ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-[#102A56] shadow-xs font-bold'
+                    : 'text-[#64748B] hover:text-[#102A56]'
                 }`}
               >
                 {afterLabel}
@@ -342,15 +344,15 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
             <div
               role="group"
               aria-label="Preview layout"
-              className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+              className="inline-flex items-center p-0.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg text-[11px] font-medium"
             >
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-[#102A56] shadow-xs font-bold'
+                    : 'text-[#64748B] hover:text-[#102A56]'
                 }`}
               >
                 <Grid2x2 className="w-3 h-3" />
@@ -359,10 +361,10 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('single')}
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                   viewMode === 'single'
-                    ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-[#102A56] shadow-xs font-bold'
+                    : 'text-[#64748B] hover:text-[#102A56]'
                 }`}
               >
                 <Maximize2 className="w-3 h-3" />
@@ -376,7 +378,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
             <div
               role="group"
               aria-label="Zoom controls"
-              className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+              className="inline-flex items-center p-0.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg text-[11px] font-medium"
             >
               <button
                 type="button"
@@ -384,7 +386,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                 onClick={handleZoomOut}
                 aria-label="Zoom out"
                 title="Zoom out"
-                className="p-1 rounded text-slate-700 hover:bg-white hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                className="p-1.5 rounded-md text-[#17243A] hover:bg-white hover:text-[#2563EB] disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
@@ -394,7 +396,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                 disabled={zoomPct === 100}
                 aria-label={`Zoom ${zoomPct}%, click to reset to 100%`}
                 title={zoomPct === 100 ? 'Zoom level' : 'Reset zoom to 100%'}
-                className="px-1.5 py-0.5 font-mono tabular-nums text-[11px] text-slate-700 min-w-[42px] text-center rounded hover:bg-white disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-default"
+                className="px-1.5 py-0.5 font-mono tabular-nums text-[11px] text-[#102A56] font-semibold min-w-[42px] text-center rounded-md hover:bg-white disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-default"
               >
                 {zoomPct}%
               </button>
@@ -404,7 +406,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                 onClick={handleZoomIn}
                 aria-label="Zoom in"
                 title="Zoom in"
-                className="p-1 rounded text-slate-700 hover:bg-white hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
+                className="p-1.5 rounded-md text-[#17243A] hover:bg-white hover:text-[#2563EB] disabled:opacity-40 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -417,7 +419,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
               type="button"
               onClick={() => setIsOpen((v) => !v)}
               aria-expanded={isOpen}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-md transition-colors whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-[#102A56] hover:text-[#2563EB] bg-white hover:bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap cursor-pointer"
             >
               {isOpen ? (
                 <>
@@ -442,18 +444,18 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
           {compareMode === 'split' && hasCompare && primaryUrl && compareUrl ? (
             <div className="space-y-3">
               {/* Navigation Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-md px-3 py-2 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs">
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     disabled={splitPageNum <= 1}
                     onClick={() => setSingleSeqIndex((i) => Math.max(0, i - 1))}
                     aria-label="Previous comparison page"
-                    className="p-1 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                    className="p-1 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
-                  <span className="font-mono tabular-nums text-slate-700 px-1.5">
+                  <span className="font-mono tabular-nums text-[#17243A] px-1.5">
                     Page {splitPageNum} / {splitMaxPages}
                   </span>
                   <button
@@ -463,27 +465,27 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                       setSingleSeqIndex((i) => Math.min(splitMaxPages - 1, i + 1))
                     }
                     aria-label="Next comparison page"
-                    className="p-1 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                    className="p-1 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                   >
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <span className="text-[11px] font-mono tabular-nums text-slate-500">
+                <span className="text-[11px] font-mono tabular-nums text-[#64748B]">
                   Zoom {zoomPct}%
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Before (Original) */}
-                <div className="bg-white border border-slate-200 rounded-lg p-3 flex flex-col items-center">
-                  <div className="w-full flex items-center justify-between text-xs pb-2 mb-2 border-b border-slate-100">
-                    <span className="font-semibold text-slate-700">{beforeLabel}</span>
-                    <span className="font-mono tabular-nums text-[11px] text-slate-500">
+                <div className="bg-white border border-[#E2E8F0] rounded-xl p-3 flex flex-col items-center">
+                  <div className="w-full flex items-center justify-between text-xs pb-2 mb-2 border-b border-[#E2E8F0]">
+                    <span className="font-semibold text-[#17243A]">{beforeLabel}</span>
+                    <span className="font-mono tabular-nums text-[11px] text-[#64748B]">
                       {compareNumPages > 0 ? `${compareNumPages} pages` : '...'}
                     </span>
                   </div>
                   <div
-                    className={`w-full overflow-auto max-h-[480px] bg-slate-100/80 rounded p-2 [&_canvas]:shadow-xs ${
+                    className={`w-full overflow-auto max-h-[480px] bg-[#F4F7FB] rounded-lg p-2 [&_canvas]:shadow-xs ${
                       zoomPct <= 100 ? '[&_canvas]:!max-w-full [&_canvas]:!h-auto' : ''
                     }`}
                   >
@@ -531,15 +533,15 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                 </div>
 
                 {/* After Changes */}
-                <div className="bg-white border border-blue-200 rounded-lg p-3 flex flex-col items-center">
-                  <div className="w-full flex items-center justify-between text-xs pb-2 mb-2 border-b border-slate-100">
-                    <span className="font-semibold text-blue-800">{afterLabel}</span>
-                    <span className="font-mono tabular-nums text-[11px] text-slate-500">
+                <div className="bg-white border border-[#2563EB]/40 rounded-xl p-3 flex flex-col items-center">
+                  <div className="w-full flex items-center justify-between text-xs pb-2 mb-2 border-b border-[#E2E8F0]">
+                    <span className="font-semibold text-[#102A56]">{afterLabel}</span>
+                    <span className="font-mono tabular-nums text-[11px] text-[#64748B]">
                       {primaryNumPages > 0 ? `${primaryNumPages} pages` : '...'}
                     </span>
                   </div>
                   <div
-                    className={`w-full overflow-auto max-h-[480px] bg-slate-100/80 rounded p-2 [&_canvas]:shadow-xs ${
+                    className={`w-full overflow-auto max-h-[480px] bg-[#F4F7FB] rounded-lg p-2 [&_canvas]:shadow-xs ${
                       zoomPct <= 100 ? '[&_canvas]:!max-w-full [&_canvas]:!h-auto' : ''
                     }`}
                   >
@@ -642,8 +644,8 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                         const borderClass = isMarked
                           ? markVariant === 'delete'
                             ? 'border-red-400 bg-red-50/40 ring-1 ring-red-300'
-                            : 'border-blue-500 bg-blue-50/35 ring-1 ring-blue-400'
-                          : 'border-slate-200 bg-white hover:border-slate-300';
+                            : 'border-[#2563EB] bg-[#EFF6FF]/60 ring-1 ring-[#2563EB]'
+                          : 'border-[#E2E8F0] bg-white hover:border-[#2563EB]/60';
 
                         const label = getPageLabel
                           ? getPageLabel(pageNum, seqIndex)
@@ -652,7 +654,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                         return (
                           <div
                             key={`${pageNum}-${seqIndex}`}
-                            className={`rounded-lg border p-2 flex flex-col justify-between transition-all ${borderClass}`}
+                            className={`rounded-xl border p-2.5 flex flex-col justify-between transition-all ${borderClass}`}
                           >
                             {/* Interactive Thumbnail Surface */}
                             <div className="relative group">
@@ -775,8 +777,8 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
 
                     {/* Grid Pagination Bar */}
                     {totalChunks > 1 && (
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
-                        <span className="text-slate-500 font-mono tabular-nums">
+                      <div className="flex items-center justify-between pt-2.5 border-t border-[#E2E8F0] text-xs">
+                        <span className="text-[#64748B] font-mono tabular-nums">
                           Showing {chunkStart + 1}–
                           {Math.min(chunkStart + GRID_PAGE_SIZE, totalSeqPages)} of {totalSeqPages}
                         </span>
@@ -785,7 +787,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                             type="button"
                             disabled={safeGridChunk === 0}
                             onClick={() => setGridChunk((c) => Math.max(0, c - 1))}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                           >
                             <ChevronLeft className="w-3.5 h-3.5" />
                             <span>Prev</span>
@@ -794,7 +796,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                             type="button"
                             disabled={safeGridChunk >= totalChunks - 1}
                             onClick={() => setGridChunk((c) => Math.min(totalChunks - 1, c + 1))}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                           >
                             <span>Next</span>
                             <ChevronRight className="w-3.5 h-3.5" />
@@ -808,18 +810,18 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                 {effectiveNumPages > 0 && viewMode === 'single' && (
                   <div className="space-y-3">
                     {/* Reader Controls */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-md px-3 py-2 text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs">
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           disabled={safeSingleIdx <= 0}
                           onClick={() => setSingleSeqIndex((i) => Math.max(0, i - 1))}
                           aria-label="Previous page"
-                          className="p-1 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                          className="p-1 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                         >
                           <ChevronLeft className="w-3.5 h-3.5" />
                         </button>
-                        <span className="font-mono tabular-nums text-slate-700 px-1.5">
+                        <span className="font-mono tabular-nums text-[#17243A] px-1.5">
                           {getPageLabel
                             ? getPageLabel(singlePageNum, safeSingleIdx)
                             : `Page ${singlePageNum}`}{' '}
@@ -832,7 +834,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                             setSingleSeqIndex((i) => Math.min(totalSeqPages - 1, i + 1))
                           }
                           aria-label="Next page"
-                          className="p-1 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                          className="p-1 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                         >
                           <ChevronRight className="w-3.5 h-3.5" />
                         </button>
@@ -843,12 +845,12 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
                           <button
                             type="button"
                             onClick={() => onPageClick(singlePageNum, safeSingleIdx)}
-                            className={`px-2.5 py-1 rounded border text-[11px] font-semibold transition-colors cursor-pointer ${
+                            className={`px-2.5 py-1 rounded-lg border text-[11px] font-semibold transition-colors cursor-pointer ${
                               markedSet.has(singlePageNum)
                                 ? markVariant === 'delete'
                                   ? 'bg-red-600 text-white border-red-600'
-                                  : 'bg-blue-600 text-white border-blue-600'
-                                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                                  : 'bg-[#2563EB] text-white border-[#2563EB]'
+                                : 'bg-white text-[#17243A] border-[#E2E8F0] hover:bg-[#F4F7FB]'
                             }`}
                           >
                             {markedSet.has(singlePageNum)
@@ -863,7 +865,7 @@ export const PdfPreview: React.FC<PdfPreviewProps> = ({
 
                     {/* Centered Full Page Canvas */}
                     <div
-                      className={`w-full overflow-auto max-h-[540px] bg-slate-200/60 border border-slate-200 rounded-lg p-3 [&_canvas]:shadow-sm ${
+                      className={`w-full overflow-auto max-h-[540px] bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-3 [&_canvas]:shadow-sm ${
                         zoomPct <= 100 ? '[&_canvas]:!max-w-full [&_canvas]:!h-auto' : ''
                       }`}
                     >

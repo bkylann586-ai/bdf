@@ -189,7 +189,7 @@ export const DeletePagesTool: React.FC = () => {
   const remainingCount = Math.max(0, totalPages - previewRemoveCount);
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {!file ? (
         <div className="space-y-3">
           <DropZone
@@ -202,7 +202,7 @@ export const DeletePagesTool: React.FC = () => {
             helperText="Select 1 PDF file (up to 250 MB) to strip blank, duplicate, or unwanted pages."
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -211,14 +211,14 @@ export const DeletePagesTool: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* File Overview */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl gap-3">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#102A56] text-[#38BDF8] flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
+                <p className="text-sm font-bold text-[#17243A] truncate">{file.name}</p>
+                <p className="text-xs text-[#64748B] font-mono tabular-nums">
                   {formatBytes(file.size)} · {totalPages} {totalPages === 1 ? 'page' : 'pages'} total
                 </p>
               </div>
@@ -226,20 +226,20 @@ export const DeletePagesTool: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline ml-3 shrink-0"
+              className="px-3 py-1.5 min-h-[36px] text-xs font-semibold text-[#64748B] hover:text-[#102A56] bg-white border border-[#E2E8F0] hover:border-[#2563EB]/40 rounded-lg shrink-0 cursor-pointer transition-colors"
             >
               Choose different file
             </button>
           </div>
 
           {totalPages === 1 ? (
-            <div role="alert" className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+            <div role="alert" className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
               This document only contains 1 page. At least 1 page must remain in a valid PDF, so no pages can be deleted.
             </div>
           ) : (
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4 space-y-3">
               <div>
-                <label htmlFor="deleteRangeInput" className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="deleteRangeInput" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                   Pages or Ranges to Delete (1–{totalPages})
                 </label>
                 <input
@@ -247,24 +247,24 @@ export const DeletePagesTool: React.FC = () => {
                   type="text"
                   value={pageRange}
                   onChange={(e) => setPageRange(e.target.value)}
-                  className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                  className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none font-mono"
                   placeholder="e.g. 1, 3-4"
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#64748B]">
                 <span>Quick select:</span>
                 <button
                   type="button"
                   onClick={() => setPageRange('1')}
-                  className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                  className="px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg hover:border-[#2563EB] text-[#2563EB] font-semibold cursor-pointer"
                 >
                   Cover Page (1)
                 </button>
                 <button
                   type="button"
                   onClick={() => setPageRange(String(totalPages))}
-                  className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                  className="px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg hover:border-[#2563EB] text-[#2563EB] font-semibold cursor-pointer"
                 >
                   Last Page ({totalPages})
                 </button>
@@ -272,7 +272,7 @@ export const DeletePagesTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPageRange(`2-${totalPages - 1}`)}
-                    className="px-2 py-0.5 bg-white border border-slate-300 rounded hover:border-blue-400 text-blue-600 font-medium"
+                    className="px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg hover:border-[#2563EB] text-[#2563EB] font-semibold cursor-pointer"
                   >
                     Middle Pages (2–{totalPages - 1})
                   </button>
@@ -280,7 +280,7 @@ export const DeletePagesTool: React.FC = () => {
               </div>
 
               {!previewError && previewRemoveCount > 0 && (
-                <p className="text-xs text-slate-700 font-medium">
+                <p className="text-xs text-[#17243A] font-medium">
                   Preview: Removing <span className="font-mono font-bold text-red-600">{previewRemoveCount}</span> page(s) ·{' '}
                   <span className="font-mono font-bold text-emerald-700">{remainingCount}</span> page(s) will be kept.
                 </p>
@@ -322,15 +322,15 @@ export const DeletePagesTool: React.FC = () => {
                 <div
                   role="group"
                   aria-label="Deletion preview filter"
-                  className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-md text-[11px] font-medium"
+                  className="inline-flex items-center p-0.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg text-[11px] font-medium"
                 >
                   <button
                     type="button"
                     onClick={() => setPreviewViewTab('all')}
-                    className={`px-2 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                    className={`px-2 py-1 rounded-md transition-colors whitespace-nowrap cursor-pointer ${
                       previewViewTab === 'all'
-                        ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white text-[#102A56] shadow-xs font-semibold'
+                        : 'text-[#64748B] hover:text-[#102A56]'
                     }`}
                   >
                     Before ({totalPages})
@@ -339,10 +339,10 @@ export const DeletePagesTool: React.FC = () => {
                     type="button"
                     disabled={keptPages.length === 0}
                     onClick={() => setPreviewViewTab('kept')}
-                    className={`px-2 py-1 rounded transition-colors whitespace-nowrap disabled:opacity-40 cursor-pointer ${
+                    className={`px-2 py-1 rounded-md transition-colors whitespace-nowrap disabled:opacity-40 cursor-pointer ${
                       previewViewTab === 'kept'
                         ? 'bg-white text-emerald-700 shadow-xs font-semibold'
-                        : 'text-slate-600 hover:text-slate-900'
+                        : 'text-[#64748B] hover:text-[#102A56]'
                     }`}
                   >
                     After ({keptPages.length})
@@ -353,7 +353,7 @@ export const DeletePagesTool: React.FC = () => {
           />
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -364,7 +364,7 @@ export const DeletePagesTool: React.FC = () => {
               type="button"
               disabled={totalPages === 1}
               onClick={handleDelete}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] disabled:bg-slate-300 disabled:cursor-not-allowed rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <FileMinus className="w-4 h-4" />
               <span>{t('tool.deletePages.button')}</span>

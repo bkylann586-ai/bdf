@@ -6,6 +6,7 @@ import { AdPlaceholder } from './AdPlaceholder';
 import { SeoMeta, getProductionBaseUrl } from './SeoMeta';
 import { TOOLS } from '../lib/toolsCatalog';
 import { Link } from './Link';
+import { ToolIcon } from './illustrations/PdfIllustrations';
 import { useTranslation } from '../lib/i18n';
 
 interface ToolLayoutProps {
@@ -97,7 +98,7 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/60 pb-16">
+    <div className="min-h-screen bg-[#F4F7FB] pb-16">
       <SeoMeta
         title={tool.metaTitle}
         description={tool.metaDescription}
@@ -106,56 +107,61 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
         faqs={faqs}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          items={[
-            { label: 'Tools', href: '/tools' },
-            { label: tool.name },
-          ]}
-        />
+      {/* Crisp Architectural Header Band */}
+      <div className="bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-7 sm:pb-9">
+          <Breadcrumbs
+            items={[
+              { label: 'Tools', href: '/tools' },
+              { label: tool.name },
+            ]}
+          />
 
-        {/* Tool Header */}
-        <div className="text-center py-6 sm:py-8 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200/60 rounded-md text-xs font-medium mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{t('header.privacyBadge')}</span>
+          <div className="text-center pt-3 sm:pt-5 max-w-3xl mx-auto">
+            <div className="flex items-center justify-center gap-3 mb-3.5">
+              <ToolIcon name={tool.iconName} size="lg" tone="navy" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                <span>{t('header.privacyBadge')}</span>
+              </div>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+              {tool.name}
+            </h1>
+            <p className="text-sm sm:text-base text-[#64748B] leading-relaxed max-w-2xl mx-auto">
+              {tool.tagline}
+            </p>
           </div>
-
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            {tool.name}
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            {tool.tagline}
-          </p>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Interactive Tool Container */}
-        <div className="max-w-4xl mx-auto mb-12">
-          {children}
-        </div>
+        <div className="max-w-4xl mx-auto mb-12">{children}</div>
 
         {/* Step-by-Step Guide (Separates Tool Controls from Ad Area) */}
-        <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm">
-          <div className="flex items-center gap-2 mb-6">
-            <BookOpen className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+        <section className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center">
+              <BookOpen className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               How to Use {tool.name}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {howToSteps.map((s, idx) => (
-              <div key={idx} className="flex flex-col">
-                <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold font-mono mb-3">
+              <div
+                key={idx}
+                className="flex flex-col p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]"
+              >
+                <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
                   {idx + 1}
                 </span>
-                <h3 className="text-sm font-semibold text-slate-900 mb-1">
-                  {s.title}
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {s.description}
-                </p>
+                <h3 className="text-sm font-bold text-[#17243A] mb-1">{s.title}</h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">{s.description}</p>
               </div>
             ))}
           </div>
@@ -167,28 +173,29 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
         </div>
 
         {/* Technical Details & In-Browser Limitations */}
-        <section className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Cpu className="w-5 h-5 text-slate-700" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+        <section className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#102A56] flex items-center justify-center">
+              <Cpu className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               Technical Specifications & Browser Execution
             </h2>
           </div>
 
-          <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#64748B] mb-6 leading-relaxed">
             {technicalIntro ||
               `PDFQuick executes all ${tool.name} operations directly in your browser using client-side JavaScript, HTML5 Canvas, and memory buffers without uploading files to remote servers:`}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {technicalDetails.map((item, idx) => (
-              <div key={idx} className="p-4 bg-slate-50 border border-slate-200/80 rounded-lg">
-                <h3 className="text-xs font-bold text-slate-900 mb-1">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {item.content}
-                </p>
+              <div
+                key={idx}
+                className="p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl"
+              >
+                <h3 className="text-xs font-bold text-[#102A56] mb-1.5">{item.title}</h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">{item.content}</p>
               </div>
             ))}
           </div>
@@ -197,11 +204,13 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
         {/* Frequently Asked Questions */}
         <section
           id="faqs"
-          className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-sm"
+          className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-8 max-w-4xl mx-auto shadow-[0_1px_3px_rgba(16,42,86,0.04)]"
         >
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center">
+              <HelpCircle className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               Frequently Asked Questions
             </h2>
           </div>
@@ -211,16 +220,10 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
               <div
                 key={idx}
                 id={`faq-${idx + 1}`}
-                className="pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+                className="pb-4 border-b border-[#E2E8F0] last:border-0 last:pb-0"
               >
-                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">
-                  {faq.question}
-                </h3>
-                <div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {faq.answer}
-                  </p>
-                </div>
+                <h3 className="text-sm font-bold text-[#17243A] mb-1.5">{faq.question}</h3>
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -228,25 +231,24 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
 
         {/* Related Tools Navigation */}
         <section className="my-10 max-w-4xl mx-auto">
-          <h2 className="text-base font-bold text-slate-900 mb-4">
-            Related PDF Tools
-          </h2>
+          <h2 className="text-base font-bold text-[#102A56] mb-4">Related PDF Tools</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {relatedTools.map((relTool) => (
               <Link
                 key={relTool.id}
                 to={relTool.path}
-                className="p-4 bg-white border border-slate-200 hover:border-blue-400 rounded-lg shadow-sm transition-all hover:-translate-y-0.5 group flex flex-col justify-between"
+                className="p-4 bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(16,42,86,0.06)] group flex flex-col justify-between"
               >
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">
+                  <ToolIcon name={relTool.iconName} size="sm" className="mb-3" />
+                  <h3 className="text-sm font-bold text-[#17243A] group-hover:text-[#2563EB] transition-colors mb-1">
                     {relTool.name}
                   </h3>
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
                     {relTool.shortDescription}
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 mt-3">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2563EB] mt-3">
                   <span>Open tool</span>
                   <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </span>

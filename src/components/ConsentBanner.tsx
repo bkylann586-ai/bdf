@@ -113,43 +113,43 @@ export const ConsentBanner: React.FC = () => {
       dir={dir}
       role="dialog"
       aria-label={copy.title}
-      className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:end-4 sm:max-w-md z-40 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-lg p-4 text-slate-800"
+      className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:end-4 sm:max-w-md z-40 bg-white/95 backdrop-blur-md border border-[#E2E8F0] rounded-2xl shadow-[0_12px_32px_rgba(16,42,86,0.12)] p-4 text-[#17243A]"
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 p-1.5 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+        <div className="mt-0.5 p-2 rounded-xl bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] shrink-0">
           <ShieldCheck className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-xs font-bold text-slate-900">{copy.title}</h2>
+            <h2 className="text-xs font-bold text-[#102A56]">{copy.title}</h2>
             <button
               type="button"
               onClick={handleDecline}
               aria-label={copy.decline}
-              className="text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
+              className="text-[#64748B] hover:text-[#17243A] p-1 rounded-lg hover:bg-[#F4F7FB] cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
-          <p className="mt-1 text-xs text-slate-600 leading-relaxed">{copy.body}</p>
+          <p className="mt-1 text-xs text-[#64748B] leading-relaxed">{copy.body}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleAccept}
-              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold transition-colors cursor-pointer"
             >
               {copy.accept}
             </button>
             <button
               type="button"
               onClick={handleDecline}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-lg bg-[#F4F7FB] hover:bg-[#E2E8F0] text-[#17243A] border border-[#E2E8F0] text-xs font-semibold transition-colors cursor-pointer"
             >
               {copy.decline}
             </button>
             <Link
               to="/privacy#consent-settings"
-              className="text-[11px] font-medium text-blue-600 hover:underline ms-auto"
+              className="text-[11px] font-semibold text-[#2563EB] hover:underline ms-auto"
             >
               {copy.settings}
             </Link>

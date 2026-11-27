@@ -238,7 +238,7 @@ export const EditPdfMetadataTool: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {!file ? (
         <div className="space-y-3">
           <DropZone
@@ -253,7 +253,7 @@ export const EditPdfMetadataTool: React.FC = () => {
           {errorMessage && (
             <div
               role="alert"
-              className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700"
+              className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700"
             >
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
@@ -263,14 +263,14 @@ export const EditPdfMetadataTool: React.FC = () => {
       ) : (
         <form onSubmit={handleSaveMetadata} className="space-y-6">
           {/* File Overview Header */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#102A56] text-[#38BDF8] flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-900 truncate">{file.name}</p>
-                <p className="text-xs text-slate-500 font-mono tabular-nums">
+                <p className="text-sm font-semibold text-[#17243A] truncate">{file.name}</p>
+                <p className="text-xs text-[#64748B] font-mono tabular-nums">
                   {formatBytes(file.size)} · {file.pageCount}{' '}
                   {file.pageCount === 1 ? 'page' : 'pages'}
                   {originalMetadata?.hasXmpStream ? ' · XMP metadata stream detected' : ''}
@@ -280,7 +280,7 @@ export const EditPdfMetadataTool: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="text-xs text-slate-600 hover:text-slate-900 underline shrink-0 whitespace-nowrap"
+              className="text-xs font-medium text-[#64748B] hover:text-[#102A56] underline shrink-0 whitespace-nowrap cursor-pointer"
             >
               Choose different file
             </button>
@@ -288,13 +288,13 @@ export const EditPdfMetadataTool: React.FC = () => {
 
           {/* Primary Metadata Fields: Title, Author, Creation Date */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-              <h3 className="text-sm font-bold text-slate-900">Core Document Properties</h3>
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2.5">
+              <h3 className="text-sm font-bold text-[#102A56]">Core Document Properties</h3>
               <div className="flex items-center gap-3 text-xs">
                 <button
                   type="button"
                   onClick={handleResetToOriginal}
-                  className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1 text-[#64748B] hover:text-[#102A56] transition-colors whitespace-nowrap cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Restore Original</span>
@@ -302,7 +302,7 @@ export const EditPdfMetadataTool: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleClearAllFields}
-                  className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors whitespace-nowrap cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Clear All</span>
@@ -313,14 +313,14 @@ export const EditPdfMetadataTool: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="metaTitleInput" className="text-xs font-semibold text-slate-700">
+                  <label htmlFor="metaTitleInput" className="text-xs font-semibold text-[#17243A]">
                     Document Title
                   </label>
                   {title && (
                     <button
                       type="button"
                       onClick={() => setTitle('')}
-                      className="text-[11px] text-slate-500 hover:text-slate-800"
+                      className="text-[11px] text-[#64748B] hover:text-[#17243A] cursor-pointer"
                     >
                       Clear
                     </button>
@@ -333,20 +333,20 @@ export const EditPdfMetadataTool: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Annual Financial Report 2026"
-                  className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="metaAuthorInput" className="text-xs font-semibold text-slate-700">
+                  <label htmlFor="metaAuthorInput" className="text-xs font-semibold text-[#17243A]">
                     Author
                   </label>
                   {author && (
                     <button
                       type="button"
                       onClick={() => setAuthor('')}
-                      className="text-[11px] text-slate-500 hover:text-slate-800"
+                      className="text-[11px] text-[#64748B] hover:text-[#17243A] cursor-pointer"
                     >
                       Clear
                     </button>
@@ -359,7 +359,7 @@ export const EditPdfMetadataTool: React.FC = () => {
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="e.g. Alex Morgan or Finance Department"
-                  className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                 />
               </div>
             </div>
@@ -368,16 +368,16 @@ export const EditPdfMetadataTool: React.FC = () => {
               <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                 <label
                   htmlFor="metaCreationDateInput"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#17243A]"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                  <Calendar className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span>Creation Date &amp; Time</span>
                 </label>
                 <div className="flex items-center gap-3 text-[11px]">
                   <button
                     type="button"
                     onClick={() => setCreationDate(formatDateTimeLocalInput(new Date()))}
-                    className="text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+                    className="text-[#2563EB] hover:text-[#1D4ED8] font-semibold whitespace-nowrap cursor-pointer"
                   >
                     Set to Now
                   </button>
@@ -385,7 +385,7 @@ export const EditPdfMetadataTool: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setCreationDate('')}
-                      className="text-slate-500 hover:text-slate-800 whitespace-nowrap"
+                      className="text-[#64748B] hover:text-[#17243A] whitespace-nowrap cursor-pointer"
                     >
                       Clear Date
                     </button>
@@ -397,39 +397,39 @@ export const EditPdfMetadataTool: React.FC = () => {
                 type="datetime-local"
                 value={creationDate}
                 onChange={(e) => setCreationDate(e.target.value)}
-                className="w-full sm:w-80 text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono tabular-nums"
+                className="w-full sm:w-80 min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 font-mono tabular-nums outline-none"
               />
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#64748B] mt-1">
                 Leave blank to remove the CreationDate entry from the PDF Info dictionary.
               </p>
             </div>
           </div>
 
           {/* Extended Metadata Toggle */}
-          <div className="border border-slate-200 rounded-lg">
+          <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
             <button
               type="button"
               onClick={() => setShowAdvanced((prev) => !prev)}
               aria-expanded={showAdvanced}
-              className="w-full flex items-center justify-between px-4 py-3 text-left text-xs font-semibold text-slate-800 hover:bg-slate-50 transition-colors rounded-lg"
+              className="w-full flex items-center justify-between px-4 py-3 text-start text-xs font-semibold text-[#102A56] hover:bg-[#F4F7FB] transition-colors cursor-pointer"
             >
               <span>
                 Additional PDF Properties (Subject, Keywords, Creator, Producer, Modification Date)
               </span>
               {showAdvanced ? (
-                <ChevronUp className="w-4 h-4 text-slate-500 shrink-0" />
+                <ChevronUp className="w-4 h-4 text-[#64748B] shrink-0" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
+                <ChevronDown className="w-4 h-4 text-[#64748B] shrink-0" />
               )}
             </button>
 
             {showAdvanced && (
-              <div className="px-4 pb-4 pt-3 border-t border-slate-200 space-y-4 bg-slate-50/50">
+              <div className="px-4 pb-4 pt-3 border-t border-[#E2E8F0] space-y-4 bg-[#F4F7FB]">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
                       htmlFor="metaSubjectInput"
-                      className="block text-xs font-semibold text-slate-700 mb-1.5"
+                      className="block text-xs font-semibold text-[#17243A] mb-1.5"
                     >
                       Subject
                     </label>
@@ -440,14 +440,14 @@ export const EditPdfMetadataTool: React.FC = () => {
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
                       placeholder="Brief document summary or topic"
-                      className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full min-h-[42px] text-xs sm:text-sm px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="metaKeywordsInput"
-                      className="block text-xs font-semibold text-slate-700 mb-1.5"
+                      className="block text-xs font-semibold text-[#17243A] mb-1.5"
                     >
                       Keywords (comma-separated)
                     </label>
@@ -458,14 +458,14 @@ export const EditPdfMetadataTool: React.FC = () => {
                       value={keywords}
                       onChange={(e) => setKeywords(e.target.value)}
                       placeholder="e.g. invoice, 2026, tax, summary"
-                      className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full min-h-[42px] text-xs sm:text-sm px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="metaCreatorInput"
-                      className="block text-xs font-semibold text-slate-700 mb-1.5"
+                      className="block text-xs font-semibold text-[#17243A] mb-1.5"
                     >
                       Creator Application
                     </label>
@@ -476,14 +476,14 @@ export const EditPdfMetadataTool: React.FC = () => {
                       value={creator}
                       onChange={(e) => setCreator(e.target.value)}
                       placeholder="e.g. Microsoft Word, Google Docs"
-                      className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full min-h-[42px] text-xs sm:text-sm px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="metaProducerInput"
-                      className="block text-xs font-semibold text-slate-700 mb-1.5"
+                      className="block text-xs font-semibold text-[#17243A] mb-1.5"
                     >
                       PDF Producer
                     </label>
@@ -494,18 +494,18 @@ export const EditPdfMetadataTool: React.FC = () => {
                       value={producer}
                       onChange={(e) => setProducer(e.target.value)}
                       placeholder="e.g. PDFQuick"
-                      className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-full min-h-[42px] text-xs sm:text-sm px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="pt-1 space-y-2">
-                  <label className="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                  <label className="inline-flex items-center gap-2 text-xs text-[#17243A] cursor-pointer">
                     <input
                       type="checkbox"
                       checked={updateModificationToNow}
                       onChange={(e) => setUpdateModificationToNow(e.target.checked)}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
                     />
                     <span className="font-medium">
                       Set Modification Date (ModDate) to current time when saving
@@ -516,7 +516,7 @@ export const EditPdfMetadataTool: React.FC = () => {
                     <div>
                       <label
                         htmlFor="metaModDateInput"
-                        className="block text-xs font-medium text-slate-600 mb-1"
+                        className="block text-xs font-medium text-[#64748B] mb-1"
                       >
                         Custom Modification Date &amp; Time
                       </label>
@@ -525,7 +525,7 @@ export const EditPdfMetadataTool: React.FC = () => {
                         type="datetime-local"
                         value={modificationDate}
                         onChange={(e) => setModificationDate(e.target.value)}
-                        className="w-full sm:w-80 text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono tabular-nums"
+                        className="w-full sm:w-80 min-h-[42px] text-xs sm:text-sm px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 font-mono tabular-nums outline-none"
                       />
                     </div>
                   )}
@@ -535,36 +535,36 @@ export const EditPdfMetadataTool: React.FC = () => {
           </div>
 
           {/* Compatibility & Viewer Options */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2.5">
-            <label className="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
+          <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
+            <label className="flex items-start gap-2.5 text-xs text-[#17243A] cursor-pointer">
               <input
                 type="checkbox"
                 checked={showTitleInWindowBar}
                 onChange={(e) => setShowTitleInWindowBar(e.target.checked)}
-                className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                className="mt-0.5 rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span>
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-[#102A56]">
                   Display document title in browser &amp; PDF viewer title bar
                 </span>
-                <span className="block text-[11px] text-slate-500 mt-0.5">
+                <span className="block text-[11px] text-[#64748B] mt-0.5">
                   Sets ViewerPreferences DisplayDocTitle when a Document Title is provided.
                 </span>
               </span>
             </label>
 
-            <label className="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
+            <label className="flex items-start gap-2.5 text-xs text-[#17243A] cursor-pointer">
               <input
                 type="checkbox"
                 checked={stripXmpMetadata}
                 onChange={(e) => setStripXmpMetadata(e.target.checked)}
-                className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                className="mt-0.5 rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span>
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-[#102A56]">
                   Remove embedded XMP XML metadata stream (recommended)
                 </span>
-                <span className="block text-[11px] text-slate-500 mt-0.5">
+                <span className="block text-[11px] text-[#64748B] mt-0.5">
                   Ensures desktop PDF readers display your updated Info Title, Author, and Creation Date instead of stale cached XMP fields.
                 </span>
               </span>
@@ -574,7 +574,7 @@ export const EditPdfMetadataTool: React.FC = () => {
           {errorMessage && (
             <div
               role="alert"
-              className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700"
+              className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700"
             >
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
@@ -584,7 +584,7 @@ export const EditPdfMetadataTool: React.FC = () => {
           <div className="flex items-center justify-end pt-2">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <FilePenLine className="w-4 h-4" />
               <span>{t('tool.editMetadata.button')}</span>

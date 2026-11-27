@@ -462,12 +462,12 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
       <div className="space-y-6">
         {/* Guarantee Status Banner (Strictly honest about what was destroyed vs preserved) */}
         <div
-          className={`rounded-xl border p-5 sm:p-6 ${
+          className={`rounded-2xl border p-5 sm:p-6 ${
             isMetadataOnly
               ? 'bg-amber-50 border-amber-300 text-amber-950'
               : isFullVerified
                 ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                : 'bg-blue-50 border-blue-300 text-blue-950'
+                : 'bg-[#EFF6FF] border-[#2563EB]/30 text-[#102A56]'
           }`}
         >
           <div className="flex items-start gap-3">
@@ -502,27 +502,27 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
         </div>
 
         {/* Post-Export Audit Telemetry Table */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs">
-          <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+          <h3 className="text-sm font-bold text-[#102A56] mb-4 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Post-Export Automated Security Verification</span>
           </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="text-slate-500 mb-1">Pages Preserved</div>
-              <div className="font-mono font-bold text-slate-900 text-sm">
+            <div className="p-3.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
+              <div className="text-[#64748B] mb-1">Pages Preserved</div>
+              <div className="font-mono font-bold text-[#102A56] text-sm">
                 {result.audit.outputPageCount} / {result.audit.inputPageCount}
               </div>
             </div>
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="text-slate-500 mb-1">Redacted Regions</div>
-              <div className="font-mono font-bold text-slate-900 text-sm">
+            <div className="p-3.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
+              <div className="text-[#64748B] mb-1">Redacted Regions</div>
+              <div className="font-mono font-bold text-[#102A56] text-sm">
                 {result.audit.redactionBoxCount}
               </div>
             </div>
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="text-slate-500 mb-1">Text on Redacted Pages</div>
+            <div className="p-3.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
+              <div className="text-[#64748B] mb-1">Text on Redacted Pages</div>
               <div
                 className={`font-mono font-bold text-sm ${
                   result.audit.textCountOnRedactedPages === 0 ? 'text-emerald-700' : 'text-red-700'
@@ -531,8 +531,8 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                 {result.audit.textCountOnRedactedPages} extractable
               </div>
             </div>
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="text-slate-500 mb-1">XMP &amp; Info Metadata</div>
+            <div className="p-3.5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
+              <div className="text-[#64748B] mb-1">XMP &amp; Info Metadata</div>
               <div
                 className={`font-mono font-bold text-sm ${
                   !result.audit.hasXmpMetadataAfter && result.audit.remainingInfoKeys.length === 0
@@ -547,15 +547,15 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <div className="text-xs text-slate-600 font-mono">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#E2E8F0]">
+            <div className="text-xs text-[#64748B] font-mono">
               {result.downloadName} · {formatBytes(result.fileSize)} (Original: {formatBytes(result.originalSize)})
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => downloadBlob(result.blob, result.downloadName)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs cursor-pointer"
+                className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs cursor-pointer transition-colors"
               >
                 <Download className="w-4 h-4" />
                 <span>Download Sanitized PDF</span>
@@ -563,14 +563,14 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setResult(null)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
+                className="min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[#17243A] bg-[#F4F7FB] hover:bg-[#E2E8F0]/70 border border-[#E2E8F0] rounded-xl cursor-pointer transition-colors"
               >
                 <span>Edit Redaction Areas</span>
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg cursor-pointer"
+                className="min-h-[44px] inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium text-[#64748B] hover:text-[#102A56] bg-white border border-[#E2E8F0] hover:bg-[#F4F7FB] rounded-xl cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>New Document</span>
@@ -587,14 +587,14 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
         </div>
 
         {/* Before vs After Visual & Text Layer Comparison */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-blue-600" />
+              <h3 className="text-sm font-bold text-[#102A56] flex items-center gap-2">
+                <Eye className="w-4 h-4 text-[#2563EB]" />
                 <span>Before &amp; After Inspection Preview</span>
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#64748B]">
                 Verify visually and structurally that sensitive regions are gone before sharing.
               </p>
             </div>
@@ -605,19 +605,19 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                   type="button"
                   disabled={comparePage <= 1}
                   onClick={() => setComparePage((p) => Math.max(1, p - 1))}
-                  className="p-1.5 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                  className="p-1.5 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] text-[#17243A] disabled:opacity-40 cursor-pointer"
                   aria-label="Previous comparison page"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="font-mono text-slate-700">
+                <span className="font-mono text-[#17243A]">
                   Page {comparePage} / {result.audit.outputPageCount}
                 </span>
                 <button
                   type="button"
                   disabled={comparePage >= result.audit.outputPageCount}
                   onClick={() => setComparePage((p) => Math.min(result.audit.outputPageCount, p + 1))}
-                  className="p-1.5 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                  className="p-1.5 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] text-[#17243A] disabled:opacity-40 cursor-pointer"
                   aria-label="Next comparison page"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -629,12 +629,12 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-700">BEFORE (Original Page {comparePage})</span>
-                <span className="font-mono text-[11px] text-slate-500">
+                <span className="font-bold text-[#17243A]">BEFORE (Original Page {comparePage})</span>
+                <span className="font-mono text-[11px] text-[#64748B]">
                   {beforeTextCount !== null ? `${beforeTextCount} text runs` : '...'}
                 </span>
               </div>
-              <div className="bg-slate-100 border border-slate-200 rounded-lg p-2 flex justify-center overflow-auto max-h-[460px]">
+              <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-2 flex justify-center overflow-auto max-h-[460px]">
                 <canvas ref={beforeCanvasRef} className="max-w-full h-auto bg-white shadow-xs" />
               </div>
             </div>
@@ -650,7 +650,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                   {afterTextCount !== null ? `${afterTextCount} selectable text runs` : '...'}
                 </span>
               </div>
-              <div className="bg-slate-100 border border-emerald-200 rounded-lg p-2 flex justify-center overflow-auto max-h-[460px]">
+              <div className="bg-[#F4F7FB] border border-emerald-200 rounded-xl p-2 flex justify-center overflow-auto max-h-[460px]">
                 <canvas ref={afterCanvasRef} className="max-w-full h-auto bg-white shadow-xs" />
               </div>
             </div>
@@ -663,7 +663,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Anti-Fake-Redaction Security Warning */}
-      <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-5 flex items-start gap-3">
+      <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
         <ShieldAlert className="w-5 h-5 text-red-700 shrink-0 mt-0.5" />
         <div className="text-xs sm:text-sm text-red-950 leading-relaxed">
           <p className="font-bold mb-1">
@@ -676,14 +676,14 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
       </div>
 
       {errorMsg && (
-        <div role="alert" className="bg-red-50 border border-red-300 rounded-xl p-4 text-xs sm:text-sm text-red-900 flex items-start gap-2.5">
+        <div role="alert" className="bg-red-50 border border-red-300 rounded-2xl p-4 text-xs sm:text-sm text-red-900 flex items-start gap-2.5">
           <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {!fileItem || !inspection ? (
-        <div className="space-y-4">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
           <DropZone
             accept="application/pdf,.pdf"
             multiple={false}
@@ -704,22 +704,26 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left 8 Cols: Interactive Page Preview & Drag-to-Redact Canvas */}
-          <div className="lg:col-span-8 bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-              <div className="min-w-0">
-                <h2 className="text-sm font-bold text-slate-900 truncate flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span>{fileItem.name}</span>
-                </h2>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Drag across any sensitive text or number on Page {currentPage} to mark for permanent removal.
-                  {currentPageMeta && (
-                    <span className="ml-1.5 font-mono">
-                      ({Math.round(currentPageMeta.widthPt)}×{Math.round(currentPageMeta.heightPt)} pt ·{' '}
-                      {currentPageMeta.isLikelyScanned ? 'Image/Scanned Page' : 'Text-Layer Page'})
-                    </span>
-                  )}
-                </p>
+          <div className="lg:col-span-8 bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] pb-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-[#102A56] text-[#38BDF8] flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-bold text-[#102A56] truncate">
+                    {fileItem.name}
+                  </h2>
+                  <p className="text-[11px] text-[#64748B] mt-0.5">
+                    Drag across any sensitive text or number on Page {currentPage} to mark for permanent removal.
+                    {currentPageMeta && (
+                      <span className="ms-1.5 font-mono">
+                        ({Math.round(currentPageMeta.widthPt)}×{Math.round(currentPageMeta.heightPt)} pt ·{' '}
+                        {currentPageMeta.isLikelyScanned ? 'Image/Scanned Page' : 'Text-Layer Page'})
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
@@ -727,19 +731,19 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                   type="button"
                   disabled={currentPage <= 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="p-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                  className="p-1.5 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] text-[#17243A] disabled:opacity-40 cursor-pointer"
                   aria-label="Previous page"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs font-mono text-slate-700 px-1">
+                <span className="text-xs font-mono text-[#17243A] px-1">
                   Page {currentPage} / {inspection.pageCount}
                 </span>
                 <button
                   type="button"
                   disabled={currentPage >= inspection.pageCount}
                   onClick={() => setCurrentPage((p) => Math.min(inspection.pageCount, p + 1))}
-                  className="p-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                  className="p-1.5 border border-[#E2E8F0] rounded-lg hover:bg-[#F4F7FB] text-[#17243A] disabled:opacity-40 cursor-pointer"
                   aria-label="Next page"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -750,33 +754,33 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
             {/* Text Search Auto-Locator Bar */}
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-[#64748B] absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Find & auto-mark text on this page (e.g. 4829, address, name)..."
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:border-blue-500 outline-none"
+                  className="w-full min-h-[40px] ps-9 pe-3 py-2 text-xs bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                 />
               </div>
               <button
                 type="button"
                 disabled={isSearchingText || searchTerm.trim().length < 2}
                 onClick={handleFindTextOnPage}
-                className="px-3.5 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                className="min-h-[40px] px-3.5 py-2 text-xs font-semibold text-[#2563EB] bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#2563EB]/25 rounded-xl disabled:opacity-50 cursor-pointer whitespace-nowrap transition-colors"
               >
                 {isSearchingText ? 'Scanning...' : 'Auto-Mark Text Matches'}
               </button>
             </div>
 
             {searchNotice && (
-              <div className="text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+              <div className="text-xs text-[#17243A] bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl px-3 py-2">
                 {searchNotice}
               </div>
             )}
 
             {/* Interactive Canvas + Normalized SVG/Box Redaction Layer */}
-            <div className="bg-slate-100 border border-slate-300 rounded-lg p-3 flex justify-center overflow-auto max-h-[650px]">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-3 flex justify-center overflow-auto max-h-[650px]">
               <div className="relative inline-block select-none touch-none shadow-md bg-white">
                 <canvas ref={editorCanvasRef} className="block max-w-full h-auto" />
 
@@ -837,24 +841,24 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
           {/* Right 4 Cols: Pre-Scrubbing Diagnostics, Region List & Controls */}
           <div className="lg:col-span-4 space-y-5">
             {/* Detected Risks Panel */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#102A56]">
                   Detected Hidden Metadata
                 </h3>
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="text-[11px] font-medium text-slate-500 hover:text-red-600 cursor-pointer"
+                  className="text-[11px] font-medium text-[#64748B] hover:text-red-600 cursor-pointer"
                 >
                   Change File
                 </button>
               </div>
 
-              <ul className="space-y-1.5 text-xs text-slate-600">
+              <ul className="space-y-1.5 text-xs text-[#64748B]">
                 <li className="flex justify-between">
                   <span>Info Metadata Fields:</span>
-                  <span className="font-mono font-semibold text-slate-900">
+                  <span className="font-mono font-semibold text-[#102A56]">
                     {inspection.infoFieldsPresent.length > 0
                       ? `${inspection.infoFieldsPresent.length} (${inspection.infoFieldsPresent.slice(0, 3).join(', ')})`
                       : 'None'}
@@ -862,19 +866,19 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                 </li>
                 <li className="flex justify-between">
                   <span>XMP Packet (/Metadata):</span>
-                  <span className="font-mono font-semibold text-slate-900">
+                  <span className="font-mono font-semibold text-[#102A56]">
                     {inspection.hasXmpMetadata ? 'Present' : 'None'}
                   </span>
                 </li>
                 <li className="flex justify-between">
                   <span>Annotations / Comments:</span>
-                  <span className="font-mono font-semibold text-slate-900">
+                  <span className="font-mono font-semibold text-[#102A56]">
                     {inspection.annotationCount}
                   </span>
                 </li>
                 <li className="flex justify-between">
                   <span>Hidden OCG / AcroForm:</span>
-                  <span className="font-mono font-semibold text-slate-900">
+                  <span className="font-mono font-semibold text-[#102A56]">
                     {inspection.hasHiddenLayersOcg || inspection.hasAcroForm ? 'Detected' : 'None'}
                   </span>
                 </li>
@@ -882,9 +886,9 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
             </div>
 
             {/* Marked Regions Manager */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#102A56]">
                   Marked Blackout Areas ({regions.length})
                 </h3>
                 <div className="flex items-center gap-2">
@@ -892,7 +896,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                     type="button"
                     disabled={regions.length === 0}
                     onClick={() => setRegions((prev) => prev.slice(0, -1))}
-                    className="inline-flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 disabled:opacity-40 cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] text-[#64748B] hover:text-[#102A56] disabled:opacity-40 cursor-pointer"
                   >
                     <Undo2 className="w-3 h-3" />
                     Undo
@@ -910,27 +914,27 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
               </div>
 
               {regions.length === 0 ? (
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-[#64748B] leading-relaxed">
                   No blackout regions marked yet. Draw rectangles directly over the page preview, or use &ldquo;Auto-Mark Text Matches&rdquo; above.
                 </p>
               ) : (
-                <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                <div className="max-h-40 overflow-y-auto space-y-1.5 pe-1">
                   {regions.map((r, i) => (
                     <div
                       key={r.id}
-                      className="flex items-center justify-between text-[11px] bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5"
+                      className="flex items-center justify-between text-[11px] bg-[#F4F7FB] border border-[#E2E8F0] rounded-lg px-2.5 py-1.5"
                     >
                       <button
                         type="button"
                         onClick={() => setCurrentPage(r.pageNumber)}
-                        className="text-left truncate font-medium text-slate-800 hover:text-blue-600 cursor-pointer"
+                        className="text-start truncate font-medium text-[#17243A] hover:text-[#2563EB] cursor-pointer"
                       >
                         #{i + 1} · Page {r.pageNumber} {r.label ? `(${r.label})` : ''}
                       </button>
                       <button
                         type="button"
                         onClick={() => setRegions((prev) => prev.filter((it) => it.id !== r.id))}
-                        className="text-slate-400 hover:text-red-600 ml-2 shrink-0 cursor-pointer"
+                        className="text-[#64748B] hover:text-red-600 ms-2 shrink-0 cursor-pointer"
                         aria-label={`Delete region ${i + 1}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -942,40 +946,52 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
             </div>
 
             {/* Privacy Mode & Execution Controls */}
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-4">
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2 flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#102A56] mb-2 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
                   <span>Destructive Flattening Scope</span>
                 </h3>
                 <div className="space-y-2 text-xs">
-                  <label className="flex items-start gap-2 p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <label
+                    className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      mode === 'targeted'
+                        ? 'bg-[#EFF6FF] border-[#2563EB]'
+                        : 'border-[#E2E8F0] hover:bg-[#F4F7FB]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="redactMode"
                       checked={mode === 'targeted'}
                       onChange={() => setMode('targeted')}
-                      className="mt-0.5 text-blue-600"
+                      className="mt-0.5 text-[#2563EB] focus:ring-[#2563EB]"
                     />
                     <div>
-                      <div className="font-semibold text-slate-900">Targeted Pages (Default)</div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="font-semibold text-[#102A56]">Targeted Pages (Default)</div>
+                      <div className="text-[11px] text-[#64748B]">
                         Destructively flattens only pages with blackout boxes; keeps untouched pages crisp (with annotations &amp; metadata stripped).
                       </div>
                     </div>
                   </label>
 
-                  <label className="flex items-start gap-2 p-2.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <label
+                    className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      mode === 'deep-flatten-all'
+                        ? 'bg-[#EFF6FF] border-[#2563EB]'
+                        : 'border-[#E2E8F0] hover:bg-[#F4F7FB]'
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="redactMode"
                       checked={mode === 'deep-flatten-all'}
                       onChange={() => setMode('deep-flatten-all')}
-                      className="mt-0.5 text-blue-600"
+                      className="mt-0.5 text-[#2563EB] focus:ring-[#2563EB]"
                     />
                     <div>
-                      <div className="font-semibold text-slate-900">Deep-Flatten All Pages (Max Scrub)</div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="font-semibold text-[#102A56]">Deep-Flatten All Pages (Max Scrub)</div>
+                      <div className="text-[11px] text-[#64748B]">
                         Flattens every page to clean raster images to eliminate any hidden layers or invisible OCR text across the entire PDF.
                       </div>
                     </div>
@@ -983,23 +999,23 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs pt-2 border-t border-slate-100">
-                <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
+              <div className="space-y-2 text-xs pt-2 border-t border-[#E2E8F0]">
+                <label className="flex items-center gap-2 text-[#17243A] cursor-pointer">
                   <input
                     type="checkbox"
                     checked={scrubMetadata}
                     onChange={(e) => setScrubMetadata(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600"
+                    className="rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
                   />
                   <span>Scrub Author, Title, Creator, Dates &amp; XMP Stream</span>
                 </label>
 
-                <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
+                <label className="flex items-center gap-2 text-[#17243A] cursor-pointer">
                   <input
                     type="checkbox"
                     checked={stampRedactedLabel}
                     onChange={(e) => setStampRedactedLabel(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600"
+                    className="rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
                   />
                   <span>Label blackout boxes &ldquo;REDACTED&rdquo;</span>
                 </label>
@@ -1008,7 +1024,7 @@ export const FinancialPrivacyRedactionTool: React.FC = () => {
               <button
                 type="button"
                 onClick={handleApplyRedaction}
-                className="w-full py-3 px-4 text-xs sm:text-sm font-semibold text-white bg-slate-900 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+                className="w-full min-h-[44px] py-3 px-4 text-xs sm:text-sm font-semibold text-white bg-[#102A56] hover:bg-[#2563EB] active:bg-[#1D4ED8] rounded-xl shadow-xs transition-colors cursor-pointer"
               >
                 {t('banking.privacyButton')}
               </button>

@@ -243,7 +243,7 @@ export const CompressPdfTool: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
@@ -256,7 +256,7 @@ export const CompressPdfTool: React.FC = () => {
             helperText="Select 1 or more PDF files (up to 250 MB total). Multiple PDFs compress sequentially inside your browser."
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -272,33 +272,33 @@ export const CompressPdfTool: React.FC = () => {
           />
 
           {/* Honest Notice */}
-          <div className="p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-lg flex items-start gap-2.5 text-xs text-slate-700">
-            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl flex items-start gap-2.5 text-xs text-[#17243A]">
+            <Info className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
             <div className="leading-relaxed">
-              <strong className="text-slate-900">How browser compression works: </strong>
+              <strong className="text-[#102A56]">How browser compression works: </strong>
               Scanned documents and PDFs containing high-resolution images benefit the most from optimization. Plain vector and text-only documents are often already compact; lossless re-encoding removes orphaned data and stream redundancies.
             </div>
           </div>
 
           {/* Optimization Options */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-2">
+            <label className="block text-xs font-semibold text-[#17243A] mb-2">
               Compression Level {files.length > 1 ? '(applied to all queued PDFs)' : ''}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setLevel('recommended')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   level === 'recommended'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-900">Balanced (Recommended)</span>
+                  <span className="text-xs font-bold text-[#17243A]">Balanced (Recommended)</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Best balance of visual clarity and file size reduction. Ideal for standard business documents and scans.
                 </p>
               </button>
@@ -306,16 +306,16 @@ export const CompressPdfTool: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setLevel('extreme')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   level === 'extreme'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-900">Maximum Reduction</span>
+                  <span className="text-xs font-bold text-[#17243A]">Maximum Reduction</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Aggressive downsampling for small email attachments and fast mobile web sharing.
                 </p>
               </button>
@@ -323,16 +323,16 @@ export const CompressPdfTool: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setLevel('lossless')}
-                className={`p-3.5 text-left border rounded-lg transition-all ${
+                className={`p-4 text-start border rounded-xl transition-all cursor-pointer ${
                   level === 'lossless'
-                    ? 'border-blue-600 bg-blue-50/60 ring-1 ring-blue-600'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                    ? 'border-[#2563EB] bg-[#EFF6FF] ring-1 ring-[#2563EB]'
+                    : 'border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-900">Lossless Re-encode</span>
+                  <span className="text-xs font-bold text-[#17243A]">Lossless Re-encode</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-[#64748B] leading-relaxed">
                   Preserves original vector clarity 100%. Re-encodes object streams and strips obsolete catalog objects.
                 </p>
               </button>
@@ -340,7 +340,7 @@ export const CompressPdfTool: React.FC = () => {
           </div>
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -351,7 +351,7 @@ export const CompressPdfTool: React.FC = () => {
             <button
               type="button"
               onClick={handleCompress}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <Minimize2 className="w-4 h-4" />
               <span>

@@ -308,7 +308,7 @@ export const FinancialFormFillerTool: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Legal & Privacy Disclaimer Banner */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 sm:p-5 flex items-start gap-3">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
         <div className="text-xs sm:text-sm text-amber-950 leading-relaxed space-y-1">
           <p className="font-semibold">{HELPER_TEMPLATE_DISCLAIMER}</p>
@@ -319,17 +319,17 @@ export const FinancialFormFillerTool: React.FC = () => {
       </div>
 
       {/* Template Selector Tabs */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3.5">
+          <h2 className="text-sm font-bold text-[#102A56] flex items-center gap-2">
+            <FileSpreadsheet className="w-4 h-4 text-[#2563EB]" />
             <span>1. Choose Financial Helper Worksheet</span>
           </h2>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleFillSample}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#2563EB] bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#2563EB]/25 rounded-xl transition-colors cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Fill Sample Data</span>
@@ -337,7 +337,7 @@ export const FinancialFormFillerTool: React.FC = () => {
             <button
               type="button"
               onClick={handleClearAll}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#64748B] hover:text-[#17243A] bg-[#F4F7FB] hover:bg-[#E2E8F0]/60 border border-[#E2E8F0] rounded-xl transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset Form</span>
@@ -353,14 +353,14 @@ export const FinancialFormFillerTool: React.FC = () => {
                 key={tpl.id}
                 type="button"
                 onClick={() => handleSelectTemplate(tpl.id)}
-                className={`text-left p-3 rounded-lg border transition-all cursor-pointer ${
+                className={`text-start p-3 rounded-xl border transition-all cursor-pointer ${
                   active
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                    : 'bg-slate-50 text-slate-800 border-slate-200 hover:border-blue-400 hover:bg-white'
+                    ? 'bg-[#102A56] text-white border-[#102A56] shadow-xs'
+                    : 'bg-[#F4F7FB] text-[#17243A] border-[#E2E8F0] hover:border-[#2563EB] hover:bg-white'
                 }`}
               >
                 <div className="text-xs font-bold leading-snug mb-1">{tpl.name}</div>
-                <div className={`text-[11px] ${active ? 'text-blue-100' : 'text-slate-500'}`}>
+                <div className={`text-[11px] ${active ? 'text-[#38BDF8]' : 'text-[#64748B]'}`}>
                   {tpl.sections.reduce((acc, s) => acc + s.fields.length, 0)} fields · USD
                 </div>
               </button>
@@ -374,12 +374,12 @@ export const FinancialFormFillerTool: React.FC = () => {
         {/* Left: Interactive Form Fields */}
         <div className="lg:col-span-7 space-y-5">
           {/* Paper Standard & Output Settings */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-bold text-slate-900">
-                2. Paper Size & Print Settings
+              <h2 className="text-sm font-bold text-[#102A56]">
+                2. Paper Size &amp; Print Settings
               </h2>
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg">
                 <ShieldCheck className="w-3 h-3" />
                 Zero Cloud Storage
               </span>
@@ -392,14 +392,14 @@ export const FinancialFormFillerTool: React.FC = () => {
                   setPaperSize('letter');
                   setGeneratedResult(null);
                 }}
-                className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-3 rounded-xl border text-start transition-all cursor-pointer ${
                   paperSize === 'letter'
-                    ? 'bg-blue-50 border-blue-500 text-blue-950'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    ? 'bg-[#EFF6FF] border-[#2563EB] text-[#102A56]'
+                    : 'bg-white border-[#E2E8F0] text-[#17243A] hover:border-[#CBD5E1]'
                 }`}
               >
                 <div className="text-xs font-bold">{t('banking.paperLetter')}</div>
-                <div className="text-[11px] text-slate-500">Default US Banking & Mortgage Print Size</div>
+                <div className="text-[11px] text-[#64748B]">Default US Banking &amp; Mortgage Print Size</div>
               </button>
 
               <button
@@ -408,14 +408,14 @@ export const FinancialFormFillerTool: React.FC = () => {
                   setPaperSize('a4');
                   setGeneratedResult(null);
                 }}
-                className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-3 rounded-xl border text-start transition-all cursor-pointer ${
                   paperSize === 'a4'
-                    ? 'bg-blue-50 border-blue-500 text-blue-950'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    ? 'bg-[#EFF6FF] border-[#2563EB] text-[#102A56]'
+                    : 'bg-white border-[#E2E8F0] text-[#17243A] hover:border-[#CBD5E1]'
                 }`}
               >
                 <div className="text-xs font-bold">{t('banking.paperA4')}</div>
-                <div className="text-[11px] text-slate-500">International UK / EU / Global Print Size</div>
+                <div className="text-[11px] text-[#64748B]">International UK / EU / Global Print Size</div>
               </button>
             </div>
 
@@ -426,14 +426,14 @@ export const FinancialFormFillerTool: React.FC = () => {
                   setWorksheetLanguage('en');
                   setGeneratedResult(null);
                 }}
-                className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`p-2.5 rounded-xl border text-start transition-all cursor-pointer ${
                   worksheetLanguage === 'en'
-                    ? 'bg-blue-50 border-blue-500 text-blue-950'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    ? 'bg-[#EFF6FF] border-[#2563EB] text-[#102A56]'
+                    : 'bg-white border-[#E2E8F0] text-[#17243A] hover:border-[#CBD5E1]'
                 }`}
               >
                 <div className="text-xs font-bold">PDF Output: English (LTR)</div>
-                <div className="text-[11px] text-slate-500">US Standard headings (supports Arabic field entries)</div>
+                <div className="text-[11px] text-[#64748B]">US Standard headings (supports Arabic field entries)</div>
               </button>
 
               <button
@@ -443,18 +443,18 @@ export const FinancialFormFillerTool: React.FC = () => {
                   setWorksheetLanguage('ar');
                   setGeneratedResult(null);
                 }}
-                className={`p-2.5 rounded-lg border text-right transition-all cursor-pointer ${
+                className={`p-2.5 rounded-xl border text-right transition-all cursor-pointer ${
                   worksheetLanguage === 'ar'
-                    ? 'bg-blue-50 border-blue-500 text-blue-950'
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    ? 'bg-[#EFF6FF] border-[#2563EB] text-[#102A56]'
+                    : 'bg-white border-[#E2E8F0] text-[#17243A] hover:border-[#CBD5E1]'
                 }`}
               >
                 <div className="text-xs font-bold">لغة ملف الـ PDF: العربية (RTL)</div>
-                <div className="text-[11px] text-slate-500">تخطيط عربي كامل مع خط Noto Sans Arabic ونصوص مختلطة</div>
+                <div className="text-[11px] text-[#64748B]">تخطيط عربي كامل مع خط Noto Sans Arabic ونصوص مختلطة</div>
               </button>
             </div>
 
-            <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer pt-1">
+            <label className="flex items-center gap-2 text-xs text-[#17243A] cursor-pointer pt-1">
               <input
                 type="checkbox"
                 checked={includeBlankOptionalFields}
@@ -462,7 +462,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                   setIncludeBlankOptionalFields(e.target.checked);
                   setGeneratedResult(null);
                 }}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB]"
               />
               <span>Include blank optional fields cleanly in exported PDF</span>
             </label>
@@ -470,10 +470,10 @@ export const FinancialFormFillerTool: React.FC = () => {
 
           {/* Form Sections */}
           {activeTemplate.sections.map((section) => (
-            <div key={section.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-              <div className="border-b border-slate-100 pb-2.5">
-                <h3 className="text-sm font-bold text-slate-900">{section.title}</h3>
-                <p className="text-xs text-slate-500 mt-0.5">{section.description}</p>
+            <div key={section.id} className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-4">
+              <div className="border-b border-[#E2E8F0] pb-2.5">
+                <h3 className="text-sm font-bold text-[#102A56]">{section.title}</h3>
+                <p className="text-xs text-[#64748B] mt-0.5">{section.description}</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -484,12 +484,12 @@ export const FinancialFormFillerTool: React.FC = () => {
                     <div key={field.key} className={isWide ? 'sm:col-span-2' : ''}>
                       <label
                         htmlFor={`fld-${field.key}`}
-                        className="block text-xs font-semibold text-slate-800 mb-1"
+                        className="block text-xs font-semibold text-[#17243A] mb-1.5"
                       >
                         {field.label}
-                        {field.required && <span className="text-red-600 ml-0.5">*</span>}
+                        {field.required && <span className="text-red-600 ms-0.5">*</span>}
                         {field.sensitivity === 'pii-caution' && (
-                          <span className="ml-1.5 text-[10px] font-normal text-amber-700">
+                          <span className="ms-1.5 text-[10px] font-normal text-amber-700">
                             (RAM-only)
                           </span>
                         )}
@@ -500,7 +500,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                           id={`fld-${field.key}`}
                           value={val}
                           onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                          className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                          className="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                         >
                           <option value="">Select {field.label}...</option>
                           {field.options.map((opt) => (
@@ -516,11 +516,11 @@ export const FinancialFormFillerTool: React.FC = () => {
                           value={val}
                           onChange={(e) => handleFieldChange(field.key, e.target.value)}
                           placeholder={field.examplePlaceholder}
-                          className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                         />
                       ) : field.type === 'currency' ? (
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500">
+                          <span className="absolute start-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#64748B]">
                             USD $
                           </span>
                           <input
@@ -532,7 +532,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                             value={val}
                             onChange={(e) => handleFieldChange(field.key, e.target.value)}
                             placeholder={field.examplePlaceholder.replace('$', '')}
-                            className="w-full pl-14 pr-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none tabular-nums"
+                            className="w-full min-h-[42px] ps-14 pe-3 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none tabular-nums"
                           />
                         </div>
                       ) : field.type === 'percentage' ? (
@@ -547,9 +547,9 @@ export const FinancialFormFillerTool: React.FC = () => {
                             value={val}
                             onChange={(e) => handleFieldChange(field.key, e.target.value)}
                             placeholder={field.examplePlaceholder.replace('%', '')}
-                            className="w-full pl-3 pr-8 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none tabular-nums"
+                            className="w-full min-h-[42px] ps-3 pe-8 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none tabular-nums"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-500">
+                          <span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#64748B]">
                             %
                           </span>
                         </div>
@@ -560,12 +560,12 @@ export const FinancialFormFillerTool: React.FC = () => {
                           value={val}
                           onChange={(e) => handleFieldChange(field.key, e.target.value)}
                           placeholder={field.examplePlaceholder}
-                          className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+                          className="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                         />
                       )}
 
                       {field.validationNote && (
-                        <p className="text-[11px] text-slate-400 mt-1">{field.validationNote}</p>
+                        <p className="text-[11px] text-[#64748B] mt-1">{field.validationNote}</p>
                       )}
                     </div>
                   );
@@ -575,8 +575,8 @@ export const FinancialFormFillerTool: React.FC = () => {
           ))}
 
           {/* Optional Notes Box */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-            <label htmlFor="preparer-notes" className="block text-xs font-bold text-slate-900 mb-1.5">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+            <label htmlFor="preparer-notes" className="block text-xs font-bold text-[#102A56] mb-1.5">
               Optional Preparer Notes (Printed at bottom of worksheet)
             </label>
             <textarea
@@ -588,7 +588,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                 setGeneratedResult(null);
               }}
               placeholder="Optional clarifications for your personal records or CPA review..."
-              className="w-full px-3 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
             />
           </div>
         </div>
@@ -596,17 +596,17 @@ export const FinancialFormFillerTool: React.FC = () => {
         {/* Right: Live USD Calculation Summary, Live Preview & Export */}
         <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
           {/* Computed USD Totals Card */}
-          <div className="bg-slate-900 text-white rounded-xl p-5 shadow-sm">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-300 mb-3">
+          <div className="bg-[#102A56] text-white rounded-2xl p-5 shadow-sm">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#38BDF8] mb-3">
               Live Worksheet Summary (USD)
             </h3>
             <div className="space-y-2.5">
               {summaryMetrics.map((metric) => (
                 <div
                   key={metric.label}
-                  className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0 last:pb-0 text-xs"
+                  className="flex items-center justify-between py-2 border-b border-white/15 last:border-0 last:pb-0 text-xs"
                 >
-                  <span className="text-slate-300">{metric.label}</span>
+                  <span className="text-slate-200">{metric.label}</span>
                   <span
                     className={`font-mono font-bold text-sm tabular-nums ${
                       metric.tone === 'positive'
@@ -627,7 +627,7 @@ export const FinancialFormFillerTool: React.FC = () => {
 
           {/* Credential Safety Warnings */}
           {credentialWarnings.length > 0 && (
-            <div role="alert" className="bg-red-50 border border-red-300 rounded-xl p-4 text-xs text-red-900 flex items-start gap-2.5">
+            <div role="alert" className="bg-red-50 border border-red-300 rounded-2xl p-4 text-xs text-red-900 flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 {credentialWarnings.map((w, i) => (
@@ -638,26 +638,26 @@ export const FinancialFormFillerTool: React.FC = () => {
           )}
 
           {errorMsg && (
-            <div role="alert" className="bg-red-50 border border-red-200 rounded-xl p-4 text-xs text-red-800 flex items-start gap-2.5">
+            <div role="alert" className="bg-red-50 border border-red-200 rounded-2xl p-4 text-xs text-red-800 flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Action CTA Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.06)] space-y-3">
             <button
               type="button"
               disabled={isGenerating}
               onClick={handleGeneratePdf}
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded-lg shadow-xs transition-colors cursor-pointer"
+              className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] disabled:opacity-60 rounded-xl shadow-xs transition-colors cursor-pointer"
             >
               <Eye className="w-4 h-4" />
               <span>{isGenerating ? 'Generating PDF...' : t('banking.formFillerButton')}</span>
             </button>
 
             {generatedResult && (
-              <div className="pt-3 border-t border-slate-100 space-y-3">
+              <div className="pt-3 border-t border-[#E2E8F0] space-y-3">
                 <div className="flex items-center justify-between text-xs text-emerald-700 font-semibold">
                   <span className="inline-flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
@@ -670,7 +670,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleDownloadPdf}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg cursor-pointer"
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl cursor-pointer transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download PDF</span>
@@ -678,9 +678,9 @@ export const FinancialFormFillerTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={handlePrintPdf}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
+                    className="min-h-[42px] inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-[#17243A] bg-[#F4F7FB] hover:bg-[#E2E8F0]/70 border border-[#E2E8F0] rounded-xl cursor-pointer transition-colors"
                   >
-                    <Printer className="w-4 h-4" />
+                    <Printer className="w-4 h-4 text-[#2563EB]" />
                     <span>Print Worksheet</span>
                   </button>
                 </div>
@@ -688,7 +688,7 @@ export const FinancialFormFillerTool: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setGeneratedResult(null)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 py-1 cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-medium text-[#64748B] hover:text-[#102A56] py-1 cursor-pointer"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Keep Editing Fields</span>
@@ -700,19 +700,19 @@ export const FinancialFormFillerTool: React.FC = () => {
           </div>
 
           {/* Document Preview Box (Real Rendered PDF Canvas after Generate, or Live Sheet Preview before Generate) */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
-              <span className="text-xs font-bold text-slate-900">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2.5 mb-3">
+              <span className="text-xs font-bold text-[#102A56]">
                 {generatedResult ? 'Rendered PDF Page Preview' : 'Live Worksheet Layout Preview'}
               </span>
-              <span className="text-[11px] font-mono text-slate-500">
+              <span className="text-[11px] font-mono text-[#64748B]">
                 {paperSize === 'a4' ? 'A4' : 'US Letter'}
               </span>
             </div>
 
             {generatedResult ? (
               <div className="space-y-3">
-                <div className="bg-slate-100 border border-slate-200 rounded-lg p-2 flex items-center justify-center overflow-auto max-h-[540px]">
+                <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-2 flex items-center justify-center overflow-auto max-h-[540px]">
                   <canvas
                     ref={previewCanvasRef}
                     className={`max-w-full h-auto shadow-sm bg-white ${
@@ -726,19 +726,19 @@ export const FinancialFormFillerTool: React.FC = () => {
                       type="button"
                       disabled={previewPage <= 1}
                       onClick={() => setPreviewPage((p) => Math.max(1, p - 1))}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 border border-slate-300 rounded bg-white disabled:opacity-40 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 border border-[#E2E8F0] rounded-lg bg-white text-[#17243A] hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                     >
                       <ChevronLeft className="w-3.5 h-3.5" />
                       Prev
                     </button>
-                    <span className="font-mono text-slate-600">
+                    <span className="font-mono text-[#64748B]">
                       Page {previewPage} of {previewTotalPages}
                     </span>
                     <button
                       type="button"
                       disabled={previewPage >= previewTotalPages}
                       onClick={() => setPreviewPage((p) => Math.min(previewTotalPages, p + 1))}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 border border-slate-300 rounded bg-white disabled:opacity-40 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 border border-[#E2E8F0] rounded-lg bg-white text-[#17243A] hover:bg-[#F4F7FB] disabled:opacity-40 cursor-pointer"
                     >
                       Next
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -749,10 +749,10 @@ export const FinancialFormFillerTool: React.FC = () => {
             ) : (
               <div
                 dir={worksheetLanguage === 'ar' ? 'rtl' : 'ltr'}
-                className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-[11px] space-y-3 max-h-[480px] overflow-y-auto"
+                className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4 text-[11px] space-y-3 max-h-[480px] overflow-y-auto"
               >
-                <div className="bg-slate-900 text-white p-3 rounded">
-                  <div className="text-[9px] font-bold text-blue-300 uppercase">
+                <div className="bg-[#102A56] text-white p-3 rounded-lg">
+                  <div className="text-[9px] font-bold text-[#38BDF8] uppercase">
                     {worksheetLanguage === 'ar' ? 'ورقة عمل مساعدة — PDFQuick' : 'PDFQuick Helper Worksheet'}
                   </div>
                   <div className="text-sm font-bold">
@@ -764,17 +764,17 @@ export const FinancialFormFillerTool: React.FC = () => {
                     {paperSize === 'a4' ? 'ISO A4' : 'US Letter'} · USD
                   </div>
                 </div>
-                <div className="bg-amber-50 border border-amber-200 p-2 rounded text-[10px] text-amber-900">
+                <div className="bg-amber-50 border border-amber-200 p-2 rounded-lg text-[10px] text-amber-900">
                   {worksheetLanguage === 'ar'
                     ? ARABIC_HELPER_DISCLAIMER
                     : 'Helper template only — NOT an official bank or lender form.'}
                 </div>
                 {worksheetLanguage === 'ar' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-2 space-y-1">
+                  <div className="bg-[#EFF6FF] border border-[#2563EB]/25 rounded-lg p-2 space-y-1">
                     {summaryMetrics.map((m) => (
                       <div key={m.label} className="flex justify-between text-[10px]">
-                        <span className="text-slate-600">{translateSummaryLabelAr(m.label)}</span>
-                        <span className="font-mono font-bold text-slate-900">{m.value}</span>
+                        <span className="text-[#64748B]">{translateSummaryLabelAr(m.label)}</span>
+                        <span className="font-mono font-bold text-[#102A56]">{m.value}</span>
                       </div>
                     ))}
                   </div>
@@ -782,8 +782,8 @@ export const FinancialFormFillerTool: React.FC = () => {
                 {activeTemplate.sections.map((sec) => {
                   const arSec = FINANCIAL_TEMPLATES_AR[activeTemplate.id]?.sections[sec.id];
                   return (
-                    <div key={sec.id} className="bg-white border border-slate-200 rounded p-2.5">
-                      <div className="font-bold text-slate-900 text-[11px] mb-1.5">
+                    <div key={sec.id} className="bg-white border border-[#E2E8F0] rounded-lg p-2.5">
+                      <div className="font-bold text-[#102A56] text-[11px] mb-1.5">
                         {worksheetLanguage === 'ar' && arSec ? arSec.title : sec.title}
                       </div>
                       <div className="space-y-1">
@@ -800,12 +800,12 @@ export const FinancialFormFillerTool: React.FC = () => {
                           return (
                             <div
                               key={fld.key}
-                              className="flex justify-between gap-2 text-[10px] border-b border-slate-100 last:border-0 pb-0.5"
+                              className="flex justify-between gap-2 text-[10px] border-b border-[#F1F5F9] last:border-0 pb-0.5"
                             >
-                              <span className="text-slate-500">
+                              <span className="text-[#64748B]">
                                 {worksheetLanguage === 'ar' && arFld ? arFld.label : fld.label}
                               </span>
-                              <span className="font-medium text-slate-900 truncate max-w-[160px]" dir="auto">
+                              <span className="font-medium text-[#17243A] truncate max-w-[160px]" dir="auto">
                                 {shown}
                               </span>
                             </div>

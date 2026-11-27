@@ -240,7 +240,7 @@ export const MergePdfTool: React.FC = () => {
   const totalBytes = files.reduce((acc, f) => acc + f.size, 0);
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
@@ -254,7 +254,7 @@ export const MergePdfTool: React.FC = () => {
             helperText={t('dropzone.helper')}
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -263,18 +263,18 @@ export const MergePdfTool: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* Summary & Toolbar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-bold text-[#102A56]">
                 {files.length} {files.length === 1 ? 'Document' : 'Documents'} Queued
               </h3>
-              <p className="text-xs text-slate-500 font-mono tabular-nums mt-0.5">
+              <p className="text-xs text-[#64748B] font-mono tabular-nums mt-0.5">
                 Total size: {formatBytes(totalBytes)} · Total pages: {totalPages}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors focus-within:ring-2 focus-within:ring-blue-600 focus-within:ring-offset-2">
+              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[36px] text-xs font-semibold text-[#2563EB] bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#BFDBFE] rounded-xl transition-colors focus-within:ring-2 focus-within:ring-[#2563EB] focus-within:ring-offset-2">
                 <Plus className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{t('tool.merge.addMore')}</span>
                 <input
@@ -293,7 +293,7 @@ export const MergePdfTool: React.FC = () => {
               <button
                 type="button"
                 onClick={clearAll}
-                className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-3.5 py-2 min-h-[36px] text-xs font-semibold text-[#64748B] hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
               >
                 {t('tool.merge.clearAll')}
               </button>
@@ -301,24 +301,24 @@ export const MergePdfTool: React.FC = () => {
           </div>
 
           {/* Files List */}
-          <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-96 overflow-y-auto pe-1">
             {files.map((file, idx) => (
               <div
                 key={file.id}
-                className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg transition-colors gap-3"
+                className="flex items-center justify-between p-3.5 bg-[#F4F7FB] hover:bg-[#EFF6FF]/60 border border-[#E2E8F0] rounded-xl transition-colors gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 font-mono">
+                  <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] text-xs font-bold flex items-center justify-center shrink-0 font-mono">
                     {idx + 1}
                   </span>
-                  <div className="w-8 h-8 rounded bg-white border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center text-[#2563EB] shrink-0">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-semibold text-slate-800 truncate">
+                    <p className="text-xs sm:text-sm font-semibold text-[#17243A] truncate">
                       {file.name}
                     </p>
-                    <p className="text-[11px] text-slate-500 font-mono tabular-nums">
+                    <p className="text-[11px] text-[#64748B] font-mono tabular-nums">
                       {formatBytes(file.size)}
                       {file.pageCount && ` · ${file.pageCount} pages`}
                     </p>
@@ -330,7 +330,7 @@ export const MergePdfTool: React.FC = () => {
                     type="button"
                     onClick={() => moveItem(idx, 'up')}
                     disabled={idx === 0}
-                    className="p-1 text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-slate-200"
+                    className="p-1.5 text-[#64748B] hover:text-[#102A56] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg hover:bg-white cursor-pointer"
                     title="Move up in merge sequence"
                     aria-label={`Move ${file.name} up`}
                   >
@@ -340,7 +340,7 @@ export const MergePdfTool: React.FC = () => {
                     type="button"
                     onClick={() => moveItem(idx, 'down')}
                     disabled={idx === files.length - 1}
-                    className="p-1 text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-slate-200"
+                    className="p-1.5 text-[#64748B] hover:text-[#102A56] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg hover:bg-white cursor-pointer"
                     title="Move down in merge sequence"
                     aria-label={`Move ${file.name} down`}
                   >
@@ -349,7 +349,7 @@ export const MergePdfTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => removeItem(file.id)}
-                    className="p-1 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 ml-1"
+                    className="p-1.5 text-[#64748B] hover:text-red-600 rounded-lg hover:bg-red-50 ms-1 cursor-pointer"
                     title="Remove document from queue"
                     aria-label={`Remove ${file.name}`}
                   >
@@ -369,9 +369,9 @@ export const MergePdfTool: React.FC = () => {
           />
 
           {/* Merge Options */}
-          <div className="pt-4 border-t border-slate-200">
+          <div className="pt-4 border-t border-[#E2E8F0]">
             <div className="max-w-md">
-              <label htmlFor="outputName" className="block text-xs font-semibold text-slate-700 mb-1">
+              <label htmlFor="outputName" className="block text-xs font-semibold text-[#17243A] mb-1.5">
                 Output File Name
               </label>
               <input
@@ -379,14 +379,14 @@ export const MergePdfTool: React.FC = () => {
                 type="text"
                 value={outputName}
                 onChange={(e) => setOutputName(e.target.value)}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
                 placeholder="pdfquick-merged.pdf"
               />
             </div>
           </div>
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -394,7 +394,7 @@ export const MergePdfTool: React.FC = () => {
 
           {/* Action Row */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-[#64748B]">
               Files are processed in the order shown above.
             </span>
 
@@ -402,7 +402,7 @@ export const MergePdfTool: React.FC = () => {
               type="button"
               onClick={handleMerge}
               disabled={files.length < 2}
-              className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+              className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
             >
               {t('tool.merge.button')}
             </button>

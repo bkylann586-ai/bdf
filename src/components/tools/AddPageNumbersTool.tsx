@@ -276,7 +276,7 @@ export const AddPageNumbersTool: React.FC = () => {
   ];
 
   return (
-    <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
       {files.length === 0 ? (
         <div className="space-y-3">
           <DropZone
@@ -289,7 +289,7 @@ export const AddPageNumbersTool: React.FC = () => {
             helperText="Select 1 or more PDF files (up to 250 MB total) to add sequential header or footer numbers."
           />
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -307,15 +307,15 @@ export const AddPageNumbersTool: React.FC = () => {
           {/* Options Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Position */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-              <label htmlFor="numberPosition" className="block text-xs font-semibold text-slate-700 mb-2">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
+              <label htmlFor="numberPosition" className="block text-xs font-semibold text-[#17243A] mb-2">
                 Placement Position
               </label>
               <select
                 id="numberPosition"
                 value={position}
                 onChange={(e) => setPosition(e.target.value as PageNumberPosition)}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 {positions.map((pos) => (
                   <option key={pos.value} value={pos.value}>
@@ -326,15 +326,15 @@ export const AddPageNumbersTool: React.FC = () => {
             </div>
 
             {/* Format */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-              <label htmlFor="numberFormat" className="block text-xs font-semibold text-slate-700 mb-2">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
+              <label htmlFor="numberFormat" className="block text-xs font-semibold text-[#17243A] mb-2">
                 Label Format
               </label>
               <select
                 id="numberFormat"
                 value={format}
                 onChange={(e) => setFormat(e.target.value as PageNumberFormat)}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 {formats.map((fmt) => (
                   <option key={fmt.value} value={fmt.value}>
@@ -345,8 +345,8 @@ export const AddPageNumbersTool: React.FC = () => {
             </div>
 
             {/* Start Number */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-              <label htmlFor="startNumberInput" className="block text-xs font-semibold text-slate-700 mb-2">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
+              <label htmlFor="startNumberInput" className="block text-xs font-semibold text-[#17243A] mb-2">
                 Starting Page Number
               </label>
               <input
@@ -356,20 +356,20 @@ export const AddPageNumbersTool: React.FC = () => {
                 max={9999}
                 value={startNumber}
                 onChange={(e) => setStartNumber(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none font-mono"
               />
             </div>
 
             {/* Font Size */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-              <label htmlFor="numberFontSize" className="block text-xs font-semibold text-slate-700 mb-2">
+            <div className="bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4">
+              <label htmlFor="numberFontSize" className="block text-xs font-semibold text-[#17243A] mb-2">
                 Font Size (pt)
               </label>
               <select
                 id="numberFontSize"
                 value={fontSize}
                 onChange={(e) => setFontSize(Number(e.target.value))}
-                className="w-full text-xs sm:text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full min-h-[42px] text-xs sm:text-sm px-3.5 py-2 bg-white border border-[#E2E8F0] rounded-xl text-[#17243A] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none"
               >
                 <option value={10}>10 pt (Compact)</option>
                 <option value={11}>11 pt (Standard US Letter / A4)</option>
@@ -380,14 +380,14 @@ export const AddPageNumbersTool: React.FC = () => {
           </div>
 
           {/* Skip First Page */}
-          <label className="flex items-center gap-2.5 p-3.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer">
+          <label className="flex items-center gap-2.5 p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl cursor-pointer hover:border-[#2563EB]/40 transition-colors">
             <input
               type="checkbox"
               checked={skipFirstPage}
               onChange={(e) => setSkipFirstPage(e.target.checked)}
-              className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              className="w-4 h-4 accent-[#2563EB] rounded border-[#E2E8F0]"
             />
-            <span className="text-xs font-medium text-slate-700">
+            <span className="text-xs font-semibold text-[#17243A]">
               Skip cover page (leave Page 1 unnumbered and begin numbering on Page 2)
             </span>
           </label>
@@ -403,7 +403,7 @@ export const AddPageNumbersTool: React.FC = () => {
           )}
 
           {errorMessage && (
-            <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
+            <div role="alert" className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
               <span>{errorMessage}</span>
             </div>
@@ -413,7 +413,7 @@ export const AddPageNumbersTool: React.FC = () => {
             <button
               type="button"
               onClick={handleApplyNumbers}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
             >
               <Hash className="w-4 h-4" />
               <span>

@@ -1,28 +1,29 @@
 import React from 'react';
-import { ShieldCheck, FileText } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { TOOLS } from '../lib/toolsCatalog';
 import { Link } from './Link';
+import { BrandMark } from './BrandMark';
 import { useTranslation } from '../lib/i18n';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-slate-900 text-slate-400 text-sm mt-auto border-t border-slate-800">
+    <footer className="bg-[#102A56] text-slate-300 text-sm mt-auto border-t border-[#1A3C75]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Info */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-white">
-              <div className="w-7 h-7 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-                <FileText className="w-4 h-4" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">PDFQuick</span>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <Link to="/" className="inline-flex items-center gap-2.5 text-white group">
+              <BrandMark variant="dark" size="sm" />
+              <span className="text-lg font-extrabold tracking-tight">
+                PDF<span className="text-[#38BDF8]">Quick</span>
+              </span>
+            </Link>
+            <p className="text-xs text-slate-300/90 leading-relaxed">
               {t('footer.description')}
             </p>
-            <div className="inline-flex items-center gap-1.5 text-xs text-emerald-400">
+            <div className="inline-flex items-center gap-1.5 text-xs text-[#38BDF8] font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0" />
               <span>{t('footer.zeroStorage')}</span>
             </div>
@@ -30,44 +31,65 @@ export const Footer: React.FC = () => {
 
           {/* Tools Links */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               {t('footer.pdfTools')}
             </h4>
             <ul className="space-y-2">
               {TOOLS.map((tool) => (
                 <li key={tool.id}>
-                  <Link to={tool.path} className="hover:text-white transition-colors text-xs">
+                  <Link
+                    to={tool.path}
+                    className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  >
                     {tool.name}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link to="/tools" className="hover:text-white transition-colors text-xs text-blue-400">
+                <Link
+                  to="/tools"
+                  className="hover:text-white transition-colors text-xs font-semibold text-[#38BDF8]"
+                >
                   {t('footer.viewAll')}
                 </Link>
               </li>
-              <li className="pt-2 border-t border-slate-800">
-                <Link to="/banking-finance" className="hover:text-white transition-colors text-xs font-semibold text-emerald-400">
+              <li className="pt-2.5 border-t border-white/10">
+                <Link
+                  to="/banking-finance"
+                  className="hover:text-white transition-colors text-xs font-semibold text-emerald-300"
+                >
                   Banking & Finance Hub
                 </Link>
               </li>
               <li>
-                <Link to="/banking/us-banks" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/banking/us-banks"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   US Bank Statement Guides
                 </Link>
               </li>
               <li>
-                <Link to="/banking/financial-pdf-form-filler" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/banking/financial-pdf-form-filler"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   Financial PDF Form Filler
                 </Link>
               </li>
               <li>
-                <Link to="/banking/financial-document-privacy" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/banking/financial-document-privacy"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   Privacy &amp; Redaction Tools
                 </Link>
               </li>
               <li>
-                <Link to="/banking/financial-templates" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/banking/financial-templates"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   Financial Helper Templates
                 </Link>
               </li>
@@ -76,32 +98,47 @@ export const Footer: React.FC = () => {
 
           {/* Legal & Company */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               {t('footer.legal')}
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/about"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   {t('footer.about')}
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/privacy"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   {t('footer.privacy')}
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/terms"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   {t('footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link to="/dmca" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/dmca"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   {t('footer.dmca')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-white transition-colors text-xs">
+                <Link
+                  to="/contact"
+                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                >
                   {t('footer.contact')}
                 </Link>
               </li>
@@ -110,31 +147,41 @@ export const Footer: React.FC = () => {
 
           {/* Security & Browser Execution Notice */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
               {t('footer.browserNotice')}
             </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-300/90 leading-relaxed">
               {t('footer.browserDetails')}
             </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-400 leading-relaxed">
               {t('footer.publicDeviceNotice')}
             </p>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-300/80">
           <p>© {new Date().getFullYear()} PDFQuick. {t('footer.allRights')}</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link to="/privacy" className="hover:text-slate-400 transition-colors">Privacy</Link>
-            <span>·</span>
-            <Link to="/privacy#consent-settings" className="hover:text-slate-400 transition-colors">Consent Settings</Link>
-            <span>·</span>
-            <Link to="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>
-            <span>·</span>
-            <Link to="/dmca" className="hover:text-slate-400 transition-colors">DMCA</Link>
-            <span>·</span>
-            <Link to="/contact" className="hover:text-slate-400 transition-colors">Contact</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/privacy#consent-settings" className="hover:text-white transition-colors">
+              Consent Settings
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/terms" className="hover:text-white transition-colors">
+              Terms
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/dmca" className="hover:text-white transition-colors">
+              DMCA
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/contact" className="hover:text-white transition-colors">
+              Contact
+            </Link>
           </div>
         </div>
       </div>

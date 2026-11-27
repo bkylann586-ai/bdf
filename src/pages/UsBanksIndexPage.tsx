@@ -66,7 +66,7 @@ export const UsBanksIndexPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-slate-50/60 pb-16">
+    <div className="flex-1 bg-[#F4F7FB] pb-16">
       <SeoMeta
         title="US Bank Statement PDF Guides – Chase, BofA, Wells Fargo, Citi, U.S. Bank | PDFQuick"
         description="Independent privacy-first guides for organizing PDF statements downloaded from Chase, Bank of America, Wells Fargo, Citi, and U.S. Bank locally in your browser."
@@ -75,33 +75,40 @@ export const UsBanksIndexPage: React.FC = () => {
         faqs={US_BANKS_INDEX_FAQS}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <Breadcrumbs
-          items={[
-            { label: 'Banking & Finance', href: '/banking-finance' },
-            { label: 'US Bank Statement Guides' },
-          ]}
-        />
+      {/* Editorial Header Band */}
+      <div className="bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
+          <Breadcrumbs
+            items={[
+              { label: 'Banking & Finance', href: '/banking-finance' },
+              { label: 'US Bank Statement Guides' },
+            ]}
+          />
 
-        <div className="text-center py-8 sm:py-10 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200/70 rounded-md text-xs font-medium mb-4">
-            <Landmark className="w-3.5 h-3.5 text-blue-600" />
-            <span>Independent Customer Workflow Guides · Zero Bank Affiliation</span>
+          <div className="text-center pt-5 sm:pt-7 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-4">
+              <Landmark className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span>Independent Customer Workflow Guides · Zero Bank Affiliation</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+              US Bank Statement PDF Guides
+            </h1>
+            <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
+              Practical instructions for organizing downloaded monthly statements, check copies, and tax summaries from major US institutions—100% locally in browser memory.
+            </p>
           </div>
-
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            US Bank Statement PDF Guides
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            Practical instructions for organizing downloaded monthly statements, check copies, and tax summaries from major US institutions—100% locally in browser memory.
-          </p>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Trademark & Independence Disclaimer */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 mb-10 flex items-start gap-3 shadow-xs">
-          <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-          <p className="text-xs text-slate-600 leading-relaxed">
-            <strong>Non-Affiliation Notice:</strong> JPMorgan Chase, Bank of America, Wells Fargo, Citibank, and U.S. Bank are trademarks of their respective owners. PDFQuick uses no bank logos, claims zero partnership or endorsement, and never accesses external banking portals or credentials.
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 mb-10 flex items-start gap-3 shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+          <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0">
+            <Info className="w-4 h-4" />
+          </div>
+          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            <strong className="text-[#102A56]">Non-Affiliation Notice:</strong> JPMorgan Chase, Bank of America, Wells Fargo, Citibank, and U.S. Bank are trademarks of their respective owners. PDFQuick uses no bank logos, claims zero partnership or endorsement, and never accesses external banking portals or credentials.
           </p>
         </div>
 
@@ -111,28 +118,31 @@ export const UsBanksIndexPage: React.FC = () => {
             <Link
               key={bank.slug}
               to={bank.path}
-              className="bg-white border border-slate-200 hover:border-blue-500 rounded-xl p-6 shadow-xs hover:shadow transition-all flex flex-col justify-between group"
+              className="bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-2xl p-6 shadow-[0_1px_3px_rgba(16,42,86,0.04)] hover:shadow-sm transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h2 className="text-lg font-bold text-[#102A56] group-hover:text-[#2563EB] transition-colors">
                     {bank.bankName} PDF Guide
                   </h2>
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700 shrink-0">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>Offline Safe</span>
+                  </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed mb-4">
                   {bank.overview}
                 </p>
-                <ul className="space-y-1.5 text-xs text-slate-500 mb-4">
+                <ul className="space-y-1.5 text-xs text-[#64748B] mb-4">
                   {bank.commonStatementTasks.slice(0, 2).map((task, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold">•</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mt-1.5 shrink-0" />
                       <span>{task}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
+              <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-semibold text-[#2563EB]">
                 <span>Read {bank.bankName} Guide</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -146,18 +156,20 @@ export const UsBanksIndexPage: React.FC = () => {
         </div>
 
         {/* FAQs */}
-        <section id="faqs" className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 my-10 shadow-sm">
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+        <section id="faqs" className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-10 shadow-[0_1px_3px_rgba(16,42,86,0.04)]">
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] flex items-center justify-center">
+              <HelpCircle className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#102A56]">
               Frequently Asked Questions
             </h2>
           </div>
           <div className="space-y-4">
             {US_BANKS_INDEX_FAQS.map((faq, idx) => (
-              <div key={idx} className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
-                <h3 className="text-sm font-semibold text-slate-900 mb-1.5">{faq.question}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{faq.answer}</p>
+              <div key={idx} className="pb-4 border-b border-[#E2E8F0] last:border-0 last:pb-0">
+                <h3 className="text-sm font-bold text-[#17243A] mb-1.5">{faq.question}</h3>
+                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>

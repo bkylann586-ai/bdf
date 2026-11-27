@@ -1,8 +1,43 @@
 @import "tailwindcss";
 
+@theme {
+  --color-pq-navy: #102A56;
+  --color-pq-navy-light: #1A3C75;
+  --color-pq-blue: #2563EB;
+  --color-pq-blue-hover: #1D4ED8;
+  --color-pq-cyan: #38BDF8;
+  --color-pq-bg: #FFFFFF;
+  --color-pq-subtle: #F4F7FB;
+  --color-pq-text: #17243A;
+  --color-pq-muted: #64748B;
+  --color-pq-border: #E2E8F0;
+}
+
 @layer base {
   :root {
+    --pq-navy: #102A56;
+    --pq-blue: #2563EB;
+    --pq-cyan: #38BDF8;
+    --pq-bg: #FFFFFF;
+    --pq-bg-subtle: #F4F7FB;
+    --pq-text: #17243A;
+    --pq-text-muted: #64748B;
+    --pq-border: #E2E8F0;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: #17243A;
+    background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: #17243A;
+    background-color: #FFFFFF;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
   }
 
   code, kbd, samp, pre {
@@ -10,9 +45,23 @@
   }
 }
 
-/* Custom subtle transitions and focus outlines */
+/* Subtle architectural grid backdrop for hero and workspace headers */
+.bg-pq-grid {
+  background-color: #F4F7FB;
+  background-image:
+    linear-gradient(to right, rgba(226, 232, 240, 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.55) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bg-pq-dots {
+  background-image: radial-gradient(rgba(16, 42, 86, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Crisp accessible focus ring */
 :focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #2563EB;
   outline-offset: 2px;
 }
 
@@ -22,5 +71,14 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

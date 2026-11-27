@@ -110,10 +110,10 @@ const ToolPageFallback: React.FC = () => (
   <div
     role="status"
     aria-live="polite"
-    className="flex-1 flex flex-col items-center justify-center py-24 px-4 bg-slate-50/60"
+    className="flex-1 flex flex-col items-center justify-center py-24 px-4 bg-[#F4F7FB]"
   >
-    <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
-    <p className="text-sm font-medium text-slate-600">Loading PDF tool...</p>
+    <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin mb-3" />
+    <p className="text-sm font-medium text-[#64748B]">Loading PDF tool...</p>
   </div>
 );
 
