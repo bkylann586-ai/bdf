@@ -18,7 +18,7 @@ import {
   readPdfMetadata,
   updatePdfMetadata,
 } from '../../lib/editPdfMetadata';
-import { formatBytes } from '../../lib/pdfUtils';
+import { formatBytes } from '../../lib/fileHelpers';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSampleMetadataPdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';

@@ -17,7 +17,7 @@ import {
   createBatchProgressItems,
   updateBatchProgressItems,
 } from '../../lib/batchProcessing';
-import { formatBytes } from '../../lib/pdfUtils';
+import { formatBytes } from '../../lib/fileHelpers';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import { createSampleImage } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';

@@ -80,6 +80,11 @@ export default defineConfig(() => {
           codeSplitting: {
             groups: [
               {
+                name: 'vite-preload',
+                test: /preload-helper/,
+                priority: 40,
+              },
+              {
                 name: 'vendor-react',
                 test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
                 priority: 30,

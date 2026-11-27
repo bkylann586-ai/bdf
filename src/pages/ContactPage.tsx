@@ -29,7 +29,7 @@ export const ContactPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
 
-  const { operator, adsense } = getSiteConfig();
+  const { operator, adsense, monetag } = getSiteConfig();
   const baseUrl = getProductionBaseUrl();
 
   const formatDiagnosticText = () =>
@@ -274,9 +274,13 @@ export const ContactPage: React.FC = () => {
                       Commercial Monetization Status
                     </dt>
                     <dd className="font-medium text-[#17243A]">
-                      {adsense.isConfigured
-                        ? 'Google AdSense active with CMP consent controls'
-                        : 'Ad-free pre-monetization mode (AdSense disabled until owner approval)'}
+                      {adsense.isConfigured && monetag.isConfigured
+                        ? 'Monetag advertising active; Google AdSense active'
+                        : monetag.isConfigured
+                          ? 'Monetag advertising active (Google AdSense remains disabled)'
+                          : adsense.isConfigured
+                            ? 'Google AdSense active (Monetag disabled)'
+                            : 'No advertising networks currently active (AdSense disabled until owner approval)'}
                     </dd>
                   </div>
                 </dl>

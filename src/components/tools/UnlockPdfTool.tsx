@@ -17,7 +17,7 @@ import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { Link } from '../Link';
 import { inspectPdfEncryption, unlockPdfDocument } from '../../lib/unlockPdf';
-import { formatBytes } from '../../lib/pdfUtils';
+import { formatBytes } from '../../lib/fileHelpers';
 import { validateSelectedFiles } from '../../lib/fileValidation';
 import {
   createSampleEncryptedPdf,

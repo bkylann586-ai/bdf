@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 import { ProcessingFile, ProcessingResult, ImagesToPdfOptions } from '../types';
-import { readFileAsArrayBuffer } from './pdfUtils';
+import { readFileAsArrayBuffer } from './fileHelpers';
 
 export interface ImagesToPdfProgressCallback {
   (current: number, total: number, message: string): void;

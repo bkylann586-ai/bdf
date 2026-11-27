@@ -13,7 +13,7 @@ import { getSiteConfig } from '../lib/siteConfig';
 
 export const AboutPage: React.FC = () => {
   const baseUrl = getProductionBaseUrl();
-  const { operator, adsense } = getSiteConfig();
+  const { operator, adsense, monetag } = getSiteConfig();
 
   const schema = {
     '@context': 'https://schema.org',
@@ -144,9 +144,13 @@ export const AboutPage: React.FC = () => {
             </h2>
             <p className="text-[#64748B]">
               PDFQuick is free to use without subscriptions, watermarks, or user account registrations.{' '}
-              {adsense.isConfigured
-                ? 'To keep the platform free, clearly labeled advertising may appear alongside instructional guides with full EEA/UK user consent controls.'
-                : 'Currently, PDFQuick runs ad-free while operator disclosures and consent infrastructure are finalized. If advertising is later enabled upon owner approval, it will remain strictly separated from document dropzones and governed by regional user consent controls.'}{' '}
+              {adsense.isConfigured || monetag.isConfigured
+                ? adsense.isConfigured && monetag.isConfigured
+                  ? 'To keep the platform free, PDFQuick uses third-party advertising through Google AdSense and Monetag, separated from document dropzones and download controls.'
+                  : monetag.isConfigured
+                    ? 'To keep the platform free, PDFQuick currently uses third-party advertising through Monetag, separated from document dropzones and download controls. Google AdSense is not currently active.'
+                    : 'To keep the platform free, clearly labeled advertising via Google AdSense may appear alongside instructional guides.'
+                : 'Currently, PDFQuick runs without active advertising networks configured. If advertising is enabled later, it will remain separated from document dropzones.'}{' '}
               We never sell user data, never upload documents, and never run invasive behavioral trackers.
             </p>
           </section>

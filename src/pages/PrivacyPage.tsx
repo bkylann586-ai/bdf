@@ -249,14 +249,23 @@ export const PrivacyPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold text-[#102A56] mb-3">5. Advertising Disclosures</h2>
             <p className="text-[#64748B]">
-              {adsense.isConfigured || monetag.isConfigured
-                ? `To keep PDFQuick free, ${[
-                    adsense.isConfigured ? 'Google AdSense' : null,
-                    monetag.isConfigured ? 'Monetag' : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' and ')} monetization may run strictly outside document dropzones and download controls, and only after your explicit consent preferences are granted.`
-                : 'PDFQuick currently operates in ad-free mode with zero active advertising scripts or unverified ad placeholders. Should the operator enable Google AdSense or Monetag after review, ad scripts and notifications remain separated from document controls and gated behind EEA/UK user consent.'}
+              {adsense.isConfigured || monetag.isConfigured ? (
+                <>
+                  {monetag.isConfigured &&
+                    (monetag.requireConsent
+                      ? 'To keep PDFQuick free, Monetag advertising scripts are configured with pre-consent gating enabled and load only after explicit ad storage consent is granted in your browser.'
+                      : 'To keep PDFQuick free, Monetag advertising scripts load automatically by default without waiting for prior explicit consent (pre-consent gating is currently disabled). You can opt out locally in your browser at any time using the Deny All Ad & Analytics Storage button in Section 6 below, which removes active Monetag tags and prevents Monetag from loading in this browser while that stored preference remains.')}
+                  {monetag.isConfigured && adsense.isConfigured ? ' ' : ''}
+                  {adsense.isConfigured &&
+                    'Google AdSense is active and subject to the regional Consent Mode v2 and CMP settings below.'}
+                  {!adsense.isConfigured &&
+                    monetag.isConfigured &&
+                    ' Google AdSense is not currently active.'}{' '}
+                  PDFQuick&apos;s document tools process files locally in browser memory and do not send your PDF contents to advertising scripts.
+                </>
+              ) : (
+                'PDFQuick currently operates without active advertising networks configured.'
+              )}
             </p>
           </section>
 
@@ -297,14 +306,29 @@ export const PrivacyPage: React.FC = () => {
                     Privacy &amp; Consent Settings (Google Consent Mode v2)
                   </h3>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
+                    cmpStatus.hasGoogleFundingChoices ||
+                    (cmpStatus.isExternalCmpActive && cmpStatus.tcfCmpId)
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : adsense.isConfigured || monetag.isConfigured
+                        ? 'bg-amber-100 text-amber-900'
+                        : 'bg-slate-100 text-[#102A56]'
+                  }`}
+                >
                   {cmpStatus.hasGoogleFundingChoices
                     ? 'Funding Choices Loaded'
                     : cmpStatus.isExternalCmpActive && cmpStatus.tcfCmpId
                       ? `External TCF CMP Loaded (ID #${cmpStatus.tcfCmpId})`
-                      : adsense.isConfigured
-                        ? 'Consent Mode Active (Verify External CMP)'
-                        : 'Consent Mode v2 Ready · Zero Trackers Loaded'}
+                      : adsense.isConfigured && monetag.isConfigured
+                        ? 'AdSense & Monetag Active (Verify External CMP)'
+                        : adsense.isConfigured
+                          ? 'AdSense Active (Verify External CMP)'
+                          : monetag.isConfigured
+                            ? monetag.requireConsent
+                              ? 'Monetag Active (Pre-Consent Gating Enabled; No External CMP)'
+                              : 'Monetag Advertising Active (No External TCF CMP)'
+                            : 'No Advertising Networks Configured'}
                 </span>
               </div>
 
