@@ -18,18 +18,9 @@ interface SwGlobalScope {
   location: Location;
   skipWaiting: () => Promise<void>;
   addEventListener: (type: string, listener: (event: SwMessageEvent) => void) => void;
-  options: { domain: string; zoneId: number };
-  lary: string;
-  importScripts: (...urls: string[]) => void;
 }
 
 declare const self: SwGlobalScope;
-
-// Monetag MultiTag push worker is combined with the existing root PWA worker.
-// This avoids two competing service-worker registrations at the same '/' scope.
-self.options = { domain: '3nbf4.com', zoneId: 12361227 };
-self.lary = '';
-self.importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw');
 
 const CANONICAL_ROUTES = new Set<string>([
   '/',
