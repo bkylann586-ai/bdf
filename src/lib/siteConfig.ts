@@ -202,7 +202,7 @@ export function getSiteConfig(): SiteConfig {
   const rawMonetagEnabled = cleanText(readEnv('VITE_MONETAG_ENABLED'));
   const monetagEnabled = rawMonetagEnabled ? rawMonetagEnabled === 'true' : true;
 
-  let monetagScriptUrl = 'https://quge5.com/88/tag.min.js';
+  let monetagScriptUrl = 'https://3nbf4.com/act/files/tag.min.js?z=12361227';
   const rawMonetagScriptUrl = cleanText(readEnv('VITE_MONETAG_SCRIPT_URL'));
   if (rawMonetagScriptUrl) {
     try {
@@ -211,40 +211,37 @@ export function getSiteConfig(): SiteConfig {
         monetagScriptUrl = parsed.toString();
       }
     } catch {
-      monetagScriptUrl = 'https://quge5.com/88/tag.min.js';
+      monetagScriptUrl = 'https://3nbf4.com/act/files/tag.min.js?z=12361227';
     }
   }
 
-  let derivedHost = 'quge5.com';
+  let derivedHost = '3nbf4.com';
   try {
     derivedHost = new URL(monetagScriptUrl).hostname.toLowerCase();
   } catch {
-    derivedHost = 'quge5.com';
+    derivedHost = '3nbf4.com';
   }
 
-  const rawMonetagDomain = cleanText(readEnv('VITE_MONETAG_DOMAIN')) || derivedHost;
+  const configuredMonetagDomain = cleanText(readEnv('VITE_MONETAG_DOMAIN'));
+  const rawMonetagDomain =
+    configuredMonetagDomain && !['quge5.com', '5gvci.com'].includes(configuredMonetagDomain.toLowerCase())
+      ? configuredMonetagDomain
+      : derivedHost;
   const monetagDomain = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(rawMonetagDomain)
     ? rawMonetagDomain.toLowerCase()
     : derivedHost;
   const parsedZoneId = Number.parseInt(
-    cleanText(readEnv('VITE_MONETAG_ZONE_ID')) || '316384',
+    cleanText(readEnv('VITE_MONETAG_ZONE_ID')) || '12361227',
     10
   );
   const monetagZoneId =
-    Number.isFinite(parsedZoneId) && parsedZoneId > 0 ? parsedZoneId : 316384;
+    Number.isFinite(parsedZoneId) && parsedZoneId > 0 && parsedZoneId !== 316384 && parsedZoneId !== 12336654
+      ? parsedZoneId
+      : 12361227;
 
-  const rawSwScope = cleanText(readEnv('VITE_MONETAG_SW_SCOPE')) || '/monetag/';
-  const monetagSwScope =
-    rawSwScope.startsWith('/') && rawSwScope !== '/'
-      ? rawSwScope.endsWith('/')
-        ? rawSwScope
-        : `${rawSwScope}/`
-      : '/monetag/';
-  const rawSwPath = cleanText(readEnv('VITE_MONETAG_SW_PATH')) || '/monetag/sw.js';
-  const monetagSwPath =
-    rawSwPath.startsWith(monetagSwScope) && rawSwPath !== '/sw.js'
-      ? rawSwPath
-      : `${monetagSwScope}sw.js`;
+  // Monetag's push worker is combined with the PWA worker at the root scope.
+  const monetagSwScope = '/';
+  const monetagSwPath = '/sw.js';
 
   const monetagVerificationToken = cleanText(readEnv('VITE_MONETAG_VERIFICATION_TOKEN'));
   const monetagRequireConsent = readEnv('VITE_MONETAG_REQUIRE_CONSENT') === 'true';
