@@ -38,7 +38,7 @@ export const AboutPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="About PDFQuick – Client-Side Document Utilities"
         description="Learn how PDFQuick processes PDF files directly in your web browser using modern WebAssembly and JavaScript, preserving document confidentiality."
@@ -47,15 +47,15 @@ export const AboutPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs items={[{ label: 'About PDFQuick' }]} />
 
-          <div className="pt-5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-3">
-              <span>Our Mission</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-4">
+          <div className="pt-5 text-start">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#2563EB] block mb-2">
+              Our Mission
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-4">
               About PDFQuick
             </h1>
             <p className="text-base text-[#64748B] leading-relaxed max-w-2xl">
@@ -65,10 +65,10 @@ export const AboutPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-10 space-y-8 text-sm text-[#17243A] leading-relaxed">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
+        <div className="pq-card p-6 sm:p-10 space-y-8 text-sm text-[#0F172A] leading-relaxed">
           <section>
-            <h2 className="text-xl font-bold text-[#102A56] mb-3 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-[#0F172A] mb-3 flex items-center gap-2">
               <Lock className="w-5 h-5 text-[#2563EB]" />
               The Problem with Traditional PDF Websites
             </h2>
@@ -78,59 +78,59 @@ export const AboutPage: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-[#102A56] mb-3 flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-[#2563EB]" />
+            <h2 className="text-xl font-bold text-[#0F172A] mb-3 flex items-center gap-2">
+              <Cpu className="w-5 h-5 text-[#7C3AED]" />
               Our Architecture: In-Browser Client-Side Execution
             </h2>
-            <div className="my-4 p-2 rounded-2xl bg-[#F4F7FB] border border-[#E2E8F0]">
+            <div className="my-4 p-2 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
               <LocalSecurityIllustration />
             </div>
             <p className="text-[#64748B]">
               Modern web browsers are capable execution environments. Leveraging HTML5 Canvas, WebAssembly, and standard-compliant JavaScript libraries (including pdf-lib, PDF.js, and Tesseract.js), PDFQuick compiles and manipulates documents directly within your computer or smartphone&apos;s memory.
             </p>
-            <p className="mt-3 font-semibold text-[#102A56]">When you drop a file onto PDFQuick:</p>
+            <p className="mt-3 font-semibold text-[#0F172A]">When you drop a file onto PDFQuick:</p>
             <ul className="list-disc ps-5 space-y-1.5 mt-2 text-[#64748B]">
               <li>
-                <strong className="text-[#17243A]">Zero document bytes leave your machine:</strong> No API endpoints receive your document.
+                <strong className="text-[#0F172A]">Zero document bytes leave your machine:</strong> No API endpoints receive your document.
               </li>
               <li>
-                <strong className="text-[#17243A]">No server queues:</strong> Processing runs at your device&apos;s native hardware speed without queue wait times.
+                <strong className="text-[#0F172A]">No server queues:</strong> Processing runs at your device&apos;s native hardware speed without queue wait times.
               </li>
               <li>
-                <strong className="text-[#17243A]">Automatic memory reclamation:</strong> Temporary memory buffers are cleared when operations finish or when you close the tab.
+                <strong className="text-[#0F172A]">Automatic memory reclamation:</strong> Temporary memory buffers are cleared when operations finish or when you close the tab.
               </li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-[#102A56] mb-3 flex items-center gap-2">
-              <Code2 className="w-5 h-5 text-[#2563EB]" />
+            <h2 className="text-xl font-bold text-[#0F172A] mb-3 flex items-center gap-2">
+              <Code2 className="w-5 h-5 text-[#10B981]" />
               Open, Maintained Technologies
             </h2>
             <p className="text-[#64748B]">
               PDFQuick relies on established, audited open-source browser components:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              <div className="p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
-                <h3 className="font-bold text-[#102A56] text-xs">pdf-lib</h3>
+              <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                <h3 className="font-bold text-[#2563EB] text-xs">pdf-lib</h3>
                 <p className="text-xs text-[#64748B] mt-1">
                   Handles binary stream parsing, page tree manipulation, lossless object merging, splitting, redaction output, and metadata synthesis.
                 </p>
               </div>
-              <div className="p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
-                <h3 className="font-bold text-[#102A56] text-xs">PDF.js</h3>
+              <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                <h3 className="font-bold text-[#7C3AED] text-xs">PDF.js</h3>
                 <p className="text-xs text-[#64748B] mt-1">
                   The standard-compliant PDF rendering engine executing vector rasterization cleanly inside a dedicated Web Worker.
                 </p>
               </div>
-              <div className="p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
-                <h3 className="font-bold text-[#102A56] text-xs">Tesseract.js (OCR)</h3>
+              <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                <h3 className="font-bold text-[#059669] text-xs">Tesseract.js (OCR)</h3>
                 <p className="text-xs text-[#64748B] mt-1">
                   Lazy-loaded WebAssembly optical character recognition engine with local language assets cached in browser storage for offline OCR.
                 </p>
               </div>
-              <div className="p-4 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
-                <h3 className="font-bold text-[#102A56] text-xs">JSZip &amp; HTML5 Canvas</h3>
+              <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
+                <h3 className="font-bold text-[#D97706] text-xs">JSZip &amp; HTML5 Canvas</h3>
                 <p className="text-xs text-[#64748B] mt-1">
                   Sub-pixel canvas rasterization and browser-side DEFLATE packaging for multi-page image sets and split PDF ZIP downloads.
                 </p>
@@ -205,11 +205,11 @@ export const AboutPage: React.FC = () => {
               className="text-xs font-semibold text-[#2563EB] hover:underline flex items-center gap-1"
             >
               <span>Read our Privacy Policy &amp; Consent Settings</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
             </Link>
             <Link
               to="/tools"
-              className="text-xs font-semibold text-[#102A56] hover:text-[#2563EB]"
+              className="text-xs font-semibold text-[#0F172A] hover:text-[#2563EB]"
             >
               Explore Tools →
             </Link>

@@ -1,9 +1,11 @@
 import React from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { applySwUpdate, dismissSwUpdate, useSwUpdatePrompt } from '../lib/pwa';
+import { useTranslation } from '../lib/i18n';
 
 export const SwUpdatePrompt: React.FC = () => {
   const { updateAvailable, isUpdating } = useSwUpdatePrompt();
+  const { t } = useTranslation();
 
   if (!updateAvailable) return null;
 
@@ -11,13 +13,10 @@ export const SwUpdatePrompt: React.FC = () => {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-2xl bg-[#102A56] border border-[#38BDF8]/25 px-4 py-3 text-xs text-white shadow-xl max-w-sm"
+      className="fixed bottom-4 end-4 z-50 flex items-center gap-3 rounded-2xl bg-[#0F172A] border border-[#2563EB]/40 px-4 py-3 text-xs text-white shadow-xl max-w-sm"
     >
       <div className="flex-1">
-        <p className="font-semibold text-white">App update ready</p>
-        <p className="text-slate-300 mt-0.5 leading-relaxed">
-          Refresh when ready to apply the latest version. Your current files will clear on reload.
-        </p>
+        <p className="font-semibold text-white">{t('sw.updateReady')}</p>
       </div>
       <button
         type="button"
@@ -28,7 +27,7 @@ export const SwUpdatePrompt: React.FC = () => {
         className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-60 px-3 py-2 font-semibold text-white transition-colors shrink-0 cursor-pointer"
       >
         <RefreshCw className={`w-3.5 h-3.5 ${isUpdating ? 'animate-spin' : ''}`} />
-        <span>{isUpdating ? 'Updating...' : 'Refresh'}</span>
+        <span>{t('sw.updateBtn')}</span>
       </button>
       <button
         type="button"

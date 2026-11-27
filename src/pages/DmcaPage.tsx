@@ -34,7 +34,7 @@ export const DmcaPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Copyright & DMCA Policy – Intellectual Property | PDFQuick"
         description="Copyright and intellectual property information for PDFQuick. Learn about our client-side processing model and how to submit intellectual property notices."
@@ -43,12 +43,12 @@ export const DmcaPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs items={[{ label: 'Copyright & DMCA Policy' }]} />
 
-          <div className="pt-5">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-2">
+          <div className="pt-5 text-start">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-2">
               Copyright &amp; Intellectual Property Notice
             </h1>
             <p className="text-xs text-[#64748B] font-mono">
@@ -58,8 +58,8 @@ export const DmcaPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-10 space-y-7 text-sm text-[#64748B] leading-relaxed">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
+        <div className="pq-card p-6 sm:p-10 space-y-7 text-sm text-[#64748B] leading-relaxed">
           <section>
             <h2 className="text-lg font-bold text-[#102A56] mb-2">
               1. Local Processing Architecture &amp; Document Ownership

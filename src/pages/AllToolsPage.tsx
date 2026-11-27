@@ -22,8 +22,17 @@ import { Link } from '../components/Link';
 import {
   EmptySearchIllustration,
   ToolIcon,
+  getToolAccentTone,
+  ToolAccentTone,
 } from '../components/illustrations/PdfIllustrations';
-import { useTranslation } from '../lib/i18n';
+import { useTranslation, getLocalizedToolMeta } from '../lib/i18n';
+
+const TONE_ACCENTS: Record<ToolAccentTone, { borderHover: string; linkText: string; stripe: string }> = {
+  blue: { borderHover: 'hover:border-[#2563EB]', linkText: 'text-[#2563EB]', stripe: 'bg-[#2563EB]' },
+  purple: { borderHover: 'hover:border-[#7C3AED]', linkText: 'text-[#7C3AED]', stripe: 'bg-[#7C3AED]' },
+  emerald: { borderHover: 'hover:border-[#10B981]', linkText: 'text-[#059669]', stripe: 'bg-[#10B981]' },
+  amber: { borderHover: 'hover:border-[#F59E0B]', linkText: 'text-[#D97706]', stripe: 'bg-[#F59E0B]' },
+};
 
 export const AllToolsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -69,45 +78,54 @@ export const AllToolsPage: React.FC = () => {
     },
   ];
 
-  const renderCategorySection = (title: string, items: ToolMeta[]) => {
+  const renderCategorySection = (title: string, items: ToolMeta[], accentColor: string) => {
     if (items.length === 0) return null;
     return (
       <div className="mb-12">
         <div className="border-b border-[#E2E8F0] pb-2.5 mb-6 flex items-center justify-between">
-          <h2 className="font-bold text-[#102A56] uppercase tracking-wider text-xs">
+          <h2 className={`font-bold uppercase tracking-wider text-xs ${accentColor}`}>
             {title}
           </h2>
-          <span className="text-xs font-mono text-[#64748B]">{items.length} tools</span>
+          <span className="text-xs font-mono tabular-nums text-[#64748B]">{items.length}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {items.map((tool) => (
-            <Link
-              key={tool.id}
-              to={tool.path}
-              className="bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-2xl p-6 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(16,42,86,0.06)] group flex flex-col justify-between text-start"
-            >
-              <div>
-                <div className="flex items-center gap-3.5 mb-3">
-                  <ToolIcon name={tool.iconName} size="md" />
-                  <div className="min-w-0">
-                    <h3 className="text-base font-bold text-[#102A56] group-hover:text-[#2563EB] transition-colors">
-                      {tool.name}
-                    </h3>
-                    <span className="text-[11px] font-mono text-[#64748B] block truncate">
-                      Accepted: {tool.acceptTypes}
-                    </span>
+          {items.map((tool) => {
+            const localized = getLocalizedToolMeta(tool, t);
+            const tone = getToolAccentTone(tool.iconName);
+            const accent = TONE_ACCENTS[tone];
+            return (
+              <Link
+                key={tool.id}
+                to={tool.path}
+                className={`relative overflow-hidden pq-card pq-card-hover ${accent.borderHover} p-6 group flex flex-col justify-between text-start`}
+              >
+                <div
+                  className={`absolute top-0 inset-x-0 h-1 ${accent.stripe} opacity-80 group-hover:opacity-100`}
+                  aria-hidden="true"
+                />
+                <div>
+                  <div className="flex items-center gap-3.5 mb-3 pt-1">
+                    <ToolIcon name={tool.iconName} size="md" />
+                    <div className="min-w-0">
+                      <h3 className="text-base font-bold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">
+                        {localized.name}
+                      </h3>
+                      <span className="text-[11px] font-mono text-[#64748B] block truncate">
+                        {tool.acceptTypes}
+                      </span>
+                    </div>
                   </div>
+                  <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+                    {localized.shortDescription}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
-                  {tool.shortDescription}
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-semibold text-[#2563EB]">
-                <span>Open {tool.name}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          ))}
+                <div className={`mt-4 pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-semibold ${accent.linkText}`}>
+                  <span>{t('toolLayout.openTool')}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     );
@@ -136,7 +154,7 @@ export const AllToolsPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="All 13 PDF Tools – Merge, Compress, OCR, Unlock & Edit PDFs Free | PDFQuick"
         description="Explore all 13 free in-browser PDF tools: Merge, Split, Compress, OCR PDF, Edit PDF Metadata, Unlock PDF, Rotate, Delete Pages, Reorder, Images to PDF, PDF to Images, Page Numbers, and Watermark PDF."
@@ -145,21 +163,21 @@ export const AllToolsPage: React.FC = () => {
       />
 
       {/* Crisp Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
-          <Breadcrumbs items={[{ label: 'All Tools' }]} />
+          <Breadcrumbs items={[{ label: t('nav.allTools') }]} />
 
           <div className="text-center pt-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-              <span>Complete Suite of 13 Client-Side Tools</span>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-3">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+              <span>{t('header.privacyBadge')}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
-              All PDFQuick Tools
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
+              {t('nav.allTools')} — PDFQuick
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] mb-7">
-              Built for US Letter, UK A4, and international PDF workflows. Every tool executes strictly inside your browser sandbox with zero file uploads.
+              {t('home.toolkitSubtitle')}
             </p>
 
             {/* Search Bar & Category Filter */}
@@ -172,14 +190,14 @@ export const AllToolsPage: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('tools.searchPlaceholder')}
                   aria-label={t('tools.searchPlaceholder')}
-                  className="w-full ps-10 pe-10 min-h-[44px] text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] placeholder:text-[#64748B] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none transition-colors"
+                  className="w-full ps-10 pe-10 min-h-[44px] text-xs sm:text-sm bg-white border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder:text-[#64748B] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none transition-colors shadow-xs"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
                     aria-label={t('tools.searchClear')}
-                    className="p-1.5 text-[#64748B] hover:text-[#102A56] absolute end-2 top-1/2 -translate-y-1/2 rounded-lg cursor-pointer"
+                    className="p-1.5 text-[#64748B] hover:text-[#0F172A] absolute end-2 top-1/2 -translate-y-1/2 rounded-lg cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -192,10 +210,10 @@ export const AllToolsPage: React.FC = () => {
                     key={cat.id}
                     type="button"
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-colors cursor-pointer ${
+                    className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-colors cursor-pointer tabular-nums ${
                       activeCategory === cat.id
-                        ? 'bg-[#102A56] text-white border-[#102A56]'
-                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2563EB] hover:text-[#102A56]'
+                        ? 'bg-[#0F172A] text-white border-[#0F172A]'
+                        : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2563EB] hover:text-[#0F172A]'
                     }`}
                   >
                     {cat.label} ({cat.count})
@@ -209,7 +227,7 @@ export const AllToolsPage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {filteredTools.length === 0 && matchedBankingServices.length === 0 ? (
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl p-10 text-center max-w-xl mx-auto mb-12">
+          <div className="pq-card p-10 text-center max-w-xl mx-auto mb-12">
             <EmptySearchIllustration className="mb-4" />
             <p className="text-sm text-[#64748B] mb-4">{t('tools.noResults')}</p>
             <button
@@ -229,8 +247,8 @@ export const AllToolsPage: React.FC = () => {
               <div className="mb-12">
                 <div className="border-b border-[#E2E8F0] pb-2.5 mb-6 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <Landmark className="w-4 h-4 text-emerald-700" />
-                    <h2 className="font-bold text-[#102A56] uppercase tracking-wider text-xs">
+                    <Landmark className="w-4 h-4 text-[#10B981]" />
+                    <h2 className="font-bold text-[#0F172A] uppercase tracking-wider text-xs">
                       {t('tools.cat.banking')} ({matchedBankingServices.length})
                     </h2>
                   </div>
@@ -256,19 +274,19 @@ export const AllToolsPage: React.FC = () => {
                     return (
                       <div
                         key={service.id}
-                        className={`bg-white border rounded-2xl p-6 flex flex-col justify-between text-start ${
+                        className={`pq-card p-6 flex flex-col justify-between text-start ${
                           isPlanned
                             ? 'border-amber-200/80'
-                            : 'border-[#E2E8F0] hover:border-[#2563EB] transition-colors'
+                            : 'hover:border-[#2563EB] transition-colors'
                         }`}
                       >
                         <div>
                           <div className="flex items-start justify-between gap-3 mb-3">
                             <div className="flex items-center gap-3">
-                              <span className="w-8 h-8 rounded-lg bg-[#102A56] text-[#38BDF8] text-xs font-bold font-mono flex items-center justify-center shrink-0">
+                              <span className="w-8 h-8 rounded-lg bg-[#0F172A] text-[#38BDF8] text-xs font-bold font-mono tabular-nums flex items-center justify-center shrink-0">
                                 {String(service.number).padStart(2, '0')}
                               </span>
-                              <h3 className="text-base font-bold text-[#102A56]">
+                              <h3 className="text-base font-bold text-[#0F172A]">
                                 {service.name}
                               </h3>
                             </div>
@@ -312,9 +330,9 @@ export const AllToolsPage: React.FC = () => {
                             }`}
                           >
                             <span>
-                              {isPlanned ? 'View Phase 2 Specification' : 'Launch Linked Tool'}
+                              {isPlanned ? 'View Phase 2 Specification' : t('toolLayout.openTool')}
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                           </Link>
 
                           {service.secondaryLinks && service.secondaryLinks.length > 0 && (
@@ -338,28 +356,28 @@ export const AllToolsPage: React.FC = () => {
               </div>
             )}
 
-            {renderCategorySection('Organize & Structure', organizeTools)}
-            {renderCategorySection('Edit, Unlock, Number & Stamp', editTools)}
-            {renderCategorySection('Optimize & Compress', optimizeTools)}
-            {renderCategorySection('Convert & Export', convertTools)}
+            {renderCategorySection(t('tools.cat.organize'), organizeTools, 'text-[#2563EB]')}
+            {renderCategorySection(t('tools.cat.edit'), editTools, 'text-[#7C3AED]')}
+            {renderCategorySection(t('tools.cat.optimize'), optimizeTools, 'text-[#059669]')}
+            {renderCategorySection(t('tools.cat.convert'), convertTools, 'text-[#D97706]')}
           </>
         )}
 
         {/* Feature Comparison & Decision Matrix (All 13 Tools) */}
-        <section className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-10">
+        <section className="pq-card p-6 sm:p-8 my-10 text-start">
           <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-[#102A56] mb-2">
-              PDFQuick Tool Comparison & Technical Capabilities
+            <h2 className="text-lg sm:text-xl font-bold text-[#0F172A] mb-2">
+              PDFQuick Tool Comparison &amp; Technical Capabilities
             </h2>
             <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
               Compare all 13 client-side engines, supported US/UK paper geometries, and browser execution modes to choose the right utility:
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#E2E8F0]">
+          <div className="overflow-x-auto rounded-2xl border border-[#E2E8F0]">
             <table className="w-full text-start border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#E2E8F0] bg-[#102A56] text-white">
+                <tr className="border-b border-[#E2E8F0] bg-[#0F172A] text-white">
                   <th className="py-3 px-3.5 font-semibold">Tool</th>
                   <th className="py-3 px-3.5 font-semibold">Primary Use Case</th>
                   <th className="py-3 px-3.5 font-semibold">Supported Inputs</th>
@@ -369,8 +387,8 @@ export const AllToolsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E2E8F0] text-[#64748B]">
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
                     <Link to="/merge-pdf" className="text-[#2563EB] hover:underline">
                       Merge PDF
                     </Link>
@@ -382,7 +400,7 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5 font-mono text-[11px]">Unified .pdf</td>
                   <td className="py-3.5 px-3.5">
                     Lossless page dictionary copy via{' '}
-                    <code className="bg-[#F4F7FB] px-1.5 py-0.5 rounded text-[10px] border border-[#E2E8F0]">
+                    <code className="bg-[#F8FAFC] px-1.5 py-0.5 rounded text-[10px] border border-[#E2E8F0]">
                       pdf-lib
                     </code>
                     .
@@ -390,8 +408,8 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">250 MB cumulative RAM cap; unlocked files only.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
                     <Link to="/split-pdf" className="text-[#2563EB] hover:underline">
                       Split PDF
                     </Link>
@@ -401,12 +419,12 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                   <td className="py-3.5 px-3.5 font-mono text-[11px]">.pdf (Single)</td>
                   <td className="py-3.5 px-3.5 font-mono text-[11px]">.pdf or .zip</td>
-                  <td className="py-3.5 px-3.5">Page tree pruning & asynchronous JSZip packaging.</td>
+                  <td className="py-3.5 px-3.5">Page tree pruning &amp; asynchronous JSZip packaging.</td>
                   <td className="py-3.5 px-3.5">Intervals must fall inside valid document bounds.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
                     <Link to="/rotate-pdf" className="text-[#2563EB] hover:underline">
                       Rotate PDF
                     </Link>
@@ -422,8 +440,8 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">Angle steps in 90° increments; unlocked files only.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
                     <Link to="/delete-pdf-pages" className="text-[#2563EB] hover:underline">
                       Delete PDF Pages
                     </Link>
@@ -439,8 +457,8 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">At least 1 page must remain in the final PDF.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
                     <Link to="/reorder-pdf-pages" className="text-[#2563EB] hover:underline">
                       Reorder PDF Pages
                     </Link>
@@ -456,9 +474,9 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">Accessible Up/Down controls preserve all vectors.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/add-page-numbers" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/add-page-numbers" className="text-[#7C3AED] hover:underline">
                       Add Page Numbers
                     </Link>
                   </td>
@@ -470,12 +488,12 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">
                     CropBox-aware positioning embedding Standard Helvetica fonts.
                   </td>
-                  <td className="py-3.5 px-3.5">Optional cover-page skip & custom start integer.</td>
+                  <td className="py-3.5 px-3.5">Optional cover-page skip &amp; custom start integer.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/watermark-pdf" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/watermark-pdf" className="text-[#7C3AED] hover:underline">
                       Watermark PDF
                     </Link>
                   </td>
@@ -492,9 +510,9 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/compress-pdf" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/compress-pdf" className="text-[#059669] hover:underline">
                       Compress PDF
                     </Link>
                   </td>
@@ -511,9 +529,9 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/images-to-pdf" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/images-to-pdf" className="text-[#D97706] hover:underline">
                       Images to PDF
                     </Link>
                   </td>
@@ -528,9 +546,9 @@ export const AllToolsPage: React.FC = () => {
                   <td className="py-3.5 px-3.5">250 MB cumulative upload cap across queued photos.</td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/pdf-to-images" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/pdf-to-images" className="text-[#D97706] hover:underline">
                       PDF to Images
                     </Link>
                   </td>
@@ -547,9 +565,9 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/ocr-pdf" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/ocr-pdf" className="text-[#D97706] hover:underline">
                       OCR PDF
                     </Link>
                   </td>
@@ -566,9 +584,9 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/edit-pdf-metadata" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/edit-pdf-metadata" className="text-[#7C3AED] hover:underline">
                       Edit PDF Metadata
                     </Link>
                   </td>
@@ -585,9 +603,9 @@ export const AllToolsPage: React.FC = () => {
                   </td>
                 </tr>
 
-                <tr className="hover:bg-[#F4F7FB] transition-colors">
-                  <td className="py-3.5 px-3.5 font-semibold text-[#102A56]">
-                    <Link to="/unlock-pdf" className="text-[#2563EB] hover:underline">
+                <tr className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-3.5 px-3.5 font-semibold text-[#0F172A]">
+                    <Link to="/unlock-pdf" className="text-[#7C3AED] hover:underline">
                       Unlock PDF
                     </Link>
                   </td>
@@ -614,41 +632,41 @@ export const AllToolsPage: React.FC = () => {
         </div>
 
         {/* Practical Workflow & Decision Guides */}
-        <section className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-10">
-          <h2 className="text-lg sm:text-xl font-bold text-[#102A56] mb-5">
-            Practical PDF Workflows for US, UK & Global Teams
+        <section className="pq-card p-6 sm:p-8 my-10 text-start">
+          <h2 className="text-lg sm:text-xl font-bold text-[#0F172A] mb-5">
+            Practical PDF Workflows for US, UK &amp; Global Teams
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs sm:text-sm text-[#64748B] leading-relaxed">
-            <div className="p-5 bg-[#F4F7FB] rounded-xl border border-[#E2E8F0]">
-              <h3 className="font-bold text-[#102A56] text-sm mb-2">
-                US Letter, UK A4 & Court Packet Assembly
+            <div className="p-5 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <h3 className="font-bold text-[#0F172A] text-sm mb-2">
+                US Letter, UK A4 &amp; Court Packet Assembly
               </h3>
               <p>
-                Assemble loose scans with <strong className="text-[#17243A]">Merge PDF</strong>, fix sideways forms with{' '}
-                <strong className="text-[#17243A]">Rotate PDF</strong>, strip blank separator sheets via{' '}
-                <strong className="text-[#17243A]">Delete PDF Pages</strong>, and apply court-ready headers or footers with{' '}
-                <strong className="text-[#17243A]">Add Page Numbers</strong> before filing.
+                Assemble loose scans with <strong className="text-[#0F172A]">Merge PDF</strong>, fix sideways forms with{' '}
+                <strong className="text-[#0F172A]">Rotate PDF</strong>, strip blank separator sheets via{' '}
+                <strong className="text-[#0F172A]">Delete PDF Pages</strong>, and apply court-ready headers or footers with{' '}
+                <strong className="text-[#0F172A]">Add Page Numbers</strong> before filing.
               </p>
             </div>
 
-            <div className="p-5 bg-[#F4F7FB] rounded-xl border border-[#E2E8F0]">
-              <h3 className="font-bold text-[#102A56] text-sm mb-2">
-                Draft Review & Confidentiality Stamping
+            <div className="p-5 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <h3 className="font-bold text-[#0F172A] text-sm mb-2">
+                Draft Review &amp; Confidentiality Stamping
               </h3>
               <p>
                 Before circulating contracts, financial statements, or board decks externally, apply a{' '}
-                <strong className="text-[#17243A]">Watermark PDF</strong> overlay (&ldquo;CONFIDENTIAL&rdquo; or &ldquo;DRAFT&rdquo;) in your browser so sensitive unencrypted copies never pass through remote APIs.
+                <strong className="text-[#0F172A]">Watermark PDF</strong> overlay (&ldquo;CONFIDENTIAL&rdquo; or &ldquo;DRAFT&rdquo;) in your browser so sensitive unencrypted copies never pass through remote APIs.
               </p>
             </div>
 
-            <div className="p-5 bg-[#F4F7FB] rounded-xl border border-[#E2E8F0]">
-              <h3 className="font-bold text-[#102A56] text-sm mb-2">
-                Scanner Cleanup & Size Optimization
+            <div className="p-5 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <h3 className="font-bold text-[#0F172A] text-sm mb-2">
+                Scanner Cleanup &amp; Size Optimization
               </h3>
               <p>
                 Fix backward batch-feeder scans with one-click reversal in{' '}
-                <strong className="text-[#17243A]">Reorder PDF Pages</strong>, then shrink scanned images with{' '}
-                <strong className="text-[#17243A]">Compress PDF</strong> to fit email limits and government portal upload caps.
+                <strong className="text-[#0F172A]">Reorder PDF Pages</strong>, then shrink scanned images with{' '}
+                <strong className="text-[#0F172A]">Compress PDF</strong> to fit email limits and government portal upload caps.
               </p>
             </div>
           </div>

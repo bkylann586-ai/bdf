@@ -1,16 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { extractNativeFiles, hasNativeFilesInDragEvent } from './dragDropUtils';
+import { useTranslation } from './i18n';
 
 type FileDropHandler = (files: File[]) => void;
 
 interface GlobalDropContextType {
   registerDropHandler: (handler: FileDropHandler, toolName?: string, enabled?: boolean) => () => void;
+  setPendingDropFiles: (files: File[]) => void;
+  clearPendingDropFiles: () => void;
   isDragging: boolean;
 }
 
 const GlobalDropContext = createContext<GlobalDropContextType>({
   registerDropHandler: () => () => {},
+  setPendingDropFiles: () => {},
+  clearPendingDropFiles: () => {},
   isDragging: false,
 });
 
@@ -24,12 +29,29 @@ function isTargetInsideLocalDropZone(target: EventTarget | null): boolean {
 }
 
 export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [isOverLocalZone, setIsOverLocalZone] = useState(false);
   const [activeToolName, setActiveToolName] = useState<string>('PDFQuick');
   const handlerRef = useRef<FileDropHandler | null>(null);
   const enabledRef = useRef<boolean>(false);
   const dragCounterRef = useRef(0);
+  const pendingDropRef = useRef<{ files: File[]; expiresAt: number } | null>(null);
+
+  const setPendingDropFiles = (files: File[]) => {
+    if (!files || files.length === 0) {
+      pendingDropRef.current = null;
+      return;
+    }
+    pendingDropRef.current = {
+      files: [...files],
+      expiresAt: Date.now() + 60_000,
+    };
+  };
+
+  const clearPendingDropFiles = () => {
+    pendingDropRef.current = null;
+  };
 
   const registerDropHandler = (
     handler: FileDropHandler,
@@ -43,6 +65,14 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       dragCounterRef.current = 0;
       setIsDragging(false);
       setIsOverLocalZone(false);
+    } else if (pendingDropRef.current) {
+      const pending = pendingDropRef.current;
+      pendingDropRef.current = null;
+      if (Date.now() <= pending.expiresAt && pending.files.length > 0) {
+        queueMicrotask(() => {
+          handler(pending.files);
+        });
+      }
     }
 
     return () => {
@@ -136,32 +166,38 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const showWindowOverlay = isDragging && !isOverLocalZone;
 
   return (
-    <GlobalDropContext.Provider value={{ registerDropHandler, isDragging }}>
+    <GlobalDropContext.Provider
+      value={{
+        registerDropHandler,
+        setPendingDropFiles,
+        clearPendingDropFiles,
+        isDragging,
+      }}
+    >
       {children}
 
       {/* Global Visual Drop Target Highlight Overlay (steps aside when hovering local DropZone) */}
       {showWindowOverlay && (
         <div
-          className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-slate-900/35 backdrop-blur-xs transition-opacity duration-150"
+          className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-[#0F172A]/40 backdrop-blur-xs transition-opacity duration-150"
           aria-hidden="true"
         >
-          <div className="relative mx-4 max-w-xl w-full p-8 sm:p-12 bg-white/95 rounded-2xl border-2 border-dashed border-blue-600 shadow-2xl text-center">
+          <div className="relative mx-4 max-w-xl w-full p-8 sm:p-12 bg-white/95 rounded-2xl border-2 border-dashed border-[#2563EB] shadow-2xl text-center">
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md mb-5">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-white flex items-center justify-center shadow-lg mb-5">
                 <UploadCloud className="w-8 h-8" />
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
-                Drop your files anywhere
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight mb-2">
+                {t('globalDrop.title')}
               </h2>
 
-              <p className="text-sm sm:text-base text-slate-600 max-w-md mx-auto mb-4">
-                Release anywhere in the browser window to load files into{' '}
-                <strong className="text-blue-600 font-semibold">{activeToolName}</strong>.
+              <p className="text-sm sm:text-base text-[#64748B] max-w-md mx-auto mb-4">
+                {t('globalDrop.subtitle', { tool: activeToolName })}
               </p>
 
-              <p className="text-xs text-slate-500 font-medium">
-                100% Client-Side Processing <span aria-hidden="true">·</span> Zero Server Uploads
+              <p className="text-xs text-[#64748B] font-medium">
+                {t('globalDrop.footer')}
               </p>
             </div>
           </div>
@@ -170,4 +206,3 @@ export const GlobalDropProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     </GlobalDropContext.Provider>
   );
 };
-

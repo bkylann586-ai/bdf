@@ -99,7 +99,7 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Financial Document Privacy & True PDF Redaction Tool | PDFQuick"
         description="Permanently redact sensitive areas on bank statements and scrub Author, Title, Creator, Annotations, and XMP Metadata strictly in your browser—no black-box text tricks."
@@ -109,24 +109,24 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
       />
 
       {/* Architectural Header Band matching ToolLayout */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8">
           <Breadcrumbs
             items={[
-              { label: 'Banking & Finance', href: '/banking-finance' },
-              { label: 'Financial Document Privacy & Redaction' },
+              { label: t('nav.bankingFinance'), href: '/banking-finance' },
+              { label: t('banking.privacyTitle') },
             ]}
           />
 
           <div className="text-center pt-4 max-w-3xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-3.5">
-              <ToolIcon name="PrivacyRedact" size="lg" tone="navy" />
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>{t('header.privacyBadge')}</span>
-              </div>
+              <ToolIcon name="PrivacyRedact" size="xl" />
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+              <span>{t('header.privacyBadge')}</span>
+            </p>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
               {t('banking.privacyTitle')}
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] leading-relaxed max-w-2xl mx-auto">
@@ -136,7 +136,7 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         {/* Interactive Redaction Tool Container */}
         <div className="mb-12">
           <FinancialPrivacyRedactionTool />
@@ -153,25 +153,25 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-[#64748B] leading-relaxed">
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#2563EB] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 1
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Inspect &amp; Mark Regions</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Inspect &amp; Mark Regions</h3>
               <p>Review detected Info/XMP metadata, navigate pages, and drag rectangles over sensitive numbers or auto-locate text matches.</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 2
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Destructive Rebuild</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Destructive Rebuild</h3>
               <p>Marked pages are rendered, pixels under blackout boxes are permanently cleared, and a fresh PDF catalog without XMP/Info/Annots is rebuilt.</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#10B981] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 3
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Verify Before &amp; After</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Verify Before &amp; After</h3>
               <p>Inspect side-by-side Before/After previews and automated verification confirming zero extractable text remains on redacted pages.</p>
             </div>
           </div>

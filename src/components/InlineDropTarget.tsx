@@ -105,10 +105,10 @@ export const InlineDropTarget: React.FC<InlineDropTargetProps> = ({
           inputRef.current?.click();
         }
       }}
-      className={`w-full min-h-[44px] px-4 py-2.5 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-medium cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
+      className={`w-full min-h-[46px] px-4 py-2.5 border-2 border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
         isDragOver
-          ? 'border-[#2563EB] bg-[#EFF6FF] text-[#102A56] ring-2 ring-[#38BDF8]/30'
-          : 'border-[#CBD5E1] bg-[#F4F7FB] hover:border-[#2563EB] hover:bg-[#EFF6FF]/60 text-[#64748B] hover:text-[#102A56]'
+          ? 'border-[#2563EB] bg-[#EFF6FF] text-[#0F172A] ring-2 ring-[#2563EB]/25'
+          : 'border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#2563EB] hover:bg-[#EFF6FF]/60 text-[#475569] hover:text-[#2563EB]'
       } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
     >
       <input

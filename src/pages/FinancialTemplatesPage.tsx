@@ -72,7 +72,7 @@ export const FinancialTemplatesPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Financial Worksheet Schemas & Fillable Templates Structure | PDFQuick"
         description="Explore the 5 structured financial helper schemas (Personal Financial, Income & Expense, Monthly Budget, Business Financial, Beneficiary) powered by our offline US Letter & A4 PDF Form Filler."
@@ -82,7 +82,7 @@ export const FinancialTemplatesPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs
             items={[
@@ -92,11 +92,11 @@ export const FinancialTemplatesPage: React.FC = () => {
           />
 
           <div className="text-center pt-5 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-3">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>Interactive US Letter &amp; A4 Form Filler Now Live</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
               Structured Financial Form Templates
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
@@ -106,7 +106,7 @@ export const FinancialTemplatesPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         {/* Non-Official Form Legal Notice */}
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
@@ -164,10 +164,10 @@ export const FinancialTemplatesPage: React.FC = () => {
                 </span>
                 <Link
                   to={`/banking/financial-pdf-form-filler?template=${activeTemplate.id}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 min-h-[38px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 min-h-[38px] bg-gradient-to-r from-[#2563EB] to-[#7C3AED] hover:from-[#1D4ED8] hover:to-[#6D28D9] text-white rounded-xl text-xs font-semibold shadow-xs transition-all"
                 >
                   <span>Fill &amp; Export PDF</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                 </Link>
               </div>
             </div>
@@ -234,7 +234,7 @@ export const FinancialTemplatesPage: React.FC = () => {
                     className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB] hover:underline"
                   >
                     <span>{tool.label}</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 rtl:rotate-180" />
                   </Link>
                 ))}
               </div>

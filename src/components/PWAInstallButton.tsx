@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Download, X } from 'lucide-react';
 import { usePWAInstall } from '../lib/pwa';
+import { useTranslation } from '../lib/i18n';
 
 export const PWAInstallButton: React.FC = () => {
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall();
+  const { t } = useTranslation();
   const [showIOSGuide, setShowIOSGuide] = useState(false);
 
   if (isInstalled) {
@@ -15,11 +17,11 @@ export const PWAInstallButton: React.FC = () => {
       <button
         type="button"
         onClick={install}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-lg transition-colors whitespace-nowrap cursor-pointer"
-        aria-label="Install PDFQuick app for offline use"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] text-xs font-semibold text-white bg-gradient-to-r from-[#2563EB] to-[#7C3AED] hover:opacity-95 rounded-xl shadow-xs transition-opacity whitespace-nowrap cursor-pointer"
+        aria-label={t('pwa.install')}
       >
         <Download className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">Install App</span>
+        <span className="hidden sm:inline">{t('pwa.install')}</span>
       </button>
     );
   }
@@ -30,11 +32,11 @@ export const PWAInstallButton: React.FC = () => {
         <button
           type="button"
           onClick={() => setShowIOSGuide(true)}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] text-xs font-semibold text-[#17243A] bg-[#F4F7FB] hover:bg-[#E2E8F0]/60 border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap cursor-pointer"
-          aria-label="How to install PDFQuick on iOS"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[38px] text-xs font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
+          aria-label={t('pwa.install')}
         >
           <Download className="w-3.5 h-3.5 text-[#2563EB]" />
-          <span className="hidden sm:inline">Install</span>
+          <span className="hidden sm:inline">{t('pwa.install')}</span>
         </button>
 
         {showIOSGuide && (

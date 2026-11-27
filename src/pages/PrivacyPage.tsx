@@ -118,7 +118,7 @@ export const PrivacyPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Privacy Policy – Client-Side Data Protection | PDFQuick"
         description="Comprehensive privacy policy for PDFQuick. Learn how documents remain on your device, how browser memory is handled, and our EEA/UK consent controls."
@@ -127,16 +127,16 @@ export const PrivacyPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs items={[{ label: 'Privacy Policy' }]} />
 
-          <div className="pt-5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-lg text-xs font-semibold mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="pt-5 text-start">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-2">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>Privacy-First Architecture</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-2">
               Privacy Policy
             </h1>
             <p className="text-xs text-[#64748B] font-mono">
@@ -146,10 +146,10 @@ export const PrivacyPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-10 space-y-8 text-sm text-[#17243A] leading-relaxed">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
+        <div className="pq-card p-6 sm:p-10 space-y-8 text-sm text-[#0F172A] leading-relaxed">
           {/* Executive Summary Card */}
-          <div className="p-5 bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl">
+          <div className="p-5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl">
             <h2 className="text-base font-bold text-[#102A56] mb-2.5 flex items-center gap-2">
               <EyeOff className="w-4 h-4 text-[#2563EB]" />
               Summary of Our Privacy Commitments

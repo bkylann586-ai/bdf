@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { UploadCloud, ArrowDownToLine, AlertCircle, Sparkles } from 'lucide-react';
+import { AlertCircle, Sparkles } from 'lucide-react';
 import { useTranslation } from '../lib/i18n';
 import { validateSelectedFiles } from '../lib/fileValidation';
 import { extractNativeFiles, hasNativeFilesInDragEvent } from '../lib/dragDropUtils';
+import { Upload3DIllustration } from './illustrations/PdfIllustrations';
 
 interface DropZoneProps {
   accept: string;
@@ -160,8 +161,8 @@ export const DropZone: React.FC<DropZoneProps> = ({
         onKeyDown={handleKeyDown}
         className={`group relative border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
           isDragOver
-            ? 'border-[#2563EB] bg-[#EFF6FF] ring-4 ring-[#38BDF8]/25 shadow-sm scale-[1.004]'
-            : 'border-[#CBD5E1] hover:border-[#2563EB] bg-[#F4F7FB]/55 hover:bg-[#F4F7FB]'
+            ? 'border-[#2563EB] bg-gradient-to-br from-[#EFF6FF] to-[#F5F3FF] ring-4 ring-[#2563EB]/20 shadow-md scale-[1.004]'
+            : 'border-[#CBD5E1] hover:border-[#2563EB] bg-gradient-to-b from-white to-[#F8FAFC] hover:from-[#F8FAFC] hover:to-[#EFF6FF]/60 shadow-[0_6px_24px_rgba(15,23,42,0.03)]'
         } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
       >
         <input
@@ -177,27 +178,19 @@ export const DropZone: React.FC<DropZoneProps> = ({
         />
 
         <div className="flex flex-col items-center justify-center max-w-lg mx-auto pointer-events-none">
-          <div
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border transition-all duration-150 ${
-              isDragOver
-                ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-sm scale-105'
-                : 'bg-white text-[#2563EB] border-[#E2E8F0] shadow-xs group-hover:bg-[#102A56] group-hover:text-white group-hover:border-[#102A56]'
-            }`}
-          >
-            {isDragOver ? (
-              <ArrowDownToLine className="w-6 h-6" />
-            ) : (
-              <UploadCloud className="w-6 h-6" />
-            )}
+          <div className="mb-4">
+            <Upload3DIllustration active={isDragOver} />
           </div>
 
-          <h3
-            className={`text-base sm:text-lg font-bold mb-1.5 transition-colors ${
-              isDragOver ? 'text-[#102A56]' : 'text-[#17243A]'
+          <span
+            className={`inline-flex items-center justify-center px-6 py-2.5 min-h-[44px] rounded-xl text-sm sm:text-base font-bold text-white shadow-sm mb-2.5 transition-all ${
+              isDragOver
+                ? 'bg-[#1D4ED8] scale-[1.02]'
+                : 'bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] group-hover:from-[#1D4ED8] group-hover:to-[#7C3AED]'
             }`}
           >
             {isDragOver ? t('dropzone.dragActive') : t('dropzone.clickToSelect')}
-          </h3>
+          </span>
 
           <p
             className={`text-xs sm:text-sm mb-4 transition-colors ${
@@ -206,23 +199,21 @@ export const DropZone: React.FC<DropZoneProps> = ({
           >
             {isDragOver
               ? multiple
-                ? 'Release to add native files to your local queue'
-                : 'Release to open file directly in browser memory'
+                ? t('dropzone.releaseBatch')
+                : t('dropzone.releaseSingle')
               : t('dropzone.orDrag')}
           </p>
 
           <div
             className={`flex flex-wrap items-center justify-center gap-2 text-xs font-mono tabular-nums mb-2 transition-colors ${
-              isDragOver ? 'text-[#102A56] font-semibold' : 'text-[#64748B]'
+              isDragOver ? 'text-[#0F172A] font-semibold' : 'text-[#64748B]'
             }`}
           >
-            <span className="px-2 py-0.5 rounded bg-white border border-[#E2E8F0] text-[#102A56] font-semibold">
-              {acceptedDisplay}
-            </span>
+            <span className="font-semibold text-[#2563EB]">{acceptedDisplay}</span>
             <span aria-hidden="true">·</span>
-            <span>{multiple ? 'Single or batch' : 'Single file'}</span>
+            <span>{multiple ? t('dropzone.batchFiles') : t('dropzone.singleFile')}</span>
             <span aria-hidden="true">·</span>
-            <span>Up to 250 MB</span>
+            <span>{t('dropzone.maxSize')}</span>
           </div>
 
           <p className="text-[11px] text-[#64748B] mt-1 max-w-md leading-relaxed">
@@ -251,9 +242,9 @@ export const DropZone: React.FC<DropZoneProps> = ({
               e.stopPropagation();
               onSampleRequested();
             }}
-            className="inline-flex items-center gap-2 text-xs text-[#102A56] hover:text-[#2563EB] font-semibold bg-[#F4F7FB] hover:bg-[#EFF6FF] px-4 min-h-[40px] rounded-xl border border-[#E2E8F0] hover:border-[#2563EB]/40 transition-colors whitespace-nowrap cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs text-[#0F172A] hover:text-[#2563EB] font-semibold bg-[#F8FAFC] hover:bg-[#EFF6FF] px-4 min-h-[40px] rounded-xl border border-[#E2E8F0] hover:border-[#2563EB]/40 transition-colors whitespace-nowrap cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-[#7C3AED] shrink-0" />
             <span>{displaySampleLabel}</span>
           </button>
         </div>

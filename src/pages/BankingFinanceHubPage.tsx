@@ -33,7 +33,7 @@ import {
   getProductionBaseUrl,
 } from '../components/SeoMeta';
 import { Link } from '../components/Link';
-import { EmptySearchIllustration } from '../components/illustrations/PdfIllustrations';
+import { EmptySearchIllustration, ToolIcon } from '../components/illustrations/PdfIllustrations';
 import { useTranslation } from '../lib/i18n';
 
 const BANKING_HUB_FAQS: FaqSchemaItem[] = [
@@ -112,7 +112,7 @@ export const BankingFinanceHubPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Banking & Finance PDF Tools – Private Statement Workflows | PDFQuick"
         description="Combine, split, compress, rotate, number, and watermark bank statements and financial PDFs locally in your browser. Zero uploads, zero bank logins."
@@ -122,17 +122,17 @@ export const BankingFinanceHubPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10 sm:pb-12">
-          <Breadcrumbs items={[{ label: 'Banking & Finance' }]} />
+          <Breadcrumbs items={[{ label: t('nav.bankingFinance') }]} />
 
           <section className="text-center pt-5 sm:pt-7 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-4">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-3">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>{t('banking.badge')}</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
               {t('banking.title')}
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] leading-relaxed mb-7">
@@ -149,14 +149,14 @@ export const BankingFinanceHubPage: React.FC = () => {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search banking tools (e.g. merger, mortgage, Chase, watermark, redaction)..."
                   aria-label="Search Banking and Finance PDF tools"
-                  className="w-full ps-10 pe-10 py-2.5 min-h-[44px] text-xs sm:text-sm bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl text-[#17243A] placeholder:text-[#64748B] focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none transition-all"
+                  className="w-full ps-10 pe-10 py-2.5 min-h-[44px] text-xs sm:text-sm bg-white border border-[#E2E8F0] rounded-xl text-[#0F172A] placeholder:text-[#64748B] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/15 outline-none transition-all shadow-xs"
                 />
                 {query && (
                   <button
                     type="button"
                     onClick={() => setQuery('')}
                     aria-label="Clear search"
-                    className="p-1.5 text-[#64748B] hover:text-[#102A56] absolute end-2.5 top-1/2 -translate-y-1/2 rounded-lg cursor-pointer"
+                    className="p-1.5 text-[#64748B] hover:text-[#0F172A] absolute end-2.5 top-1/2 -translate-y-1/2 rounded-lg cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -167,25 +167,25 @@ export const BankingFinanceHubPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setStatusFilter('all')}
-                  className={`px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                  className={`px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-xl border transition-colors cursor-pointer tabular-nums ${
                     statusFilter === 'all'
-                      ? 'bg-[#102A56] text-white border-[#102A56]'
-                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2563EB]/40 hover:text-[#102A56]'
+                      ? 'bg-[#0F172A] text-white border-[#0F172A]'
+                      : 'bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#2563EB]/40 hover:text-[#0F172A]'
                   }`}
                 >
                   All Active Workflows ({BANKING_SERVICES.length})
                 </button>
                 <Link
                   to="/banking/financial-pdf-form-filler"
-                  className="inline-flex items-center px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-lg border bg-[#EFF6FF] text-[#102A56] border-[#BFDBFE] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-xl border bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0] hover:border-[#10B981] transition-colors"
                 >
-                  {t('banking.formFillerTitle')} →
+                  <span>{t('banking.formFillerTitle')}</span>
                 </Link>
                 <Link
                   to="/banking/financial-document-privacy"
-                  className="inline-flex items-center px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-lg border bg-[#2563EB] text-white border-[#2563EB] hover:bg-[#1D4ED8] transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 min-h-[38px] text-xs font-semibold rounded-xl bg-gradient-to-r from-[#2563EB] to-[#7C3AED] hover:from-[#1D4ED8] hover:to-[#6D28D9] text-white transition-all"
                 >
-                  {t('banking.privacyTitle')} →
+                  <span>{t('banking.privacyTitle')}</span>
                 </Link>
               </div>
             </div>
@@ -193,12 +193,12 @@ export const BankingFinanceHubPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         {/* Compliance & Integrity Guardrails Banner */}
-        <section className="bg-[#102A56] text-white rounded-2xl p-6 sm:p-7 mb-10 shadow-sm relative overflow-hidden">
+        <section className="bg-gradient-to-br from-[#0F172A] to-[#102A56] text-white rounded-2xl p-6 sm:p-7 mb-10 shadow-sm relative overflow-hidden">
           <div className="flex items-start gap-3.5 relative">
             <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-              <Lock className="w-5 h-5 text-[#38BDF8]" />
+              <Lock className="w-5 h-5 text-[#34D399]" />
             </div>
             <div className="text-xs text-slate-200 leading-relaxed space-y-1.5">
               <p className="font-bold text-white text-sm sm:text-base">
@@ -215,13 +215,48 @@ export const BankingFinanceHubPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Dedicated Flagship Financial Tools Highlight */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+          <Link
+            to="/banking/financial-pdf-form-filler"
+            className="pq-card pq-card-hover hover:border-[#10B981] p-6 flex items-center gap-4 group"
+          >
+            <ToolIcon name="FormFiller" size="lg" />
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-bold text-[#0F172A] group-hover:text-[#059669] mb-1">
+                {t('banking.formFillerTitle')}
+              </h2>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t('banking.formFillerDesc')}
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#059669] shrink-0 rtl:rotate-180" />
+          </Link>
+
+          <Link
+            to="/banking/financial-document-privacy"
+            className="pq-card pq-card-hover hover:border-[#7C3AED] p-6 flex items-center gap-4 group"
+          >
+            <ToolIcon name="PrivacyRedact" size="lg" />
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-bold text-[#0F172A] group-hover:text-[#7C3AED] mb-1">
+                {t('banking.privacyTitle')}
+              </h2>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                {t('banking.privacyDesc')}
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#7C3AED] shrink-0 rtl:rotate-180" />
+          </Link>
+        </section>
+
         {/* 10 Banking & Finance Services Directory */}
         <section className="mb-14">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] pb-3.5 mb-6">
-            <h2 className="text-lg sm:text-xl font-extrabold text-[#102A56]">
+            <h2 className="text-lg sm:text-xl font-extrabold text-[#0F172A]">
               10 Banking &amp; Finance PDF Workflows
             </h2>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 font-semibold">
+            <span className="inline-flex items-center gap-1.5 text-xs text-[#059669] font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" />
               All 10 Workflows Active · 100% Client-Side
             </span>
@@ -310,7 +345,7 @@ export const BankingFinanceHubPage: React.FC = () => {
                         }`}
                       >
                         <span>{isActive ? 'Open Active Tool' : 'View Phase 2 Architecture'}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                       </Link>
 
                       {svc.secondaryLinks && svc.secondaryLinks.length > 0 && (

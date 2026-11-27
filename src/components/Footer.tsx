@@ -3,13 +3,13 @@ import { ShieldCheck } from 'lucide-react';
 import { TOOLS } from '../lib/toolsCatalog';
 import { Link } from './Link';
 import { BrandMark } from './BrandMark';
-import { useTranslation } from '../lib/i18n';
+import { getLocalizedToolMeta, useTranslation } from '../lib/i18n';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-[#102A56] text-slate-300 text-sm mt-auto border-t border-[#1A3C75]">
+    <footer className="bg-gradient-to-b from-[#0F172A] to-[#102A56] text-slate-300 text-sm mt-auto border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Info */}
@@ -17,14 +17,14 @@ export const Footer: React.FC = () => {
             <Link to="/" className="inline-flex items-center gap-2.5 text-white group">
               <BrandMark variant="dark" size="sm" />
               <span className="text-lg font-extrabold tracking-tight">
-                PDF<span className="text-[#38BDF8]">Quick</span>
+                PDF<span className="text-[#60A5FA]">Quick</span>
               </span>
             </Link>
             <p className="text-xs text-slate-300/90 leading-relaxed">
               {t('footer.description')}
             </p>
-            <div className="inline-flex items-center gap-1.5 text-xs text-[#38BDF8] font-medium">
-              <ShieldCheck className="w-4 h-4 shrink-0" />
+            <div className="inline-flex items-center gap-1.5 text-xs text-[#34D399] font-semibold">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-[#10B981]" />
               <span>{t('footer.zeroStorage')}</span>
             </div>
           </div>
@@ -35,20 +35,23 @@ export const Footer: React.FC = () => {
               {t('footer.pdfTools')}
             </h4>
             <ul className="space-y-2">
-              {TOOLS.map((tool) => (
-                <li key={tool.id}>
-                  <Link
-                    to={tool.path}
-                    className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
-                  >
-                    {tool.name}
-                  </Link>
-                </li>
-              ))}
+              {TOOLS.map((tool) => {
+                const localized = getLocalizedToolMeta(tool, t);
+                return (
+                  <li key={tool.id}>
+                    <Link
+                      to={tool.path}
+                      className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
+                    >
+                      {localized.name}
+                    </Link>
+                  </li>
+                );
+              })}
               <li>
                 <Link
                   to="/tools"
-                  className="hover:text-white transition-colors text-xs font-semibold text-[#38BDF8]"
+                  className="hover:text-white transition-colors text-xs font-semibold text-[#60A5FA]"
                 >
                   {t('footer.viewAll')}
                 </Link>
@@ -56,15 +59,15 @@ export const Footer: React.FC = () => {
               <li className="pt-2.5 border-t border-white/10">
                 <Link
                   to="/banking-finance"
-                  className="hover:text-white transition-colors text-xs font-semibold text-emerald-300"
+                  className="hover:text-white transition-colors text-xs font-semibold text-[#34D399]"
                 >
-                  Banking & Finance Hub
+                  {t('nav.bankingFinance')}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/banking/us-banks"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   US Bank Statement Guides
                 </Link>
@@ -72,23 +75,23 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/banking/financial-pdf-form-filler"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
-                  Financial PDF Form Filler
+                  {t('banking.formFillerTitle')}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/banking/financial-document-privacy"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
-                  Privacy &amp; Redaction Tools
+                  {t('banking.privacyTitle')}
                 </Link>
               </li>
               <li>
                 <Link
                   to="/banking/financial-templates"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   Financial Helper Templates
                 </Link>
@@ -105,7 +108,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/about"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   {t('footer.about')}
                 </Link>
@@ -113,7 +116,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/privacy"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   {t('footer.privacy')}
                 </Link>
@@ -121,7 +124,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/terms"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   {t('footer.terms')}
                 </Link>
@@ -129,7 +132,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/dmca"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   {t('footer.dmca')}
                 </Link>
@@ -137,7 +140,7 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="hover:text-[#38BDF8] transition-colors text-xs text-slate-300"
+                  className="hover:text-[#60A5FA] transition-colors text-xs text-slate-300"
                 >
                   {t('footer.contact')}
                 </Link>

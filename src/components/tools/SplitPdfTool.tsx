@@ -4,7 +4,7 @@ import { ProcessingFile, ProcessingResult, SplitMode } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { splitPdfFile } from '../../lib/splitPdf';
 import {
   formatBytes,
@@ -357,7 +357,7 @@ export const SplitPdfTool: React.FC = () => {
             )}
           </div>
 
-          <PdfPreview
+          <LazyPdfPreview
             file={file.file}
             title="Inspect PDF Pages"
             subtitle={

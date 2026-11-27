@@ -111,7 +111,7 @@ const ToolPageFallback: React.FC = () => (
   <div
     role="status"
     aria-live="polite"
-    className="flex-1 flex flex-col items-center justify-center py-24 px-4 bg-[#F4F7FB]"
+    className="flex-1 flex flex-col items-center justify-center py-24 px-4 bg-[#F8FAFC]"
   >
     <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin mb-3" />
     <p className="text-sm font-medium text-[#64748B]">Loading PDF tool...</p>
@@ -213,7 +213,7 @@ function AppContent({ ssrPageElement }: AppContentProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen flex flex-col bg-white text-[#0F172A] font-sans selection:bg-blue-100 selection:text-blue-900">
       <Header currentPath={currentPath} />
       <main className="flex-1 flex flex-col">
         <ErrorBoundary resetKey={currentPath}>

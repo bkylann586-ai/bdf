@@ -4,7 +4,7 @@ import { ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { deletePagesFromPdf } from '../../lib/deletePagesPdf';
 import {
   formatBytes,
@@ -292,7 +292,7 @@ export const DeletePagesTool: React.FC = () => {
           )}
 
           {/* Interactive Page Preview (Before & Resulting Pages Preview) */}
-          <PdfPreview
+          <LazyPdfPreview
             file={file.file}
             title="Select & Preview Pages"
             subtitle={

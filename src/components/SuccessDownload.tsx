@@ -58,23 +58,23 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
       result.blob.type === 'application/pdf');
 
   return (
-    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+    <div className="w-full pq-card p-6 sm:p-8">
       <div className="max-w-xl mx-auto text-center flex flex-col items-center">
         <div
           className={`w-14 h-14 rounded-2xl border flex items-center justify-center mb-4 ${
             isLarger
-              ? 'bg-amber-50 border-amber-200 text-amber-600'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-600'
+              ? 'bg-amber-50 border-amber-200 text-[#F59E0B]'
+              : 'bg-emerald-50 border-emerald-200 text-[#10B981]'
           }`}
         >
           {isLarger ? (
-            <Info className="w-7 h-7 text-amber-600" />
+            <Info className="w-7 h-7 text-[#F59E0B]" />
           ) : (
-            <CheckCircle2 className="w-7 h-7 text-emerald-600" />
+            <CheckCircle2 className="w-7 h-7 text-[#10B981]" />
           )}
         </div>
 
-        <h3 className="text-xl font-bold text-[#102A56] mb-2">{displayTitle}</h3>
+        <h3 className="text-xl font-bold text-[#0F172A] mb-2">{displayTitle}</h3>
         {result.message && (
           <p className="text-xs sm:text-sm text-[#64748B] mb-6 max-w-md leading-relaxed">
             {result.message}
@@ -82,13 +82,13 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
         )}
 
         {/* File Information Card */}
-        <div className="w-full bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl p-4 mb-6 text-start">
+        <div className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 mb-6 text-start">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-white flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-[#17243A] truncate">
+              <p className="text-sm font-bold text-[#0F172A] truncate">
                 {result.downloadName}
               </p>
               <div className="flex flex-wrap items-center gap-2 text-xs text-[#64748B] font-mono tabular-nums mt-0.5">
@@ -120,19 +120,19 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
             <div className="mt-3 pt-3 border-t border-[#E2E8F0] text-xs">
               <div className="flex items-center justify-between font-mono tabular-nums mb-1">
                 <span className="text-[#64748B]">{t('success.originalSize')}</span>
-                <span className="text-[#17243A] font-medium">
+                <span className="text-[#0F172A] font-medium">
                   {formatBytes(result.originalSize!)}
                 </span>
               </div>
               <div className="flex items-center justify-between font-mono tabular-nums">
                 <span className="text-[#64748B]">{t('success.processedSize')}</span>
-                <span className="text-[#102A56] font-bold">{formatBytes(result.fileSize)}</span>
+                <span className="text-[#2563EB] font-bold">{formatBytes(result.fileSize)}</span>
               </div>
 
               {isSmaller && (
                 <div className="mt-2 pt-2 border-t border-[#E2E8F0] flex items-center justify-between font-semibold">
-                  <span className="text-emerald-700">{t('success.sizeReduction')}</span>
-                  <span className="text-emerald-700 font-mono tabular-nums">
+                  <span className="text-[#059669]">{t('success.sizeReduction')}</span>
+                  <span className="text-[#059669] font-mono tabular-nums">
                     -{percentSaved}% ({formatBytes(result.originalSize! - result.fileSize)} saved)
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
           <button
             type="button"
             onClick={handleDownload}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 min-h-[44px] text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 min-h-[44px] text-sm font-semibold text-white bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#7C3AED] rounded-xl shadow-sm transition-all whitespace-nowrap cursor-pointer"
           >
             <Download className="w-4 h-4" />
             <span>{isZip ? t('success.downloadZip') : t('success.downloadPdf')}</span>
@@ -184,7 +184,7 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
           <button
             type="button"
             onClick={onReset}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 min-h-[44px] text-sm font-medium text-[#17243A] hover:text-[#102A56] bg-white hover:bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 min-h-[44px] text-sm font-medium text-[#0F172A] hover:text-[#2563EB] bg-white hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
           >
             <RotateCcw className="w-4 h-4 text-[#64748B]" />
             <span>{t('success.processAnother')}</span>
@@ -199,7 +199,7 @@ export const SuccessDownload: React.FC<SuccessDownloadProps> = ({
               className="text-[#2563EB] hover:underline inline-flex items-center gap-1 font-semibold"
             >
               <span>{t('success.tryNext', { tool: relatedToolName })}</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3 h-3 rtl:rotate-180" />
             </Link>
           </div>
         )}

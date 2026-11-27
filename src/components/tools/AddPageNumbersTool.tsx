@@ -12,7 +12,7 @@ import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { BatchFileQueue } from '../BatchFileQueue';
 import { BatchSuccessDownload } from '../BatchSuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { addPageNumbersToPdf } from '../../lib/addPageNumbersPdf';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
@@ -393,7 +393,7 @@ export const AddPageNumbersTool: React.FC = () => {
           </label>
 
           {files[0] && (
-            <PdfPreview
+            <LazyPdfPreview
               file={files[0].file}
               title="Inspect PDF Pages"
               subtitle={`Previewing ${files[0].name} (${files[0].pageCount ?? 1} page(s))`}

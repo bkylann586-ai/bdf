@@ -99,7 +99,7 @@ export const FinancialFormFillerPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Financial PDF Form Filler – US Letter & A4 USD Worksheets | PDFQuick"
         description="Fill Personal Financial Information, Income & Expense Statement, Monthly Budget, Business Financial, and Beneficiary helper PDFs privately in your browser. Supports US Letter, A4, and USD calculations."
@@ -109,24 +109,24 @@ export const FinancialFormFillerPage: React.FC = () => {
       />
 
       {/* Architectural Header Band matching ToolLayout */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8">
           <Breadcrumbs
             items={[
-              { label: 'Banking & Finance', href: '/banking-finance' },
-              { label: 'Financial PDF Form Filler' },
+              { label: t('nav.bankingFinance'), href: '/banking-finance' },
+              { label: t('banking.formFillerTitle') },
             ]}
           />
 
           <div className="text-center pt-4 max-w-3xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-3.5">
-              <ToolIcon name="FormFiller" size="lg" tone="navy" />
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-                <span>{t('header.privacyBadge')}</span>
-              </div>
+              <ToolIcon name="FormFiller" size="xl" />
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+              <span>{t('header.privacyBadge')}</span>
+            </p>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
               {t('banking.formFillerTitle')}
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] leading-relaxed max-w-2xl mx-auto">
@@ -136,7 +136,7 @@ export const FinancialFormFillerPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         {/* Interactive Form Filler Tool Container */}
         <div className="mb-12">
           <FinancialFormFillerTool />
@@ -153,25 +153,25 @@ export const FinancialFormFillerPage: React.FC = () => {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-[#64748B] leading-relaxed">
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#2563EB] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 1
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Select Worksheet &amp; Paper Size</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Select Worksheet &amp; Paper Size</h3>
               <p>Pick one of the 5 structured USD templates and select US Letter (8.5 × 11 in) or ISO A4 print framing.</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 2
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Fill &amp; Verify Computed Totals</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Fill &amp; Verify Computed Totals</h3>
               <p>Enter dollar figures, dates, and text while viewing real-time USD net worth, cash flow, or allocation totals.</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#F4F7FB]/70 border border-[#E2E8F0]">
-              <span className="w-7 h-7 rounded-lg bg-[#102A56] text-[#38BDF8] flex items-center justify-center text-xs font-bold font-mono mb-3">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+              <span className="w-7 h-7 rounded-lg bg-[#10B981] text-white flex items-center justify-center text-xs font-bold font-mono tabular-nums mb-3">
                 3
               </span>
-              <h3 className="text-sm font-bold text-[#17243A] mb-1">Preview &amp; Export Clean PDF</h3>
+              <h3 className="text-sm font-bold text-[#0F172A] mb-1">Preview &amp; Export Clean PDF</h3>
               <p>Generate and inspect the actual rendered PDF pages right in your browser, tweak any value, then download or print.</p>
             </div>
           </div>

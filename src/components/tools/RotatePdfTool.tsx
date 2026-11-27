@@ -6,7 +6,7 @@ import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { BatchFileQueue } from '../BatchFileQueue';
 import { BatchSuccessDownload } from '../BatchSuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { rotatePdfFile } from '../../lib/rotatePdf';
 import { parsePageRange, togglePageInRangeString } from '../../lib/pdfUtils';
 import { createSamplePdf } from '../../lib/sampleFiles';
@@ -384,7 +384,7 @@ export const RotatePdfTool: React.FC = () => {
           </div>
 
           {previewTargetFile && (
-            <PdfPreview
+            <LazyPdfPreview
               file={previewTargetFile.file}
               title="Orientation Preview"
               subtitle={

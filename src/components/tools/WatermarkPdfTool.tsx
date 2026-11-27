@@ -12,7 +12,7 @@ import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
 import { BatchFileQueue } from '../BatchFileQueue';
 import { BatchSuccessDownload } from '../BatchSuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { addWatermarkToPdf } from '../../lib/watermarkPdf';
 import { createSamplePdf } from '../../lib/sampleFiles';
 import { useTranslation } from '../../lib/i18n';
@@ -461,7 +461,7 @@ export const WatermarkPdfTool: React.FC = () => {
           </div>
 
           {files[0] && (
-            <PdfPreview
+            <LazyPdfPreview
               file={files[0].file}
               title="Inspect PDF Pages"
               subtitle={`Previewing ${files[0].name} (${files[0].pageCount ?? 1} page(s))`}

@@ -1,3 +1,4 @@
+import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
@@ -57,12 +58,14 @@ const CANONICAL_ROUTES = new Set<string>([
 
 function normalizeNavPath(pathname: string): string {
   if (!pathname) return '/';
-  const normalized = pathname.replace(/\/+$/, '') || '/';
+  const withoutIndex = pathname.replace(/\/index\.html$/i, '');
+  const normalized = withoutIndex.replace(/\/+$/, '') || '/';
   return normalized;
 }
 
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+clientsClaim();
 
 // Safe opt-in activation only when explicitly requested by user action
 self.addEventListener('message', (event: SwMessageEvent) => {
@@ -94,12 +97,20 @@ registerRoute(
     }
 
     const routeHtmlPath = normalized === '/' ? '/index.html' : `${normalized}/index.html`;
-    const precachedHtml = await matchPrecache(routeHtmlPath);
+    const precachedHtml =
+      (await matchPrecache(routeHtmlPath)) ||
+      (await matchPrecache(routeHtmlPath.replace(/^\//, '')));
     if (precachedHtml) {
       return precachedHtml;
     }
 
-    return fetch(request);
+    try {
+      return await fetch(request);
+    } catch {
+      const fallbackShell =
+        (await matchPrecache('/index.html')) || (await matchPrecache('index.html'));
+      return fallbackShell || Response.error();
+    }
   }
 );
 

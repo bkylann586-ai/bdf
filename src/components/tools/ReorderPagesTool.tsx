@@ -12,7 +12,7 @@ import { ProcessingFile, ProcessingResult } from '../../types';
 import { DropZone } from '../DropZone';
 import { ProcessingProgress } from '../ProcessingProgress';
 import { SuccessDownload } from '../SuccessDownload';
-import { PdfPreview } from '../PdfPreview';
+import { LazyPdfPreview } from '../LazyPdfPreview';
 import { reorderPdfPages } from '../../lib/reorderPagesPdf';
 import { formatBytes, getPdfPageCount } from '../../lib/pdfUtils';
 import { validateSelectedFiles } from '../../lib/fileValidation';
@@ -264,7 +264,7 @@ export const ReorderPagesTool: React.FC = () => {
           </div>
 
           {/* Visual Reorder & Before/After Sequence Preview */}
-          <PdfPreview
+          <LazyPdfPreview
             file={file.file}
             title="Visual Page Sequence"
             subtitle={

@@ -46,9 +46,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           <span className="font-mono tabular-nums text-[#2563EB] font-bold">{percentage}%</span>
         </div>
       )}
-      <div className="w-full bg-[#F4F7FB] rounded-full h-3 overflow-hidden p-0.5 border border-[#E2E8F0]">
+      <div className="w-full bg-[#F8FAFC] rounded-full h-3 overflow-hidden p-0.5 border border-[#E2E8F0]">
         <div
-          className={`h-full rounded-full transition-all duration-300 ease-out bg-gradient-to-r from-[#102A56] via-[#2563EB] to-[#38BDF8] ${
+          className={`h-full rounded-full transition-all duration-300 ease-out bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#10B981] ${
             animated
               ? 'relative overflow-hidden before:absolute before:inset-0 before:bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.3)_50%,transparent_100%)] before:animate-[shimmer_1.8s_infinite]'
               : ''

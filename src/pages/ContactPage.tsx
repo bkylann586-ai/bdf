@@ -91,7 +91,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title="Contact & Support Information | PDFQuick"
         description="Support guidance, technical bug reporting instructions, and operator contact details for PDFQuick client-side PDF utilities."
@@ -100,12 +100,12 @@ export const ContactPage: React.FC = () => {
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs items={[{ label: 'Contact & Support' }]} />
 
-          <div className="pt-5">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-2">
+          <div className="pt-5 text-start">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-2">
               Contact &amp; Support
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] max-w-2xl">
@@ -115,7 +115,7 @@ export const ContactPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Info sidebar */}
           <div className="space-y-4 text-sm text-[#64748B]">
@@ -397,7 +397,7 @@ export const ContactPage: React.FC = () => {
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 px-5 min-h-[44px] text-xs sm:text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 min-h-[44px] text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#2563EB] to-[#7C3AED] hover:from-[#1D4ED8] hover:to-[#6D28D9] rounded-xl shadow-xs transition-all cursor-pointer"
                 >
                   {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   <span>

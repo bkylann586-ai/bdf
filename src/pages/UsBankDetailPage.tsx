@@ -52,7 +52,7 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
   };
 
   return (
-    <div className="flex-1 bg-[#F4F7FB] pb-16">
+    <div className="flex-1 bg-[#F8FAFC] pb-16">
       <SeoMeta
         title={guide.metaTitle}
         description={guide.metaDescription}
@@ -62,7 +62,7 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
       />
 
       {/* Editorial Header Band */}
-      <div className="bg-white border-b border-[#E2E8F0]">
+      <div className="bg-pq-hero border-b border-[#E2E8F0]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-10">
           <Breadcrumbs
             items={[
@@ -72,13 +72,13 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
             ]}
           />
 
-          <section className="pt-5 max-w-3xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F4F7FB] text-[#102A56] border border-[#E2E8F0] rounded-lg text-xs font-semibold mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+          <section className="pt-5 max-w-3xl text-start">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#059669] mb-3">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>100% Client-Side Workflow · Independent Guide</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#102A56] tracking-tight mb-3">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">
               {guide.headline}
             </h1>
             <p className="text-sm sm:text-base text-[#64748B] leading-relaxed">
@@ -88,7 +88,7 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-start">
         {/* Independent Legal Notice */}
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 mb-8 flex items-start gap-3">
           <Info className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
@@ -125,10 +125,10 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
               <Link
                 key={idx}
                 to={wf.toolPath}
-                className="bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-2xl p-5 shadow-[0_1px_3px_rgba(16,42,86,0.04)] hover:shadow-sm transition-all flex flex-col justify-between group"
+                className="pq-card pq-card-hover hover:border-[#2563EB] p-5 flex flex-col justify-between group"
               >
                 <div>
-                  <h3 className="text-sm font-bold text-[#17243A] group-hover:text-[#2563EB] mb-2">
+                  <h3 className="text-sm font-bold text-[#0F172A] group-hover:text-[#2563EB] mb-2">
                     {wf.title}
                   </h3>
                   <p className="text-xs text-[#64748B] leading-relaxed mb-4">
@@ -137,7 +137,7 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
                 </div>
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563EB]">
                   <span>{wf.toolLabel}</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 transition-transform" />
                 </span>
               </Link>
             ))}
@@ -189,10 +189,10 @@ export const UsBankDetailPage: React.FC<UsBankDetailPageProps> = ({ bankSlug }) 
               <Link
                 key={b.slug}
                 to={b.path}
-                className="p-3.5 bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-xl text-xs font-semibold text-[#17243A] hover:text-[#2563EB] flex items-center justify-between transition-colors"
+                className="p-3.5 bg-white border border-[#E2E8F0] hover:border-[#2563EB] rounded-xl text-xs font-semibold text-[#0F172A] hover:text-[#2563EB] flex items-center justify-between transition-colors"
               >
                 <span>{b.bankName}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
               </Link>
             ))}
           </div>

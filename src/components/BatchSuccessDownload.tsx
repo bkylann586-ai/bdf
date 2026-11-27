@@ -46,14 +46,14 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
     : 0;
 
   return (
-    <div className="w-full bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-[0_1px_3px_rgba(16,42,86,0.06)]">
+    <div className="w-full pq-card p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E2E8F0]">
         <div className="flex items-start gap-3">
           <div
             className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${
               hasErrors
-                ? 'bg-amber-50 border-amber-200 text-amber-600'
-                : 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                ? 'bg-amber-50 border-amber-200 text-[#F59E0B]'
+                : 'bg-emerald-50 border-emerald-200 text-[#10B981]'
             }`}
           >
             {hasErrors ? (
@@ -63,17 +63,17 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
             )}
           </div>
           <div>
-            <h3 className="text-lg sm:text-xl font-bold text-[#102A56]">{title}</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-[#0F172A]">{title}</h3>
             <p className="text-xs text-[#64748B] font-mono tabular-nums mt-0.5">
               {successItems.length} of {items.length} files succeeded
               {errorItems.length > 0 ? ` · ${errorItems.length} failed` : ''}
               {zipSummary ? ` · ZIP archive ${formatBytes(zipSummary.zipBlob.size)}` : ''}
             </p>
             {showSizeComparison && totalOrig > 0 && (
-              <p className="text-xs text-[#17243A] font-mono tabular-nums mt-1">
+              <p className="text-xs text-[#0F172A] font-mono tabular-nums mt-1">
                 Total: {formatBytes(totalOrig)} → {formatBytes(totalProc)}
                 {isSmaller && (
-                  <span className="text-emerald-700 font-semibold ms-1.5">
+                  <span className="text-[#059669] font-semibold ms-1.5">
                     (-{percentSaved}% saved)
                   </span>
                 )}
@@ -87,7 +87,7 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
             <button
               type="button"
               onClick={() => downloadBlob(zipSummary.zipBlob, zipSummary.zipFilename)}
-              className="inline-flex items-center gap-2 px-5 min-h-[44px] text-sm font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#102A56] rounded-xl shadow-xs transition-colors whitespace-nowrap cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 min-h-[44px] text-sm font-semibold text-white bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#7C3AED] rounded-xl shadow-sm transition-all whitespace-nowrap cursor-pointer"
             >
               <Archive className="w-4 h-4" />
               <span>Download All as ZIP</span>
@@ -96,7 +96,7 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1.5 px-4 min-h-[44px] text-sm font-medium text-[#17243A] hover:text-[#102A56] bg-white hover:bg-[#F4F7FB] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 min-h-[44px] text-sm font-medium text-[#0F172A] hover:text-[#2563EB] bg-white hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl transition-colors whitespace-nowrap cursor-pointer"
           >
             <RotateCcw className="w-4 h-4 text-[#64748B]" />
             <span>Process More Files</span>
@@ -124,13 +124,13 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
           return (
             <div
               key={item.fileItem.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-white hover:bg-[#F4F7FB]/50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-white hover:bg-[#F8FAFC] transition-colors"
             >
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <div
                   className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${
                     item.status === 'success'
-                      ? 'bg-[#F4F7FB] border-[#E2E8F0] text-[#2563EB]'
+                      ? 'bg-[#EFF6FF] border-[#DBEAFE] text-[#2563EB]'
                       : 'bg-red-50 border-red-200 text-red-600'
                   }`}
                 >
@@ -141,7 +141,7 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-semibold text-[#17243A] truncate">
+                  <p className="text-xs sm:text-sm font-semibold text-[#0F172A] truncate">
                     {res?.downloadName || item.fileItem.name}
                   </p>
                   {item.status === 'success' && res ? (
@@ -165,7 +165,7 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
                 <button
                   type="button"
                   onClick={() => downloadBlob(res.blob, res.downloadName)}
-                  className="inline-flex items-center justify-center gap-1.5 px-3.5 min-h-[36px] text-xs font-semibold text-[#102A56] hover:text-[#2563EB] bg-[#F4F7FB] hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 min-h-[36px] text-xs font-semibold text-[#0F172A] hover:text-[#2563EB] bg-[#F8FAFC] hover:bg-[#EFF6FF] border border-[#E2E8F0] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download PDF</span>
@@ -184,7 +184,7 @@ export const BatchSuccessDownload: React.FC<BatchSuccessDownloadProps> = ({
             className="text-[#2563EB] hover:underline inline-flex items-center gap-1 font-semibold"
           >
             <span>Try {relatedToolName} next</span>
-            <ArrowRight className="w-3 h-3" />
+            <ArrowRight className="w-3 h-3 rtl:rotate-180" />
           </Link>
         </div>
       )}
