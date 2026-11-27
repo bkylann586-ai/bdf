@@ -608,6 +608,11 @@ export const AllToolsPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Advertising Placement - Between Catalog Table and Workflow Guides */}
+        <div className="px-2 sm:px-10">
+          <AdPlaceholder placement="home-between-groups" />
+        </div>
+
         {/* Practical Workflow & Decision Guides */}
         <section className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 my-10">
           <h2 className="text-lg sm:text-xl font-bold text-[#102A56] mb-5">
@@ -648,11 +653,6 @@ export const AllToolsPage: React.FC = () => {
             </div>
           </div>
         </section>
-
-        {/* Advertising Placement - Safely Buffered Below Editorial Content */}
-        <div className="my-10 py-2 px-2 sm:px-10">
-          <AdPlaceholder />
-        </div>
       </div>
     </div>
   );

@@ -167,9 +167,9 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
           </div>
         </section>
 
-        {/* Advertising Placement - Safely Buffered Below Educational Content (min >= 40px separation) */}
-        <div className="max-w-4xl mx-auto my-10 py-2 px-2 sm:px-10">
-          <AdPlaceholder />
+        {/* Advertising Placement - Safely Buffered Below Workspace & Guide */}
+        <div className="max-w-4xl mx-auto px-2 sm:px-10">
+          <AdPlaceholder placement="tool-below-workspace" />
         </div>
 
         {/* Technical Details & In-Browser Limitations */}

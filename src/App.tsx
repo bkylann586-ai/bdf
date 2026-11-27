@@ -6,6 +6,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { SwUpdatePrompt } from './components/SwUpdatePrompt';
 import { ConsentBanner } from './components/ConsentBanner';
+import { AdPlaceholder } from './components/AdPlaceholder';
 import { SsrRouterProvider, normalizePath, usePathname } from './lib/router';
 import { SeoCollectorProvider, SeoHeadCollector } from './components/SeoMeta';
 import { LanguageProvider } from './lib/i18n';
@@ -221,6 +222,9 @@ function AppContent({ ssrPageElement }: AppContentProps) {
           </Suspense>
         </ErrorBoundary>
       </main>
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <AdPlaceholder placement="pre-footer" className="my-6" />
+      </div>
       <Footer />
       <OfflineIndicator />
       <SwUpdatePrompt />

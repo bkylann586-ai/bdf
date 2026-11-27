@@ -117,6 +117,11 @@ export const HomePage: React.FC = () => {
         faqs={HOME_FAQS}
       />
 
+      {/* Optional Top Advertising Area (Below Header, Before Main Content) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <AdPlaceholder placement="home-top" className="my-4" />
+      </div>
+
       {/* Asymmetric Architectural SaaS Hero */}
       <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-white">
         <div className="absolute inset-0 bg-pq-dots opacity-65 pointer-events-none" aria-hidden="true" />
@@ -352,9 +357,9 @@ export const HomePage: React.FC = () => {
         )}
       </section>
 
-      {/* Ad Placement (Preserved Safely Buffered Outside Interactive Dropzones) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-10">
-        <AdPlaceholder />
+      {/* Ad Placement (Between Tool Groups, Outside Clickable Cards) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <AdPlaceholder placement="home-between-groups" />
       </div>
 
       {/* Banking & Finance Expansion Showcase */}

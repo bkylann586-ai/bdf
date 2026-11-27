@@ -113,7 +113,7 @@ export const ConsentBanner: React.FC = () => {
       dir={dir}
       role="dialog"
       aria-label={copy.title}
-      className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:end-4 sm:max-w-md z-40 bg-white/95 backdrop-blur-md border border-[#E2E8F0] rounded-2xl shadow-[0_12px_32px_rgba(16,42,86,0.12)] p-4 text-[#17243A]"
+      className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:end-4 sm:max-w-md z-50 bg-white/95 backdrop-blur-md border border-[#E2E8F0] rounded-2xl shadow-[0_12px_32px_rgba(16,42,86,0.12)] p-4 text-[#17243A]"
     >
       <div className="flex items-start gap-3">
         <div className="mt-0.5 p-2 rounded-xl bg-[#F4F7FB] border border-[#E2E8F0] text-[#2563EB] shrink-0">

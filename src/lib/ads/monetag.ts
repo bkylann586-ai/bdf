@@ -189,8 +189,11 @@ function injectMonetagPageScript(config: SiteMonetagConfig): boolean {
     return false;
   }
 
-  const existing = document.head.querySelector<HTMLScriptElement>(MONETAG_SCRIPT_SELECTOR) ||
-    document.querySelector<HTMLScriptElement>(MONETAG_SCRIPT_SELECTOR);
+  const existing =
+    document.head.querySelector<HTMLScriptElement>(MONETAG_SCRIPT_SELECTOR) ||
+    document.querySelector<HTMLScriptElement>(
+      `${MONETAG_SCRIPT_SELECTOR}, script[data-zone="${config.zoneId}"]`
+    );
   if (existing) {
     setRuntimeState({
       status: 'active',

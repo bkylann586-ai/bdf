@@ -1,10 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { getSiteConfig } from '../lib/siteConfig';
 
+export type AdPlacement =
+  | 'home-top'
+  | 'home-between-groups'
+  | 'tool-below-workspace'
+  | 'pre-footer'
+  | 'inline';
+
 interface AdPlaceholderProps {
   className?: string;
   format?: 'horizontal' | 'rectangle';
   adSlot?: string;
+  placement?: AdPlacement;
 }
 
 declare global {
@@ -17,6 +25,7 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
   className = '',
   format = 'horizontal',
   adSlot,
+  placement = 'inline',
 }) => {
   const { adsense } = getSiteConfig();
   const pushedRef = useRef(false);
@@ -40,12 +49,13 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
 
   return (
     <aside
-      className={`my-10 mx-auto w-full max-w-4xl border border-slate-200 bg-slate-50/60 rounded-xl p-4 flex flex-col items-center justify-center text-center ${
+      data-ad-placement={placement}
+      className={`relative z-0 isolate overflow-hidden my-8 mx-auto w-full max-w-4xl border border-[#E2E8F0] bg-[#F4F7FB] rounded-2xl p-4 flex flex-col items-center justify-center text-center ${
         format === 'horizontal' ? 'min-h-[100px]' : 'min-h-[250px]'
       } ${className}`}
       aria-label="Advertisement"
     >
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748B] mb-2">
         Advertisement
       </span>
       {adSlot ? (

@@ -178,8 +178,8 @@ export const FinancialPrivacyRedactionPage: React.FC = () => {
         </section>
 
         {/* Ad Buffer (>= 40px vertical & horizontal clearance) */}
-        <div className="max-w-4xl mx-auto my-10 py-2 px-2 sm:px-10">
-          <AdPlaceholder />
+        <div className="max-w-4xl mx-auto px-2 sm:px-10">
+          <AdPlaceholder placement="tool-below-workspace" />
         </div>
 
         {/* Technical Limitations & Honest Disclosure */}
